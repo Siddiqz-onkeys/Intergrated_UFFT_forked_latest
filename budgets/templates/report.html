@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Report</title>
+    <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Budget Performance Report</h1>
+        </header>
+        <div class="actions">
+        
+            <a href="{{ url_for('budget.report', report_type='category') }}" class="btn">Category Budgets</a>
+            <a href="{{ url_for('budget.report', report_type='user') }}" class="btn">User Budgets</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    {% if report_type == 'category' %}
+                        <th>Category</th>
+                    {% else %}
+                        <th>User</th>
+                    {% endif %}
+                    <th>Budget Amount</th>
+                    <th>Threshold</th>
+                    <th>Total Expenses</th>
+                    <th>Remaining</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in report_data %}
+                <tr>
+                    <td>{{ data.name }}</td>
+                    <td>₹{{ data.budget_amount }}</td>
+                    <td>₹{{ data.threshold_value }}</td>
+                    <td>₹{{ data.total_expenses }}</td>
+                    <td>₹{{ data.remaining }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <a href="{{ url_for('budget.home') }}" class="btn">Go Back</a>
+        </div>
+    </div>
+</body>
+</html> 

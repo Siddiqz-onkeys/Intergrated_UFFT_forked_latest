@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Created - Unified Family Finance Tracker</title>
+    <style>
+        /* General Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #2a4d69;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            color: #2a4d69;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            /* Space between buttons */
+        }
+
+        /* Buttons */
+        form {
+            margin: 0;
+        }
+
+        input[type="submit"] {
+            background-color: #2a4d69;
+            /* Dark Blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 200px;
+            /* Make buttons uniform in size */
+            text-align: center;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #37659d;
+            /* Slightly lighter blue */
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #2a4d69;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Account Created</h1>
+    <div class="main-content">
+        <form action="{{ url_for('expense.index') }}">
+            <input type="submit" value="Expenses">
+        </form>
+
+        <!-- <form action="{{ url_for('Saving.index') }}" method="get">
+            <input type="submit" value="Savings">
+        </form> -->
+
+        <form action="{{ url_for('data_visualization.index') }}">
+            <input type="submit" value="Visualization">
+        </form>
+
+        <form action="{{ url_for('budget.home') }}">
+            <input type="submit" value="Budget">
+        </form>
+
+        <form action="{{ url_for('user_reg.del_acc') }}">
+            <input type="submit" value="Delete Account">
+        </form>
+    </div>
+    <footer>
+        &copy; 2025 Unified Family Finance Tracker | All Rights Reserved
+    </footer>
+</body>
+
+</html>

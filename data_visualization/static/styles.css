@@ -1,0 +1,112 @@
+ body {
+     background-color: #f8f8ed;
+     /* Beige */
+     color: #2a4d69;
+     /* Dark blue */
+ }
+
+ h1,
+ h2 {
+     color: #2a4d69;
+     /* Dark blue */
+ }
+
+ table {
+     border-radius: 10px;
+     /* Rounded corners */
+     border: 2px solid rgba(0, 0, 0, 0.1);
+     /* Black border */
+     overflow: hidden;
+ }
+
+ table thead {
+     background-color: #2a4d69;
+     /* Dark blue */
+     color: #ffffff;
+     /* Beige */
+ }
+
+ table tbody tr:hover {
+     background-color: #ffffff;
+     /* Light beige */
+ }
+
+ .btn-primary {
+     background-color: #2a4d69;
+     /* Dark blue */
+     border-color: #2a4d69;
+     /* Dark blue */
+ }
+
+ .btn-primary:hover {
+     background-color: #f4a261;
+     /* Beige-orange */
+     border-color: #f4a261;
+     /* Beige-orange */
+ }
+
+ #expensePieChart {
+     background-color: #ffffff;
+     /* White */
+     border: 2px solid #2a4d69;
+     /* Dark blue */
+     max-width: 400px;
+     /* Smaller size */
+     max-height: 400px;
+     /* Smaller size */
+ }
+
+ .table-striped tbody tr:nth-of-type(odd) {
+     background-color: #ffffff;
+     /* Light beige */
+ }
+
+ .table-striped tbody tr:nth-of-type(even) {
+     background-color: #ffffff;
+     /* White */
+ }
+
+ #searchInput {
+     border: 1px solid black;
+ }
+
+ #noRecordsFound {
+     display: none;
+     text-align: center;
+     margin-top: 20px;
+     color: red;
+ }
+
+ #loadingAnimation {
+     display: none;
+     text-align: center;
+     margin-top: 20px;
+ }
+
+ canvas {
+     max-width: 400px;
+     max-height: 400px;
+     margin: 0 auto;
+     background-color: white;
+     border-radius: 10px;
+     /* Add border-radius for rounded corners */
+ }
+
+ h5 {
+     margin-top: 20px;
+     font-weight: bold;
+ }
+
+ /* Style for the success message */
+ .success-message {
+     display: none;
+     background-color: #28a745;
+     color: white;
+     padding: 10px;
+     border-radius: 5px;
+     margin-top: 20px;
+ }
+
+ .success-message.show {
+     display: block;
+ }

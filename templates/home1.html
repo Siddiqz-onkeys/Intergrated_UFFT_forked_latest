@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Family Finance Tracker</title>
+    <style>
+        /* General Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #2a4d69;
+            height: 100%;
+            /* Ensure the body takes up the full height of the viewport */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            color: #2a4d69;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            /* Allows the content to grow and push the footer down */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Form Section */
+        form {
+            background-color: #e3f2fd;
+            /* Light Blue */
+            padding: 20px;
+            border: 2px solid #2a4d69;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            background-color: #2a4d69;
+            /* Dark Blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #37659d;
+            /* Slightly lighter blue */
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #2a4d69;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to Unified Family Finance Tracker</h1>
+    <div class="main-content">
+        <form action="{{ url_for('user_reg.signup') }}" method="get">
+            <input type="submit" value="Sign Up">
+        </form>
+    </div>
+    <footer>
+        &copy; 2025 Unified Family Finance Tracker | All Rights Reserved
+    </footer>
+</body>
+
+</html>

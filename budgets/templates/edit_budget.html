@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Budget</title>
+    <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #007BFF;  /* Changed to a blue color */
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        select, input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input, .form-group select {
+            width: calc(100% - 10px);
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .form-group input:last-child, .form-group select:last-child {
+            margin-right: 0;
+        }
+
+        .form-group label {
+            font-size: 1.2rem;
+            margin-bottom: 7px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group input, .form-group select {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Edit Budget</h1>
+        <form method="POST">
+            <div class="form-group">
+                <!-- Category or User Dropdown -->
+                <label for="category_id" {% if budget_type == 'user' %} class="hidden" {% endif %}>Category:</label>
+                <label for="user_id" {% if budget_type == 'category' %} class="hidden" {% endif %}>User:</label>
+
+                <select name="{{ 'category_id' if budget_type == 'category' else 'user_id' }}" required>
+                    {% for item in dropdown %}
+                        <option value="{{ item.category_id if budget_type == 'category' else item.user_id }}"
+                            {% if (budget_type == 'category' and item.category_id == budget.category_id) or (budget_type == 'user' and item.user_id == budget.user_id) %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ item.name if budget_type == 'category' else item.user_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="number" name="amount" value="{{ budget.amount }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="threshold_value">Threshold Value:</label>
+                <input type="number" name="threshold_value" value="{{ budget.threshold_value }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="recurring">Recurring:</label>
+                <select name="recurring" required>
+                    <option value="1" {% if budget.recurring == 1 %}selected{% endif %}>Yes</option>
+                    <option value="0" {% if budget.recurring == 0 %}selected{% endif %}>No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" value="{{ budget.start_date }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="date" name="end_date" value="{{ budget.end_date }}" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit">Update Budget</button>
+            <a href="{{ url_for('budget.home') }}" class="go-back-btn">Go Back</a>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/first.css">
+</head>
+<body>
+    <div class="container">
+    <h1>You are a HOF ! <br> Here is a code to share with your family members <br> They can enter this code when they signup and join the family !</h1>
+    <h1>{{ message }}</h1>
+    <form action="{{ url_for('user_reg.hof') }}" method="POST">
+ 
+            <input type="submit" class="google-btn" value="Continue">
+
+    </form></div>
+</body>
+</html>

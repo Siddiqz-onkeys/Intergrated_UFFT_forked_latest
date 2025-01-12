@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
+    <style>
+        .btn {
+            margin-right: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+    </style>
+    <script>
+        function toggleOverview(type) {
+            document.getElementById('category-budgets').classList.toggle('visible', type === 'category');
+            document.getElementById('category-budgets').classList.toggle('hidden', type !== 'category');
+            document.getElementById('user-budgets').classList.toggle('visible', type === 'user');
+            document.getElementById('user-budgets').classList.toggle('hidden', type !== 'user');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to Your Budget Tracker</h1>
+        </header>
+
+        <!-- Buttons to toggle between Category and User Budgets -->
+        <div>
+            <button class="btn" onclick="toggleOverview('category')">Category Budgets</button>
+            <button class="btn" onclick="toggleOverview('user')">User Budgets</button>
+        </div>
+
+        <!-- Category Budgets Overview -->
+        <div id="category-budgets" class="visible">
+            <h2>Category Budgets Overview</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Budget Amount</th>
+                        <th>Threshold</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for budget in category_budgets %}
+                    <tr>
+                        <td>{{ budget.name }}</td>
+                        <td>₹{{ budget.amount }}</td>
+                        <td>₹{{ budget.threshold_value }}</td>
+                        <td>
+                            <a href="{{ url_for('budget.edit_budget', id=budget.budget_id, budget_type='category') }}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- User Budgets Overview -->
+        <div id="user-budgets" class="hidden">
+            <h2>User Budgets Overview</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Budget Amount</th>
+                        <th>Threshold</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for budget in user_budgets %}
+                    <tr>
+                        <td>{{ budget.name }}</td>
+                        <td>₹{{ budget.amount }}</td>
+                        <td>₹{{ budget.threshold_value }}</td>
+                        <td>
+                            <a href="{{ url_for('budget.edit_budget', id=budget.budget_id, budget_type='user') }}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Additional action buttons -->
+        <div>
+            <a href="{{ url_for('budget.add_category') }}" class="btn">Add Category</a>
+            <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
+            <a href="{{ url_for('budget.expenses') }}" class="btn">Add Expense</a>
+            <a href="{{ url_for('budget.report') }}" class="btn">View Reports</a>
+        </div>
+    </div>
+</body>
+</html>

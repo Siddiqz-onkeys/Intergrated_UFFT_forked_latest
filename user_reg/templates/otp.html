@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/first.css">
+</head>
+<body>
+    <div class="container">
+    <h1>We have sent an OTP to your email</h1>
+    {% if error %}
+    <p style="color: brown;">{{error}}</p>
+    {% endif %}
+    <form action="{{ url_for('user_reg.otp') }}" method="POST">
+        <input type="text" name="otp" placeholder="Enter OTP">  <br><br><br><br><br>
+
+        <div class="sl">
+            <input type="submit" class="google-btn" value="Continue">
+        </div>
+    </form></div>
+</body>
+</html>

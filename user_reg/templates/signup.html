@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/first.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Create an Account</h1>
+        {% if error %}
+        <p style="color: white;">{{error}}</p>
+        {% endif %}
+        <form action="{{ url_for('user_reg.signup') }}" method="POST">
+        <input type="text" placeholder="   Name" name="name" required="required"><br><br>
+        <input type="text" placeholder="   User name" name="username" required="required"><br><br>
+        <input type="password" placeholder="   Password" name="password" required="required"><br><br>
+        <input type="date" placeholder="   DOB" name="DOB" required="required"><br><br>
+        <input type="text" placeholder="   Phone number" name="phone" required="required"><br><br>
+        <input type="email" placeholder="   Email" name="email" required="required"><br><br>
+        <div class="sl">
+            <input type="submit" class="google-btn" value="Proceed">
+        </div>
+        </form>
+        <p>Already have an account ? <a href="{{url_for('user_reg.signin')}}">Sign In </a></p>
+    </div>
+    
+</body>
+</html>

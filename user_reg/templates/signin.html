@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/first.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sign In</h1>
+        {% if error %}
+        <p style="color: white;">{{error}}</p>
+        {% endif %}
+        <form action="{{url_for('user_reg.signin')}}" method="POST">
+            <input type="text" placeholder="Username" name="login_name" required="required"><br><br>
+            <input type="text" placeholder="Password" name="login_pass" required="required"><br><br>
+            <p>Forgot Password ? <a href="{{url_for('user_reg.get_mail')}}">Reset password </a></p>
+            <div class="sl">
+                <input type="submit" class="google-btn" value="Sign In">
+
+            </div>
+        </form>
+    </div>
+    
+</body>
+</html>

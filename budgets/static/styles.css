@@ -1,0 +1,248 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #e3eaf5, #f9f6f1); 
+    color: #2c3e50; 
+    line-height: 1.6;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+
+header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #b3c6e0; 
+}
+
+header h1 {
+    font-size: 3rem;
+    color: #3b5998; 
+    margin-bottom: 10px;
+}
+
+header img.logo {
+    width: 100px;
+    margin-bottom: 15px;
+    border-radius: 50%;
+}
+
+
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 15px;
+    font-size: 1.2rem;
+    color: white;
+    background: linear-gradient(90deg, #5a9bd6, #3b5998); 
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+    background: linear-gradient(90deg, #3b5998, #2a4373); 
+    transform: scale(1.05);
+}
+
+
+form {
+    margin: 20px auto;
+    background: #f9f6f1; 
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-size: 1rem;
+    color: #2c3e50; 
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    color: white;
+    background: #3b5998; 
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+form button:hover {
+    background: #2a4373; 
+    transform: scale(1.05);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff; 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #e3eaf5; 
+}
+
+table th {
+    background: linear-gradient(90deg, #5a9bd6, #3b5998); 
+    color: white;
+    font-size: 1rem;
+}
+
+table tr:hover {
+    background: #f2f5fa; 
+    transform: scale(1.01);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+
+
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.checkbox-label {
+    font-weight: bold;
+    color: #555;
+}
+
+
+
+
+.file-input {
+    margin-top: 10px;
+    font-size: 1rem;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+
+.actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.actions .btn {
+    display: inline-block;
+    margin: 10px auto;
+}
+
+
+
+
+
+/* Add this to your existing styles.css file */
+.go-back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.go-back-btn:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.alert.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert.success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

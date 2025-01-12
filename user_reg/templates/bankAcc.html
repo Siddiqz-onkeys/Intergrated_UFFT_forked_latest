@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/first.css">
+</head>
+<body>
+    <div class="container">
+        {% if error %}
+        <p style="color: white;">{{error}}</p>
+        {% endif %}
+    <form action="{{ url_for('user_reg.bankAcc') }}" method="POST">
+        <input type="text" placeholder="Bank Account Number" name='acc' required="required"><br><br>
+        <select name="role">
+            <option>HOF</option>
+            <option>Member</option>
+            <option>None</option>
+        </select><br><br>
+        <div class="sl">
+            <input type="submit" class="google-btn" value="Create">
+        </div>
+
+    </form></div>
+</body>
+</html>

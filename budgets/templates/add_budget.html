@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Budget</title>
+    <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}"> <!-- Link to your CSS -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Add Budget</h1>
+        </header>
+        <form method="POST">
+            <div class="form-group">
+                <label for="budget_type">Budget Type:</label>
+                <select id="budget_type" name="budget_type" required>
+                    <option value="category">Category Budget</option>
+                    <option value="user">User Budget</option>
+                </select>
+            </div>
+
+            <div id="category_section" class="form-group">
+                <label for="category_id">Category:</label>
+                <select name="category_id">
+                    {% for category in categories %}
+                        <option value="{{ category.category_id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="user_section" class="form-group" style="display: none;">
+                <label for="user_id">User:</label>
+                <select name="user_id">
+                    {% for user in users %}
+                        <option value="{{ user.user_id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="number" name="amount" placeholder="Enter budget amount" required>
+            </div>
+
+            <div class="form-group">
+                <label for="threshold_value">Threshold Value:</label>
+                <input type="number" name="threshold_value" placeholder="Enter threshold value" required>
+            </div>
+
+            <div class="form-group">
+                <label for="recurring">Recurring:</label>
+                <select name="recurring" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="date" name="end_date" required>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn">Add Budget</button>
+                <a href="{{ url_for('budget.home') }}" class="go-back-btn">Go Back</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('budget_type').addEventListener('change', function () {
+            if (this.value === 'category') {
+                document.getElementById('category_section').style.display = 'block';
+                document.getElementById('user_section').style.display = 'none';
+            } else {
+                document.getElementById('category_section').style.display = 'none';
+                document.getElementById('user_section').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

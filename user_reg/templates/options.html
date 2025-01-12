@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/user_reg/static/options.css">
+  
+  
+</head>
+<body>
+    <div class="container">
+    <h1>You are a HOF</h1>
+    <p>You can Either : </p>
+    <form action="{{ url_for('user_reg.options') }}" method="POST">
+       
+        <div class="opt">
+
+        <input type="radio" name="1" value="assign_hof" ><label>    Assign a new HOF and delete your account to keep the family account</label><br><br>
+        <input type="radio" name="1" value="full" ><label>      Delete your account as well as the family account</label><br><br>
+        <input type="radio" name="1" value="fam" ><label>    Just delete the family account</label><br><br>
+        </div>
+ 
+ 
+            <div class='sl'><input type="submit" class="google-btn" value="Continue"></div>
+
+       </form></div>
+</body>
+</html>
