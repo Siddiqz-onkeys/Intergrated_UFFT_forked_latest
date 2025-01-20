@@ -6,5 +6,5 @@ To use all the mentioned libraries and functionalities in your Python script, yo
 ### Install All Packages at Once
 To install all the external libraries at once, you can use the following `pip` command:
 ```bash
-pip install flask werkzeug Flask-Mail APScheduler mysql-connector-python pandas reportlab
+pip install flask werkzeug Flask-Mail APScheduler mysql-connector-python pandas reportlab transformers xlsxwriter
 ```
