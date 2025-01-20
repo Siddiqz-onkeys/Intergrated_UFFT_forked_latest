@@ -339,59 +339,5 @@ def page_not_found(e):
     ), 404
 
 
-from collections import defaultdict
-# # Function to generate summary
-# def generate_summary(expense_data):
-#     total_expense = sum(exp['amount'] for exp in expense_data)
-    
-#     summary = f"<br>Total expense: ₹{total_expense}<br>"
-    
-#     users = {}
-
-#     # Grouping expenses by users
-#     for exp in expense_data:
-#         user_name = exp['user_name']
-#         if user_name not in users:
-#             users[user_name] = []
-#         users[user_name].append(exp)
-
-#     # Looping through users and calculating their expenses
-#     for user_name, expenses in users.items():
-#         summary += f"{user_name} :-     "
-#         user_total_expense = sum(exp['amount'] for exp in expenses)
-#         summary += f"Total Expense: ₹{user_total_expense}<br>"
-        
-#         # Group expenses by category
-#         categories = {}
-#         for exp in expenses:
-#             category = exp['category_name']
-#             if category not in categories:
-#                 categories[category] = []
-#             categories[category].append(exp)
-         
-#         # Finding highest and lowest expenses
-#         highest_expense = max(expenses, key=lambda x: x['amount'])
-#         lowest_expense = min(expenses, key=lambda x: x['amount'])
-        
-#         summary += f"  Highest Expense: {highest_expense['category_name']} - ₹{highest_expense['amount']} on {highest_expense['date']}<br>"
-#         summary += f"  Lowest Expense: {lowest_expense['category_name']} - ₹{lowest_expense['amount']} on {lowest_expense['date']}<br>"
-    
-#     return summary
-
-# # Flask route to generate summary
-# @data_visualization_bp.route('/generate_summary', methods=['POST'])
-# def generate_summary_endpoint():
-#     # Get the JSON data from the request
-#     expense_data = Expense_data[0]
-
-#     if not expense_data:
-#         return jsonify({"error": "No expense data provided."}), 400
-
-#     # Generate the summary for the expense data
-#     summary = generate_summary(expense_data)
-
-#     return jsonify({"summary": summary})
-
-
 if __name__ == '__main__':
     app.run(debug=True)

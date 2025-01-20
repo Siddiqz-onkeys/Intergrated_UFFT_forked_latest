@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, request, redirect, flash, current_app
+from flask import Blueprint, render_template, request, redirect, flash, current_app,url_for
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_mail import Message
@@ -220,7 +220,7 @@ def add_budget():
         connection.close()
 
         flash('Budget added successfully!', 'success')
-        return redirect('budget.home')
+        return redirect(url_for('budget.home'))
 
     # connection = get_db_connection()
     connection=get_connection()

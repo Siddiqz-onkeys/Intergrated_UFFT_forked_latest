@@ -147,12 +147,15 @@
     <div class="main-content">
         <h2>Saving Goals</h2>
         <div class="menu">
-            <a href="{{ url_for('Saving.create_goal') }}" class="menu-item">Create Savings Goal</a>
-            <a href="{{ url_for('Saving.contribute') }}" class="menu-item">Make Contribution</a>
-            <a href="{{ url_for('Saving.display_goals') }}" class="menu-item">View Goals</a>
-            <a href="{{ url_for('Saving.update_goal') }}" class="menu-item">Update Goals</a>
+            <a href="{{ url_for('saving.create_goal') }}" class="menu-item">Create Savings Goal</a>
+            <a href="{{ url_for('saving.contribute') }}" class="menu-item">Make Contribution</a>
+            <a href="{{ url_for('saving.display_goals') }}" class="menu-item">View Goals</a>
+            <a href="{{ url_for('saving.update_goal') }}" class="menu-item">Update Goals</a>
+            <a href="{{ url_for('saving.create_joint_goal') }}" class="menu-item">Create Joint Goal</a>
+            <a href="{{ url_for('user_reg.welcome') }}" class="menu-item">Back to Home</a>
         </div>
     </div>
+
 
     <!-- Footer at the Bottom -->
     <div class="footer">

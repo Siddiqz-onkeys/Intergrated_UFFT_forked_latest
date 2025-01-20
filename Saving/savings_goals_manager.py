@@ -2,19 +2,20 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 from decimal import Decimal
-
+from db_connection import get_connection
 
 class SavingsGoalsManager:
     def __init__(self):
         try:
             # Establish database connection
-            self.connection = mysql.connector.connect(
-                host='localhost',
-                database='ProjectUFFT',
-                user='root',
-                password='roshni04',
-                use_pure=True  # This helps with Decimal handling
-            )
+            # self.connection = mysql.connector.connect(
+            #     host='localhost',
+            #     database='projectufft',
+            #     user='root',
+            #     password='',
+            #     use_pure=True  # This helps with Decimal handling
+            # )
+            self.connection = get_connection()
             self.cursor = self.connection.cursor(dictionary=True)
         except Error as e:
             print(f"Error connecting to MySQL Platform: {e}")
@@ -58,6 +59,19 @@ class SavingsGoalsManager:
         except Error as e:
             print(f"Database error getting family ID: {e}")
             return None
+        
+    def get_joint_id(self, user_id_1):
+        """
+        Get the joint ID for a given user
+        """
+        try:
+            query = "SELECT joint_id FROM joint_goals WHERE user_id_1= %s"
+            self.cursor.execute(query, (user_id_1,))
+            joint = self.cursor.fetchone()
+            return joint['joint_id'] if joint else None
+        except Error as e:
+            print(f"Database error getting family ID: {e}")
+            return None
 
     def update_family_goal_for_family(self, family_id, new_family_goal):
         """
@@ -84,7 +98,7 @@ class SavingsGoalsManager:
             
             self.cursor.execute(update_query, (new_family_goal, new_family_goal, family_id))
             self.connection.commit()
-            print(f"Family goal updated to ${new_family_goal} for all family members.")
+            print(f"Family goal set to ${new_family_goal} for all family members.")
             return True
 
         except Error as e:
@@ -296,8 +310,8 @@ class SavingsGoalsManager:
                 query = """
                 INSERT INTO savings_goals 
                 (family_id, user_id, user_goal, family_goal, 
-                user_target_amount, family_target_amount, current_amount, deadline) 
-                VALUES (%s, %s, %s, %s, %s, %s, 0, %s)
+                user_target_amount, family_target_amount, usergoal_contributed_amount,  familygoal_contributed_amount, deadline) 
+                VALUES (%s, %s, %s, %s, %s, %s, 0, 0, %s)
                 """
                 values = (family_id, user_id, user_goal, final_family_goal, 
                         user_goal, final_family_target, deadline)
@@ -310,8 +324,8 @@ class SavingsGoalsManager:
                 query = """
                 INSERT INTO savings_goals 
                 (family_id, user_id, user_goal, 
-                user_target_amount, current_amount, deadline) 
-                VALUES (%s, %s, %s, %s, 0, %s)
+                user_target_amount, usergoal_contributed_amount,  familygoal_contributed_amount, deadline) 
+                VALUES (%s, %s, %s, %s, 0, 0, %s)
                 """
                 values = (family_id, user_id, user_goal,
                         user_goal, deadline)
@@ -325,6 +339,69 @@ class SavingsGoalsManager:
             print(f"Error creating savings goal: {e}")
             self.connection.rollback()
             return False
+    
+    def get_users_by_family(self, family_id):
+        """
+        Fetch all users belonging to a specific family.
+        """
+        try:
+            query = "SELECT user_id, name FROM Users WHERE family_id = %s"
+            self.cursor.execute(query, (family_id,))
+            return self.cursor.fetchall()
+        except Error as e:
+            print(f"Database error fetching users by family ID: {e}")
+            return []
+
+    def create_joint_goal(self, user_ids, joint_goal_amount, deadline):
+        """
+        Create a joint savings goal for multiple users.
+        """
+        try:
+            if len(user_ids) < 2:
+                return False, "At least two users are required for a joint goal."
+
+            # Validate users and family ID
+            family_id = None
+            for user_id in user_ids:
+                user = self.validate_user(user_id)
+                if not user:
+                    return False, f"Invalid User ID: {user_id}"
+                if family_id is None:
+                    family_id = user['family_id']
+                elif family_id != user['family_id']:
+                    return False, "All users must belong to the same family."
+
+            # Check if goal amount is valid
+            joint_goal_amount = Decimal(str(joint_goal_amount))
+            if joint_goal_amount <= 0:
+                return False, "Joint goal amount must be greater than zero."
+
+            # Create the joint goal
+            insert_joint_goal_query = """
+            INSERT INTO joint_goals (joint_goal_amount, joint_target_amount, deadline) 
+            VALUES (%s, %s, %s)
+            """
+            self.cursor.execute(insert_joint_goal_query, (
+                joint_goal_amount,
+                joint_goal_amount,
+                deadline
+            ))
+            joint_id = self.cursor.lastrowid
+
+            # Add participants
+            for user_id in user_ids:
+                insert_participant_query = """
+                INSERT INTO joint_goal_participants (joint_id, user_id, contributed_amount)
+                VALUES (%s, %s, 0)
+                """
+                self.cursor.execute(insert_participant_query, (joint_id, user_id))
+
+            self.connection.commit()
+            return True, f"Joint goal of ${joint_goal_amount} created successfully for {len(user_ids)} users!"
+        except Error as e:
+            self.connection.rollback()
+            return False, f"Error creating joint goal: {str(e)}"
+
     def contribute_to_goal(self, user_id, contribution_type, amount):
         """
         Contribute to either user or family goal with detailed error handling.
@@ -359,7 +436,7 @@ class SavingsGoalsManager:
                 update_query = """
                 UPDATE savings_goals 
                 SET user_target_amount = %s, 
-                    current_amount = current_amount + %s 
+                    usergoal_contributed_amount = usergoal_contributed_amount + %s 
                 WHERE family_id = %s AND user_id = %s
                 """
                 self.cursor.execute(update_query, (new_user_target, amount, family_id, user_id))
@@ -385,7 +462,7 @@ class SavingsGoalsManager:
                 # Update the contributing user's current amount towards the family goal
                 update_query_user_contribution = """
                 UPDATE savings_goals 
-                SET current_amount = current_amount + %s
+                SET familygoal_contributed_amount = familygoal_contributed_amount + %s
                 WHERE family_id = %s AND user_id = %s
                 """
                 self.cursor.execute(update_query_user_contribution, (amount, family_id, user_id))
@@ -401,6 +478,75 @@ class SavingsGoalsManager:
             self.connection.rollback()
             return False, f"Error processing contribution: {str(e)}"
 
+    def contribute_to_joint_goal(self, user_id, amount):
+        """
+        Contribute to a joint goal
+        """
+        try:
+            # Get all joint goals the user is part of
+            query = """
+            SELECT jg.joint_id, jg.joint_goal_amount, jg.joint_target_amount, jg.deadline,
+                jgp.contributed_amount
+            FROM joint_goals jg
+            JOIN joint_goal_participants jgp ON jg.joint_id = jgp.joint_id
+            WHERE jgp.user_id = %s AND jg.joint_target_amount > 0
+            """
+            self.cursor.execute(query, (user_id,))
+            joint_goals = self.cursor.fetchall()
+            
+            if not joint_goals:
+                return False, "No active joint goals found for this user."
+
+            # If multiple joint goals exist, let user choose
+            if len(joint_goals) > 1:
+                print("\nAvailable Joint Goals:")
+                for idx, goal in enumerate(joint_goals, 1):
+                    print(f"{idx}. Goal Amount: ${goal['joint_goal_amount']}, " 
+                        f"Remaining: ${goal['joint_target_amount']}, "
+                        f"Your Contribution: ${goal['contributed_amount']}, "
+                        f"Deadline: {goal['deadline']}")
+                
+                while True:
+                    try:
+                        choice = int(input("\nSelect joint goal number: ")) - 1
+                        if 0 <= choice < len(joint_goals):
+                            selected_goal = joint_goals[choice]
+                            break
+                        print("Invalid selection. Please try again.")
+                    except ValueError:
+                        print("Please enter a valid number.")
+            else:
+                selected_goal = joint_goals[0]
+
+            amount = Decimal(str(amount))
+            if amount <= 0:
+                return False, "Contribution amount must be greater than zero."
+
+            # Check if contribution exceeds remaining target
+            if selected_goal['joint_target_amount'] < amount:
+                return False, f"Contribution exceeds remaining target! Maximum allowed: ${selected_goal['joint_target_amount']}"
+
+            # Update joint goal target and contribution
+            update_joint_goal_query = """
+            UPDATE joint_goals 
+            SET joint_target_amount = joint_target_amount - %s
+            WHERE joint_id = %s
+            """
+            update_participant_query = """
+            UPDATE joint_goal_participants 
+            SET contributed_amount = contributed_amount + %s
+            WHERE joint_id = %s AND user_id = %s
+            """
+            
+            self.cursor.execute(update_joint_goal_query, (amount, selected_goal['joint_id']))
+            self.cursor.execute(update_participant_query, (amount, selected_goal['joint_id'], user_id))
+            
+            self.connection.commit()
+            return True, f"Successfully contributed ${amount} to joint goal!"
+
+        except Error as e:
+            self.connection.rollback()
+            return False, f"Error contributing to joint goal: {str(e)}"
     def display_savings_goal(self):
         """
         Display current savings goal details
@@ -430,13 +576,60 @@ class SavingsGoalsManager:
                     if goal == goals[0]:
                         print(f"Family Goal: ${goal['family_goal']}")
                         print(f"Family Target Remaining: ${goal['family_target_amount']}")
-                        print(f"Current Amount: ${goal['current_amount']}")
+                        print(f"User Goal Contributed Amount: ${goal['usergoal_contributed_amount']}")
+                        print(f"Family Goal Contributed Amount: ${goal['familygoal_contributed_amount']}")
+                        print(f"Total Contributed Amount: ${goal['familygoal_contributed_amount']+goal['usergoal_contributed_amount']}")
                         print(f"Deadline: {goal['deadline']}")
             else:
                 print("No savings goals found for this family.")
 
         except Error as e:
             print(f"Error displaying savings goal: {e}")
+    def display_joint_goals(self, user_id):
+        """
+        Display all joint goals for a user
+        """
+        try:
+            query = """
+            SELECT 
+                jg.joint_id,
+                jg.joint_goal_amount,
+                jg.joint_target_amount,
+                jg.deadline,
+                jgp.contributed_amount as user_contribution,
+                GROUP_CONCAT(u.username) as participants,
+                GROUP_CONCAT(jgp2.contributed_amount) as all_contributions
+            FROM joint_goals jg
+            JOIN joint_goal_participants jgp ON jg.joint_id = jgp.joint_id
+            JOIN joint_goal_participants jgp2 ON jg.joint_id = jgp2.joint_id
+            JOIN users u ON jgp2.user_id = u.user_id
+            WHERE jgp.user_id = %s
+            GROUP BY jg.joint_id, jgp.contributed_amount
+            """
+            self.cursor.execute(query, (user_id,))
+            goals = self.cursor.fetchall()
+
+            if not goals:
+                print("No joint goals found for this user.")
+                return
+
+            print("\n=== Your Joint Goals ===")
+            for goal in goals:
+                print(f"\nJoint Goal ID: {goal['joint_id']}")
+                print(f"Total Goal Amount: ${goal['joint_goal_amount']}")
+                print(f"Remaining Target: ${goal['joint_target_amount']}")
+                print(f"Your Contribution: ${goal['user_contribution']}")
+                print(f"Deadline: {goal['deadline']}")
+                
+                # Display all participants and their contributions
+                participants = goal['participants'].split(',')
+                contributions = goal['all_contributions'].split(',')
+                print("\nParticipants:")
+                for participant, contribution in zip(participants, contributions):
+                    print(f"- {participant}: ${contribution}")
+
+        except Error as e:
+            print(f"Error displaying joint goals: {str(e)}")
     def track(self, user_id):
         """
         Track progress of user and family goals. 
@@ -471,7 +664,6 @@ class SavingsGoalsManager:
         query1 = "SELECT family_id FROM savings_goals WHERE family_target_amount = 0"
         self.cursor.execute(query1)
         res1 = self.cursor.fetchall()
-
         for i in res1:
             if i['family_id'] == family_id:
                 print("You have completed your family saving goal!")
@@ -489,7 +681,6 @@ class SavingsGoalsManager:
                 except ValueError as e:
                     print(f"Invalid input: {e}")
                 break
-
 
     def is_goal_zero(self, user_id, contribution_type):
         try:
@@ -509,7 +700,7 @@ class SavingsGoalsManager:
         """Get user's goal and current savings information"""
         try:
             query = """
-            SELECT user_goal, user_target_amount, current_amount 
+            SELECT user_goal, user_target_amount, usergoal_contributed_amount,familygoal_contributed_amount 
             FROM savings_goals 
             WHERE user_id = %s
             """
@@ -519,37 +710,37 @@ class SavingsGoalsManager:
                 return {
                     'total_goal': result['user_goal'],
                     'remaining': result['user_target_amount'],
-                    'current_amount': result['current_amount']
+                    'usergoal_contributed_amount': result['usergoal_contributed_amount'],
+                    'familygoal_contributed_amount': result['familygoal_contributed_amount']
+
                 }
             return None
         except Error as e:
             print(f"Error getting user goal info: {e}")
             return None
 
-
 def main():
     manager = SavingsGoalsManager()
     while True:
         print("\n--- Unified Family Finance Tracker ---")
         print("1. Create User Savings Goal")
-        print("2. Contribute to Savings Goal")
-        print("3. Display Family Savings Goals")
-        print("4. Update Savings Goal")
-        print("5. Exit")
+        print("2. Create Joint Savings Goal")
+        print("3. Contribute to Savings Goal")
+        print("4. Contribute to Joint Goal")
+        print("5. Display Family Savings Goals")
+        print("6. Display Joint Goals")
+        print("7. Update Savings Goal")
+        print("8. Exit")
 
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-8): ")
 
         try:
             if choice == '1':
                 user_id = int(input("Enter User ID: "))
-                
-                # Check if user is admin
                 if manager.is_admin(user_id):
                     user_goal = float(input("Enter User Goal Amount: "))
                     family_goal = float(input("Enter Family Goal Amount (optional, press enter to skip): ") or 0)
                     deadline = input("Enter Deadline (YYYY-MM-DD): ")
-                    
-                    # If family goal is 0, pass None
                     family_goal = family_goal if family_goal > 0 else None
                     manager.create_savings_goal(user_id, user_goal, deadline, family_goal)
                 else:
@@ -558,29 +749,57 @@ def main():
                     manager.create_savings_goal(user_id, user_goal, deadline)
 
             elif choice == '2':
+                user_ids = []
+                print("Enter User IDs (press Enter when done)")
+                while True:
+                    user_id = input("Enter User ID (or press Enter to finish adding users): ")
+                    if not user_id:
+                        break
+                    user_ids.append(int(user_id))
+                
+                if len(user_ids) < 2:
+                    print("At least two users are required for a joint goal.")
+                    continue
+                
+                joint_goal = float(input("Enter Joint Goal Amount: "))
+                deadline = input("Enter Deadline (YYYY-MM-DD): ")
+                success, message = manager.create_joint_goal(user_ids, joint_goal, deadline)
+                print(message)
+
+            elif choice == '3':
                 user_id = int(input("Enter User ID: "))
                 contribution_type = input("Contribute to 'user' or 'family' goal: ").lower()
                 amount = float(input("Enter contribution amount: "))
-                
-                manager.contribute_to_goal(user_id, contribution_type, amount)
+                success, message = manager.contribute_to_goal(user_id, contribution_type, amount)
+                print(message)
                 manager.track(user_id)
-
-            elif choice == '3':
-                manager.display_savings_goal()
 
             elif choice == '4':
                 user_id = int(input("Enter User ID: "))
-                manager.update_savings_goal(user_id)
+                amount = float(input("Enter contribution amount: "))
+                success, message = manager.contribute_to_joint_goal(user_id, amount)
+                print(message)
 
             elif choice == '5':
+                manager.display_savings_goal()
+
+            elif choice == '6':
+                user_id = int(input("Enter User ID: "))
+                manager.display_joint_goals(user_id)
+
+            elif choice == '7':
+                user_id = int(input("Enter User ID: "))
+                manager.update_savings_goal(user_id)
+
+            elif choice == '8':
                 print("Exiting the application.")
                 break
 
             else:
                 print("Invalid choice. Please try again.")
 
-        except ValueError:
-            print("Invalid input. Please enter valid numbers.")
+        except ValueError as e:
+            print(f"Invalid input: {str(e)}")
 
 if __name__ == "__main__":
     main()

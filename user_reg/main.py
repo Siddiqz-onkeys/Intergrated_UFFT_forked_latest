@@ -13,22 +13,24 @@ from datetime import datetime, timedelta
 from db_connection import get_connection
 
 
-
 app = Flask(__name__)
 app.secret_key = 'ProjectUFFT'
 
-#con = mysql.connector.connect(host='localhost', user='root', password='roshni04', database='ProjectUFFT')
+#con = mysql.connector.connect(host='localhost', user='root', password='roshni04', database='ProjectUFFT',connection_timeout=600)
 con=get_connection()
 cur = con.cursor(buffered=True)
 
 user_reg_bp = Blueprint('user_reg', __name__, template_folder='templates', static_folder='static')
 
-
-
-
 def is_username_taken(username):
     query = "SELECT COUNT(*) FROM users WHERE user_name = %s"
     cur.execute(query, (username,))
+    count = cur.fetchone()[0]
+    return count > 0
+
+def is_famname_taken(familyname):
+    query = "SELECT COUNT(*) FROM family WHERE family_name = %s"
+    cur.execute(query, (familyname,))
     count = cur.fetchone()[0]
     return count > 0
 
@@ -293,8 +295,7 @@ def bankAcc():
         if role=='HOF':
             hof_code=generate_family_code(cur)
             session['hof_code']=hof_code
-            cur.execute("update users set family_id=%s where user_name=%s",(hof_code,user_name))
-            con.commit()
+    
             return redirect(url_for('user_reg.hof'))
         elif role=='Member':
             return redirect(url_for('user_reg.member'))
@@ -309,6 +310,14 @@ def hof():
         hof_code=session.get('hof_code')
         message=hof_code
         return render_template("hof.html",message=message)
+    else:
+         fam_name=request.form['fam_name']
+         user_name=session.get('user_name')
+         hof_code=session.get('hof_code')
+         cur.execute("insert into families (family_id,family_name) values(%s,%s)",(hof_code,fam_name))
+         con.commit()
+         cur.execute("update users set family_id=%s where user_name=%s",(hof_code,user_name))
+         con.commit()
     return redirect(url_for('user_reg.welcome'))
     
 @user_reg_bp.route("/member",methods=['GET','POST'])
@@ -373,8 +382,10 @@ def options():
 
         elif opt=='fam' :
             fam_id=session.get('family_id')
-            cur.execute("UPDATE users SET family_id = NULL WHERE family_id = %s", (fam_id,))
+            cur.execute("DELETE FROM families WHERE family_id = %s", (fam_id,))
             con.commit()
+            cur.execute("UPDATE users SET family_id = NULL WHERE family_id = %s", (fam_id,))
+
             return redirect(url_for('user_reg.welcome'))
 
         

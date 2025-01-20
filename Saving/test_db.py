@@ -3,9 +3,9 @@ import mysql.connector
 try:
     connection = mysql.connector.connect(
         host='localhost',
-        database='ProjectUFFT',
+        database='infy',
         user='root',
-        password='roshni04',
+        password='root',
         use_pure=True
     )
     if connection.is_connected():

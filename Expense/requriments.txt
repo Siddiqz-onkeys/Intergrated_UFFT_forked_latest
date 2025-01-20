@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 Python 3.13.1
 flask
 mysql-connector
 werkzeug.utils 
+=======
+Python 3.13.1
+flask
+mysql-connector
+werkzeug.utils 
+>>>>>>> 96bdcdc303270386535ea3919f6387db908b3483
 datetime
