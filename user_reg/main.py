@@ -155,7 +155,8 @@ def member_code(mem_code):
 
 @user_reg_bp.route("/")
 def index():
-    return render_template("home_1.html")
+    return render_template("welcome.html")
+    
 
 @user_reg_bp.route("/signup",methods=['GET','POST'])
 def signup():
