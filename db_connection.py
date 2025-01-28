@@ -1,4 +1,4 @@
-# db_connection.py
+projectufft# db_connection.py
 import mysql.connector
 from mysql.connector import Error
 
@@ -6,10 +6,10 @@ def get_connection():
     """Creates and returns a new database connection."""
     try:
         connection = mysql.connector.connect(
-            host='localhost',          # Replace with your database host
+            host='project-ufft-20.cvs82c00gy0z.ap-south-1.rds.amazonaws.com',          # Replace with your database host
             user='root',          # Replace with your database username
-            password='root',  # Replace with your database password
-            database='projectufft'   # Replace with your database name
+            password='$Drop_Down%86',  # Replace with your database password
+            database='project-ufft-20'   # Replace with your database name
         )
         return connection
     except Error as e:
