@@ -5,3 +5,5 @@ transformers
 apscheduler
 pandas
 reportlab
+gunicorn==20.1.0
+
