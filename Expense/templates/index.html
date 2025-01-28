@@ -3,127 +3,57 @@
     <head>
         <title>My Expenses</title>
 
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-        <link rel="stylesheet" href="static/styles.css">
-        
+        <link rel="stylesheet" href="{{ url_for('expense.static', filename='styles.css') }}">
+
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
-        <script src="static/script.js"></script>"
+        <script src="{{ url_for('expense.static', filename='script.js') }}"></script>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body> 
-        <div id="main-container">
-            <header> <h1 id="header_text"> UNIFIED FAMILY FINANCE TRACKER</h1></header>
+        
+        <header> <h1 id="header_text"> UNIFIED FAMILY FINANCE TRACKER</h1></header>
 
+        <!-- ##### user selection section ###### -->
+        <form id="user-selection" method="POST" action="{{url_for('expense.index')}}" enctype="multipart/form">
+            <label> User: </label>
+            <select id="user_id" name="user_id">
+                <option value="" disabled selected> -- Select user --- </option>
+                {% for user in users %}
+                <option value={{ user.user_id}}>{{ user.user_name}}</option>
+                {% endfor %}
+            </select>
+            <button > FETCH ALL </button>
+        </form>
+
+
+        <div id="main-container">
             <div class="feature_buttons">
-                <button onclick=" document.getElementById('add_expense').style.display='block' "> Add Expense</button>
-                <button onclick=""> Overview </button>
-                <button onclick=" document.getElementById('sorting_filtering').style.display='block' "> Filters </button>
+                <button onclick=" document.getElementById('add_expense').style.display='block'"> Add Expense</button>
+                <button onclick=" document.getElementById('interval-selection').style.display='block'"> Overview </button>
+                <button onclick=" document.getElementById('sorting_filtering').style.display='block'"> Filters </button>
+                <button onclick="show_rec_tab()"> Reccuring expenses </button>                
             </div>
 
             <div class="body">
-                <!-- ####### ADD EXPENSE FORM #######-->
-                <div class="add_expense_form">
-                    <!-- #############  START OF THE FORM ###############-->
-                    <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                  
-                        <!-- ######### User_ID #######-->
-                        <label for="user_ID" name="user_id">User_ID</label>
-                        <input type="number" value="1" disabled>
-                        <br><br>
+                <div class="forms">
+                    <!-- ####### ADD EXPENSE FORM #######-->
+                    <div class="add_expense_form">
+                        <!-- #############  START OF THE FORM ###############-->
+
+                             <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                 
+                            <!-- ######### User_ID #######-->
+                            <label for="user_ID" name="user_id">User_ID</label>
+                            <input type="number" value="1" disabled>
+                            <br><br>
 
 
-                        <!-- ######### family_ID #######-->
-                        <label for="family_ID" name="family_id">Family_ID</label>
-                        <input type="number" value="1" disabled><br><br>
+                            <!-- ######### family_ID #######-->
+                            <label for="family_ID" name="family_id">Family_ID</label>
+                            <input type="number" value="1" disabled><br><br>
 
 
-                        <!-- ########## the input for category ##########-->
-                        <label for="category"> Category:</label>
-                        <select id="category" name="category">
-                            <option value="" disabled selected>Select a Category</option>
-
-                            <!-- Housing section-->
-                            <optgroup label="house hold expenses">
-                                <option value="rent"> rent </option>
-                                <option value="furniture"> Furniture </option>
-                                <option value="maid"> Maid </option>
-                                <option value="appliances"> Appliances </option>
-                                <option value="grociries">Grociries</option>
-                                <option value="bills">Bills</option>
-                            </optgroup>
-
-                            <!-- Financial Commitmetns -->
-                            <optgroup label="Financial Commitments">
-                                <option value="fees">Fees</option>
-                                <option value="emi">EMI</option>
-                                <option value="investment">Investments</option>
-                            </optgroup>
-
-                            <!--LifeStyle expenses-->
-                            <optgroup label="Lifestyle Expenses">
-                                <option value="Food">Food</option>
-                                <option value="Travel">Travel</option>
-                                <option value="Clothes">Clothes</option>
-                            </optgroup>
-
-                            <!--Health and Medical-->
-                            <option value="health">Health</option>
-                            <option value="Medical">Medical</option>
-
-                            <!-- Vehicle Maintainance -->
-                            <option value="vehicle maintainace"> vehicle maintainance</option>
-
-                            <!--Mischellenous -->
-                            <option value="miscellaneous">Mischellenous</option>
-
-                            <!--Others -->
-                            <option value="others">Others</option>
-                        </select>
-                        <br><br>
-
-                        <!-- ###########  DATE INPUT  ##########-->
-                        <label for="date" name="date">Select the date:</label>
-                        <input type="date" id="date" name="date" max="{{ max_date }}"><br><br>
-
-                        <!-- ###############  AMOUNT INPUT  ##########-->
-                        <label for="amount" name="amount">Amount:</label>
-                        <input type="number" step="0.01" id="amount" name="amount"><br><br>
-
-                        <!-- ############# DESCRIPTION  ########### -->
-                        <label for="desc" name="desc">Description:</label>
-                        <input type="text" id="desc" name="desc"><br><br>
-
-                        <!--############## FILE UPLOAD ############# -->
-                        <label for="receipt" name="receipt"> Receipt: </label>
-                        <input type="file" id="file" name="file" accept="image/*,application/pdf"><br><br>  
-
-                        <!-- ########### SUBMIT BUTTON ##########-->
-                        <button type="submit">ADD EXPENSE</button>
-
-                        <button type="button" onclick="document.getElementById('add_expense').style.display='none'">CANCEL</button>
-                    </form>
-                </div>
-
-                    <!-- ####### and edit menu that comtains all the options for editing #########-->
-                    <div class="edit_menu" id="edit_menu" style="display: none;">
-                        <input type='hidden' id="menu_exp_id">
-                        <input type="hidden" id="menu_exp_amount">
-
-                        <div class="menu_buttons">
-                            <div class="expense_id_menu" style="display:none"></div>
-                            <button onclick="edit_expense()"> Edit Expense Record </button><br><br>
-                            <button onclick="add_amount()"> Add Amount To This Expense </button><br><br>
-                            <button onclick="close_menu()"> Cancel </button>
-                        </div>
-                    </div>
-
-                    <!-- ##### edit expense Form ########-->
-                    <div class="edit_expense_form">
-                        <span id="exp_id_edit" style="display:none"></span>
-                        <!-- ######## START OF THE EDITING EXPENSE FORM ########-->
-                        <form id="edit_expense" method="POST" action="" enctype="multipart/form-data" style="display: none;">
                             <!-- ########## the input for category ##########-->
                             <label for="category"> Category:</label>
                             <select id="category" name="category">
@@ -185,94 +115,309 @@
                             <input type="file" id="file" name="file" accept="image/*,application/pdf"><br><br>  
 
                             <!-- ########### SUBMIT BUTTON ##########-->
-                            <button type="submit"> UPDATE EXPENSE</button>
-                            <button type="button" onclick="document.getElementById('edit_expense').style.display='none'">CANCEL</button>
+                            <button type="submit">ADD EXPENSE</button>
 
+                            <button type="button" onclick="document.getElementById('add_expense').style.display='none'">CANCEL</button>
                         </form>
                     </div>
-
-                    <!-- #### ADD AMOUNT TO THE EXPENSE #####-->
-                    <div class="add_amount" id="add_amount">
-                        <form id="add_amount_form" method="POST" action="" enctype="multipart/form-data" style="display: none;">
-                            <h3> The amount in you a have on this expense is : <span id='return_amount'></span></h3>
-                            <label for="add_amount" name="add_amount">Amount:</label>
-                            <input type="number" step="0.01" id="add_amount" name="add_amount"><br><br>
-                            <button type="submit">SUBMIT</button>
-                            <button onclick="document.getElementById('add_amount').style.display='none'" type="button"> CANCEL </button>
-                        </form>
-                    </div>
-                
-                <!-- DELETE CONFIRMATION SECTION -->
-                <form id="deleteConfirmationSection" style="display:none" method=" " action="">
-
-                    <p>Are you sure you want to delete this record?</p>
-
-                    <button type="submit" class="confirm_btn" onclick="deletion(event)">Confirm</button>
-
-                    <button onclick="document.getElementById('deleteConfirmationSection').style.display='none'" type="button">Cancel</button>
                     
-                </form>    
+                    <!-- ########### OVERIEW SECTION ######-->
+                    <div class="overview-section" id="overview-section" >
+                        <form id="interval-selection" action="{{url_for('expense.overview')}}" enctype="multipart/form" method="POST" >
+                            <label> SELECT THE DURATION </label>
+                            </br></br>
 
-                <!-- ####### SORTING AND FILTERING FORM #######-->        
-                <div class="sorting_filtering_form">
-                    <form id="sorting_filtering" method="GET" action="{{url_for('expense.filter_expenses')}}" enctype="multipart/form-data" style="display: none;">
-                        
-                        <!-- ########### Filtering Options ########### -->
-                        <div class="filtering_options">
-                            <h3>Filter By:</h3>
+                            <label> 
+                                <input type="radio" name="duration" value=1> PAST 10 DAYS
+                            </label>
+                            </br></br>
 
-                            <label for="filter_catego">Category:</label>
-                            <select id="filter_category" name="filter_category">
-                                <option value="" disabled selected>Select a Category</option>
-                                <option value="rent">Rent</option>
-                                <option value="furniture">Furniture</option>
-                                <option value="maid">Maid</option>
-                                <option value="appliances">Appliances</option>
-                                <option value="grociries">Groceries</option>
-                                <option value="bills">Bills</option>
-                                <option value="fees">Fees</option>
-                                <option value="emi">EMI</option>
-                                <option value="investment">Investments</option>
-                                <option value="food">Food</option>
-                                <option value="travel">Travel</option>
-                                <option value="clothes">Clothes</option>
-                                <option value="health">Health</option>
-                                <option value="medical">Medical</option>
-                                <option value="vehicle_maintenance">Vehicle Maintenance</option>
-                                <option value="miscellaneous">Miscellaneous</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <br><br>
+                            <label> 
+                                <input type="radio" name="duration" value=2> PAST 15 DAYS
+                            </label>
+                            </br></br>
 
-                            <label for="filter_amount_range_min">Amount Range (Min):</label>
-                            <input type="number" id="filter_amount_range_min" name="filter_amount_range_min"
-                                step="0.01"><br><br>
+                            <label> 
+                                <input type="radio" name="duration" value=3> PAST 1 MONTH
+                            </label>
+                            </br></br>
 
-                            <label for="filter_amount_range_max">Amount Range (Max):</label>
-                            <input type="number" id="filter_amount_range_max" name="filter_amount_range_max"
-                                step="0.01"><br><br>
+                            <label> 
+                                <input type="radio" name="duration" value=4> PAST 3 MONTHS
+                            </label>
+                            </br></br>
 
-                            <label for="description">Description</label>
-                            <input type="checkbox" id="description" name="description"><br><br>
+                            <label> 
+                                <input type="radio" name="duration" value=5> PAST 6 MONTHS
+                            </label>
+                            </br></br>
 
-                            <label for="receipt">Receipt</label>
-                            <input type="checkbox" id="receipt" name="receipt"><br><br>
+                            <label> 
+                                <input type="radio" name="duration" value=6> OVERALL
+                            </label>
+                            </br></br>
+
+                            <button type="button" onclick="overview()"> Get Summary </button>
+                            <button type="button" onclick="document.getElementById('interval-selection').style.display='none'"> CANCEL </button>
+                        </form>
+                        {% if summary %}
+                            <div class="summary-info" id="summary-info">
+                                <i class="fas fa-close" onclick="document.getElementById('summary-info').style.display='none'"></i>
+                                <div class="flashcards"> <p> Total Spent: {{ summary[0]}} </p> </div>
+                                <div class="flashcards"> <p> Most Spent category: {{summary[1]}} </p> </div>
+                                <div class="flashcards"> <p> Amount Spent on Most Spent Category: {{ summary[2] }} </p> </div>
+                                <div class="flashcards"> <p> Average Amount Spent: {{ summary[3] }} </p> </div>
+                                <div class="flashcards"> <p> No of Expenses Logged: {{ summary[4] }} </p> </div>
+                                <div class="arrows"> 
+                                    <i class="fas fa-arrow-left" id="left-arrow" onclick="prevCard()"></i>
+                                    <i class="fas fa-arrow-right"id="right-arrow" onclick="nextCard()"></i>
+                                </div>
+                            </div> 
+                            
+                        {% endif %}                        
+                    </div>
+                    
+                    <!-- ####### SORTING AND FILTERING FORM #######-->        
+                    <div class="sorting_filtering_form">
+                        <form id="sorting_filtering" method="GET" action="{{url_for('expense.filter_expenses')}}"  enctype="multipart/form-data" style="display: none;">
+                            
+                            <!-- ########### Filtering Options ########### -->
+                            <div class="filtering_options">
+                                <h3>Filter By:</h3>
+
+                                <label for="filter_catego">Category:</label>
+                                <select id="filter_category" name="filter_category">
+                                    <option value="" disabled selected>Select a Category</option>
+                                    <option value="rent">Rent</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="maid">Maid</option>
+                                    <option value="appliances">Appliances</option>
+                                    <option value="grociries">Groceries</option>
+                                    <option value="bills">Bills</option>
+                                    <option value="fees">Fees</option>
+                                    <option value="emi">EMI</option>
+                                    <option value="investment">Investments</option>
+                                    <option value="food">Food</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="clothes">Clothes</option>
+                                    <option value="health">Health</option>
+                                    <option value="medical">Medical</option>
+                                    <option value="vehicle_maintenance">Vehicle Maintenance</option>
+                                    <option value="miscellaneous">Miscellaneous</option>
+                                    <option value="others">Others</option>
+                                </select>
+                                <br><br>
+
+                                <label for="filter_amount_range_min">Amount Range (Min):</label>
+                                <input type="number" id="filter_amount_range_min" name="filter_amount_range_min"
+                                    step="0.01"><br><br>
+
+                                <label for="filter_amount_range_max">Amount Range (Max):</label>
+                                <input type="number" id="filter_amount_range_max" name="filter_amount_range_max"
+                                    step="0.01"><br><br>
+
+                                <label for="description">Description</label>
+                                <input type="checkbox" id="description" name="description"><br><br>
+
+                                <label for="receipt">Receipt</label>
+                                <input type="checkbox" id="receipt" name="receipt"><br><br>
+                            </div>
+
+                            <!-- ########### SUBMIT BUTTON ##########-->
+                            <button type="submit">APPLY FILTERS</button>
+
+                            <button type="button" id="reset">
+                                    <a href="{{url_for('expense.reset_filters')}}" style="text-decoration: none; color: inherit;">RESET</a>
+                            </button>
+                            
+                            
+
+                            <button type="button"
+                                onclick="document.getElementById('sorting_filtering').style.display='none'">CANCEL</button>
+                        </form>
+                    </div>
+                    
+                    <!-- ###### RECURRING EXPENSES SECTION ####-->
+                    <div class="recurring-expenses-section">
+                        <div class="reccuring expenses" id="recc_exps" style="display:none">
+                            {% for exp in reccur_exps %}
+                                    <div class="rec_id" style="display:none">{{ exp.rec_id}}</div>
+                                    <button>EDIT</button>                               
+                                    {{exp.description}} 
+                                    {{exp.amount}}
+                                    <button onclick="verify_age({{ exp.user_id }},{{ exp.rec_id }})"> DELETE </button>
+                                    <button onclick="load_rec_to_exp({{exp.rec_id}})"> ADD TO EXPENSES </button>
+                                    <br><br>
+                            {% endfor %}
+                            <button type='button' onclick= " document.getElementById('new_rec_form').style.display='block' " > ADD NEW RECURRING EXPENSE</button>
+                            <button type='button' onclick= " document.getElementById('recc_exps').style.display='none' " > CANCEL </button>
+                        </div>
+        
+                        <div class="date_and_add" id="rec_exp_conf_div" style="display:none">
+                            <form method="POST" id="rec_exp_conf" action="" enctype="multipart/form-data" >
+        
+                                <label for="date" name="date">Select the date:</label>
+                                <input type="date" id="date" name="date" max="{{ max_date }}"><br><br>
+        
+                                <button type="submit" onclick="add_rec_to_exp()"> ADD </button>
+                                <button type="button" onclick="document.getElementById('rec_exp_conf_div').style.display='none'"> CANCEL </button>
+                            </form>
+                        </div>
+        
+                        <div class="new_rec_form_div">
+                            <form id="new_rec_form" style="display:none" action="{{url_for('expense.add_rec_exp')}}" enctype="multipart/form-data" method="POST">
+                                <label for="category"> Category:</label>
+        
+                                <select id="category" name="category">
+        
+                                    <option value="" disabled selected>Select a Category</option>
+        
+                                    {% for item in categories%}
+                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
+                                    {% endfor %}  
+                                    
+                                </select>
+        
+                                <br><br>
+        
+                                <!-- ###########  DATE INPUT  ##########-->
+                                <label for="date" name="date">Select the date:</label>
+                                <input type="date" id="date" name="date" max="{{ max_date }}"><br><br>
+        
+                                <!-- ###############  AMOUNT INPUT  ##########-->
+                                <label for="amount" name="amount">Amount:</label>
+                                <input type="number" step="0.01" id="amount" name="amount"><br><br>
+        
+                                <!-- ############# DESCRIPTION  ########### -->
+                                <label for="desc" name="desc"> **Description:</label>
+                                <input type="text" id="desc" name="desc"><br><br>
+        
+                                <button type='submit'>ADD RECURRING EXPENSE </button>
+                                <button type='button' onclick="document.getElementById('new_rec_form').style.display='none'">CANCEL</button>
+        
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- ####### EDITING AN EXPENSE SECTION #####-->
+                    <div class="editing-expense-section">
+
+                        <!-- ####### and edit menu that comtains all the options for editing #########-->
+                        <div class="edit_menu" id="edit_menu" style="display: none;">
+                            <input type='hidden' id="menu_exp_id">
+                            <input type="hidden" id="menu_exp_amount">
+
+                            <div class="menu_buttons">
+                                <div class="expense_id_menu" style="display:none"></div>
+                                <button onclick="edit_expense()"> Edit Expense Record </button><br><br>
+                                <button onclick="add_amount()"> Add Amount To This Expense </button><br><br>
+                                <button onclick="close_menu()"> Cancel </button>
+                            </div>
                         </div>
 
-                        <!-- ########### SUBMIT BUTTON ##########-->
-                        <button type="submit">APPLY FILTERS</button>
+                        <!-- ##### edit expense Form ########-->
+                        <div class="edit_expense_form">
+                            <span id="exp_id_edit" style="display:none"></span>
+                            <!-- ######## START OF THE EDITING EXPENSE FORM ########-->
+                            <form id="edit_expense" method="POST" action="" enctype="multipart/form-data" style="display: none;">
+                                <!-- ########## the input for category ##########-->
+                                <label for="category"> Category:</label>
+                                <select id="category" name="category">
+                                    <option value="" disabled selected>Select a Category</option>
 
-                        <button type="button" id="reset">
-                            <a href="{{url_for('expense.reset_filters')}}" style="text-decoration: none; color: inherit;">RESET</a>
-                        </button>
-                        
-                        
+                                    <!-- Housing section-->
+                                    <optgroup label="house hold expenses">
+                                        <option value="rent"> rent </option>
+                                        <option value="furniture"> Furniture </option>
+                                        <option value="maid"> Maid </option>
+                                        <option value="appliances"> Appliances </option>
+                                        <option value="grociries">Grociries</option>
+                                        <option value="bills">Bills</option>
+                                    </optgroup>
 
-                        <button type="button"
-                            onclick="document.getElementById('sorting_filtering').style.display='none'">CANCEL</button>
-                    </form>
+                                    <!-- Financial Commitmetns -->
+                                    <optgroup label="Financial Commitments">
+                                        <option value="fees">Fees</option>
+                                        <option value="emi">EMI</option>
+                                        <option value="investment">Investments</option>
+                                    </optgroup>
+
+                                    <!--LifeStyle expenses-->
+                                    <optgroup label="Lifestyle Expenses">
+                                        <option value="Food">Food</option>
+                                        <option value="Travel">Travel</option>
+                                        <option value="Clothes">Clothes</option>
+                                    </optgroup>
+
+                                    <!--Health and Medical-->
+                                    <option value="health">Health</option>
+                                    <option value="Medical">Medical</option>
+
+                                    <!-- Vehicle Maintainance -->
+                                    <option value="vehicle maintainace"> vehicle maintainance</option>
+
+                                    <!--Mischellenous -->
+                                    <option value="miscellaneous">Mischellenous</option>
+
+                                    <!--Others -->
+                                    <option value="others">Others</option>
+                                </select>
+                                <br><br>
+
+                                <!-- ###########  DATE INPUT  ##########-->
+                                <label for="date" name="date">Select the date:</label>
+                                <input type="date" id="date" name="date" max="{{ max_date }}"><br><br>
+
+                                <!-- ###############  AMOUNT INPUT  ##########-->
+                                <label for="amount" name="amount">Amount:</label>
+                                <input type="number" step="0.01" id="amount" name="amount"><br><br>
+
+                                <!-- ############# DESCRIPTION  ########### -->
+                                <label for="desc" name="desc">Description:</label>
+                                <input type="text" id="desc" name="desc"><br><br>
+
+                                <!--############## FILE UPLOAD ############# -->
+                                <label for="receipt" name="receipt"> Receipt: </label>
+                                <input type="file" id="file" name="file" accept="image/*,application/pdf"><br><br>  
+
+                                <!-- ########### SUBMIT BUTTON ##########-->
+                                <button type="submit"> UPDATE EXPENSE</button>
+
+                                <button type="button" onclick="document.getElementById('edit_expense').style.display='none'">CANCEL</button>
+
+                            </form>
+                        </div>
+
+                        <!-- #### ADD AMOUNT TO THE EXPENSE #####-->
+                        <div class="add_amount" id="add_amount">
+                            <form id="add_amount_form" method="POST" action="" enctype"multipart/form-data" style="display: none;">
+                                <h3> The amount in you a have on this expense is : <span id='return_amount'></span></h3>
+                                <label for="add_amount" name="add_amount">Amount:</label>
+                                <input type="number" step="0.01" id="add_amount" name="add_amount"><br><br>
+                                <button type="submit">SUBMIT</button>
+                                <button onclick="document.getElementById('add_amount').style.display='none'" type="button"> CANCEL </button>
+                            </form>
+                        </div>
+
+                    </div>
+                    <!-- DELETE CONFIRMATION SECTION -->
+                    <form id="deleteConfirmationSection" style="display:none" method="POST" action="">
+
+                        <p>Are you sure you want to delete this record?</p>
+
+                        <button type="button" class="confirm_btn" onclick="deletion_f()">Confirm</button>
+
+                        <button onclick="document.getElementById('deleteConfirmationSection').style.display='none'" type="button">Cancel</button>
+                        
+                        <!-- Undo Section -->
+                        <div id="undoSection" style="display:none;">
+
+                            <p>Record deleted. <button id="undoButton" onclick="undoDeletion()">Undo</button></p>
+                            
+                        </div>
+                    </form>    
                 </div>
-
+                
                 <!-- ###### DEFAULT VIEW OF THE TABLE #####-->
                 <div class="default_view_table">
 
@@ -323,16 +468,14 @@
                                     {% endif %}
                                 </td>
                                 <td>                              
-                                <i class="fas fa-trash" onclick="verify_age({{ expense.user_id }},{{ expense.expense_id }})"></i>
+                                <i class="fas fa-trash" onclick="verify_age({{ user_id }},{{ expense.expense_id }})"></i>
                                 </td>
                             </tr>
                             <!-- ####### POP UP MESSAGES ####### -->                            
                                 <div id="pop-up messages">
                                     <div id="ageMessage" > Action Restricted, Since You are a minor </div>
                                 </div>
-                                <div id="deleteMessage"> Record Deleteion Successfull!!! </div>
-                            
-                            
+                                <div id="deleteMessage"> Record Deleteion Successfull!!! </div>                            
                             </div>
                             {% endfor %}
                         </tbody>
@@ -340,13 +483,9 @@
                 </div>
             </div>
         </div>
-        <a href="{{url_for('user_reg.welcome')}}"
-        <button style="padding: 10px 20px; margin:2%; background-color:  #2a4d69; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+        <a href="{{url_for('user_reg.welcome')}}" <button
+            style="padding: 10px 20px; margin:2%; background-color:  #2a4d69; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
             Back to Home
-        </button>
-    </a>
-        <div class="footer">
-        </div>
-
+            </button>
     </body>
 </html>

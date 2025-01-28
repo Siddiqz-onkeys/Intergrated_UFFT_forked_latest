@@ -16,7 +16,7 @@
        
         <select name="new_hof" id="new_hof" required>
             <option value="">Select a user</option>
-            {% for name in names %}
+            {% for name in names[1:] %}
                 <option>{{ name }}</option>
             {% endfor %}
         </select>

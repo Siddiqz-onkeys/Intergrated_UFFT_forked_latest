@@ -1,189 +1,10 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>View Goals</title>
-    <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #F5EFE7;
-            color: #213555;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: #F5EFE7;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
-            width: 90%;
-            text-align: center;
-        }
-
-        h1 {
-            color: #3E5879;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        h2 {
-            color: #213555;
-            margin: 20px 0;
-            font-size: 1.6rem;
-        }
-
-        .flash-message {
-            background-color: #D8C4B6;
-            color: #213555;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #D8C4B6;
-            border-radius: 5px;
-            background-color: #FFFFFF;
-            transition: all 0.3s;
-        }
-
-        input:focus {
-            border-color: #3E5879;
-            outline: none;
-        }
-
-        .btn {
-            background-color: #213555;
-            color: #F5EFE7;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #3E5879;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-            color: #213555;
-            padding: 5px 10px;
-            border: 1px solid #213555;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .back-link:hover {
-            background-color: #213555;
-            color: #F5EFE7;
-        }
-
-        .goals-display {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .goal-card {
-            background-color: #FFFFFF;
-            border: 1px solid #D8C4B6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .goal-card h3 {
-            color: #3E5879;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-
-        .goal-card p {
-            color: #213555;
-            margin-bottom: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>View Family Savings Goals</h1>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="flash-message">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form method="POST" class="form">
-            <div class="form-group">
-                <label for="user_id">Enter User ID:</label>
-                <input type="number" id="user_id" name="user_id" min="1" required>
-            </div>
-            <button type="submit" class="btn">View Goals</button>
-        </form>
-
-        {% if goals %}
-            <div class="goals-display">
-                <h2>Family Goals</h2>
-                {% for goal in goals %}
-                    <div class="goal-card">
-                        <h3>User ID: {{ goal.user_id }}</h3>
-                        <p>User Goal: ${{ goal.user_goal }}</p>
-                        <p>User Target Remaining: ${{ goal.user_target_amount }}</p>
-                        {% if loop.first %}
-                            <p>Family Goal: ${{ goal.family_goal }}</p>
-                            <p>Family Target Remaining: ${{ goal.family_target_amount }}</p>
-                            <p>Deadline: {{ goal.deadline }}</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
-    </div>
-</body>
-</html> -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Goals</title>
     <style>
-        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -191,137 +12,238 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #F5EFE7;
-            color: #213555;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
             min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
         }
 
         .container {
-            background-color: #F5EFE7;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
-            width: 90%;
-            text-align: center;
+            background: rgba(196, 218, 210, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            animation: fadeScale 0.8s ease-out;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         h1 {
-            color: #3E5879;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        h2 {
-            color: #213555;
-            margin: 20px 0;
-            font-size: 1.6rem;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #C4DAD2;
         }
 
         .flash-message {
-            background-color: #D8C4B6;
-            color: #213555;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            text-align: center;
+            background: rgba(216, 196, 182, 0.1);
+            border: 1px solid rgba(216, 196, 182, 0.2);
+            color: #C4DAD2;
         }
 
         .form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            background: rgba(196, 218, 210, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
         }
 
         .form-group {
-            text-align: left;
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #D8C4B6;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
         }
 
-        input {
+        input, select {
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #D8C4B6;
-            border-radius: 5px;
-            background-color: #FFFFFF;
-            transition: all 0.3s;
+            padding: 0.8rem 1rem;
+            background: rgba(196, 218, 210, 0.05);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 10px;
+            color: #C4DAD2;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        input:focus {
-            border-color: #3E5879;
+        input:focus, select:focus {
             outline: none;
+            border-color: #C4DAD2;
+            background: rgba(196, 218, 210, 0.1);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23C4DAD2' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
         }
 
         .btn {
-            background-color: #213555;
-            color: #F5EFE7;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
+            padding: 1rem 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
+            font-size: 1rem;
             cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            display: block;
         }
 
         .btn:hover {
-            background-color: #3E5879;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-            color: #213555;
-            padding: 5px 10px;
-            border: 1px solid #213555;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .back-link:hover {
-            background-color: #213555;
-            color: #F5EFE7;
+            background: linear-gradient(135deg, #1a4e47 0%, #16423C 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #D8C4B6;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #213555;
-            color: #F5EFE7;
-        }
-
-        td {
-            background-color: #FFFFFF;
-            color: #213555;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 2rem;
+            background: rgba(196, 218, 210, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
         }
 
         caption {
-            margin-top: 20px;
-            font-weight: bold;
             font-size: 1.5rem;
-            color: #3E5879;
+            color: #C4DAD2;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(196, 218, 210, 0.1);
+        }
+
+        th {
+            background: rgba(22, 66, 60, 0.5);
+            color: #C4DAD2;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            color: #C4DAD2;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #D8C4B6;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .delete-btn:hover {
+            background: rgba(216, 196, 182, 0.1);
+            transform: scale(1.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            text-decoration: none;
+            color: #D8C4B6;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .back-link:hover {
+            background: rgba(196, 218, 210, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #deleteModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(22, 66, 60, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            z-index: 1000;
+        }
+
+        #deleteModal h3 {
+            color: #C4DAD2;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        #deleteModal .btn {
+            margin: 0.5rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
@@ -335,48 +257,135 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
         <form method="POST" class="form">
             <div class="form-group">
-                <label for="user_id">Enter User ID:</label>
-                <input type="number" id="user_id" name="user_id" min="1" required>
+                <label for="user_id">Enter User ID</label>
+                <input type="number" id="user_id" name="user_id" value="{{ user_id }}" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="goal_type">Select Goal Type</label>
+                <select id="goal_type" name="goal_type" required>
+                    <option value="user_goal" {% if selected_goal_type == 'user_goal' %}selected{% endif %}>User Goal</option>
+                    <option value="family_goal" {% if selected_goal_type == 'family_goal' %}selected{% endif %}>Family Goal</option>
+                    <option value="joint_goal" {% if selected_goal_type == 'joint_goal' %}selected{% endif %}>Joint Goal</option>
+                </select>
             </div>
             <button type="submit" class="btn">View Goals</button>
         </form>
 
-        {% if goals %}
-            <table>
-                <caption>Family Savings Goals</caption>
-                <thead>
-                    <tr>
-                        <th>User ID</th>
-                        <th>User Goal (Rs)</th>
-                        <th>User Target Remaining (Rs)</th>
-                        <th>Family Goal (Rs)</th>
-                        <th>Family Target Remaining (Rs)</th>
-                        <th>Deadline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for goal in goals %}
-                        <tr>
-                            <td>{{ goal.user_id }}</td>
-                            <td>{{ goal.user_goal }}</td>
-                            <td>{{ goal.user_target_amount }}</td>
-                            {% if loop.first %}
-                                <td>{{ goal.family_goal }}</td>
-                                <td>{{ goal.family_target_amount }}</td>
-                                <td>{{ goal.deadline }}</td>
-                            {% else %}
-                                <td colspan="3">See first entry for family goal details</td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% elif form_submitted %}
-            <p>No goals found for this user. Please try again.</p>
+        {% if selected_goal_type == 'user_goal' and goals %}
+        <table>
+            <caption>User Goals</caption>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>User Goal (Rs)</th>
+                    <th>Remaining (Rs)</th>
+                    <th>Deadline</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in goals %}
+                <tr>
+                    <td>{{ goal.user_id }}</td>
+                    <td>{{ goal.user_goal }}</td>
+                    <td>{{ goal.user_target_amount }}</td>
+                    <td>{{ goal.deadline }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='user', goal_id=goal.user_id) }}" style="display:inline;">
+                            <button type="submit" class="delete-btn">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
+
+        {% if selected_goal_type == 'family_goal' and family_goals %}
+        <table>
+            <caption>Family Goals</caption>
+            <thead>
+                <tr>
+                    <th>Family Goal (Rs)</th>
+                    <th>Remaining (Rs)</th>
+                    <th>Deadline</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in family_goals %}
+                <tr>
+                    <td>{{ goal.family_goal }}</td>
+                    <td>{{ goal.family_target_amount }}</td>
+                    <td>{{ goal.deadline }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
+                            <button type="submit" class="delete-btn">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if selected_goal_type == 'joint_goal' and joint_goals %}
+        <table>
+            <caption>Joint Goals</caption>
+            <thead>
+                <tr>
+                    <th>Joint Goal ID</th>
+                    <th>Joint Goal (Rs)</th>
+                    <th>Remaining (Rs)</th>
+                    <th>Deadline</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in joint_goals %}
+                <tr>
+                    <td>{{ goal.joint_id }}</td>
+                    <td>{{ goal.joint_goal_amount }}</td>
+                    <td>{{ goal.joint_target_amount }}</td>
+                    <td>{{ goal.deadline }}</td>
+                    <td>
+                        <button type="button" onclick="showModal({{ goal.joint_id }}, {{ user_id }})" class="delete-btn">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <div id="deleteModal" style="display: none;">
+            <h3>Confirm Deletion</h3>
+            <p>What action would you like to take?</p>
+            <form method="POST" id="deleteForm">
+                <input type="hidden" name="user_id" id="modalUserId">
+                <button type="submit" name="action" value="withdraw" class="btn">Withdraw Contribution</button>
+                <button type="submit" name="action" value="leave" class="btn">Leave Contribution</button>
+            </form>
+            <button onclick="hideModal()" class="btn">Cancel</button>
+        </div>
+
         <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
     </div>
+
+    <script>
+        function showModal(jointId, userId) {
+            document.getElementById('modalUserId').value = userId;
+            document.getElementById('deleteForm').action = `/delete_joint_goal_action/${jointId}`;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+        
+        function hideModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

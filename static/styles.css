@@ -1,0 +1,140 @@
+:root {
+    --blue: #16423C;
+    /* Dark green */
+    --beige: #D8C4B6;
+    /* Light cream */
+    --light-beige: #F5F5F5;
+    /* Faint beige close to white */
+    --hover-blue: #0F372F;
+    /* Slightly darker green for hover */
+    --btn-color: #A8C8BF;
+    /* Lighter green for buttons */
+    --card-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    /* Soft shadow effect */
+    --card-hover-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    /* Shadow on hover */
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--light-beige);
+    color: var(--blue);
+    margin: 0;
+    padding: 0;
+
+    /* Scrollbar Styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) var(--light-beige);
+}
+
+body::-webkit-scrollbar {
+    width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+    background: var(--light-beige);
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--blue);
+    border-radius: 10px;
+    border: 2px solid var(--light-beige);
+}
+
+.navbar {
+    background-color: var(--blue);
+}
+
+.navbar-brand,
+.nav-link {
+    color: var(--beige) !important;
+}
+
+.hero {
+    background-color: var(--blue);
+    color: var(--beige);
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.features {
+    padding: 50px 20px;
+}
+
+.feature-card {
+    border: none;
+    background-color: #FFFFFF;
+    /* Pure white card background */
+    box-shadow: var(--card-shadow);
+    /* Soft shadow effect */
+    transition: all 0.3s ease;
+    /* Smooth transition for hover effect */
+    border-radius: 10px;
+    /* Rounded corners */
+    height: 100%;
+}
+
+.feature-card:hover {
+    box-shadow: var(--card-hover-shadow);
+    /* Slightly stronger shadow on hover */
+    transform: translateY(-5px);
+    /* Subtle lift effect */
+}
+
+.feature-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.feature-card img {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.footer {
+    background-color: var(--blue);
+    color: var(--beige);
+    text-align: center;
+    padding: 20px;
+}
+
+.btn-primary {
+    background-color: var(--btn-color);
+    /* Lighter green for buttons */
+    border-color: var(--btn-color);
+    color: var(--blue);
+    /* Dark green text for buttons */
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-blue);
+    /* Slightly darker green for hover */
+    border-color: var(--hover-blue);
+    color: var(--beige);
+    /* Light cream text for contrast */
+}
+
+/* Scrollbar for other scrollable elements (optional) */
+.scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) var(--light-beige);
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+    background: var(--light-beige);
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    background-color: var(--blue);
+    border-radius: 10px;
+    border: 2px solid var(--light-beige);
+}

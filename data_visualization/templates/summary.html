@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Expense Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9ed;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 2%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #2c3e50;
+            color: white;
+            font-size: 16px;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        table tfoot td {
+            font-weight: bold;
+            background-color: #f9f9ed;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        
+       input[type="submit"] {
+            margin-top: 2.5%;
+            background-color: #2a4d69;
+            /* Dark Blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 200px;
+            /* Make buttons uniform in size */
+            text-align: center;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #37659d;
+            /* Slightly lighter blue */
+        }
+
+    </style>
+    <script>
+        // JavaScript to update the summary based on dropdown selection
+        function updateSummary() {
+            const familyId = new URLSearchParams(window.location.search).get('family_id');
+            const timePeriod = document.getElementById('time-period').value;
+            window.location.href = `/data_visualization/fetch_family_summary?family_id=${familyId}&time_period=${timePeriod}`;
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Family Expense Summary</h1>
+
+        <!-- Dropdown to select the time period -->
+        <div class="dropdown">
+            <label for="time-period">Select Time Period:</label>
+            <select id="time-period" onchange="updateSummary()">
+                <option value="24_hours" {% if time_period=='24_hours' %}selected{% endif %}>24 Hours</option>
+                <option value="1_week" {% if time_period=='1_week' %}selected{% endif %}>1 Week</option>
+                <option value="1_month" {% if time_period=='1_month' %}selected{% endif %}>1 Month</option>
+                <option value="1_year" {% if time_period=='1_year' %}selected{% endif %}>1 Year</option>
+            </select>
+        </div>
+
+        {% if error_message %}
+        <p class="error">{{ error_message }}</p>
+        {% elif summary_data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Category</th>
+                    <th>Total Amount</th>
+                    <th>Total User Expense</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_name, expenses in summary_data.items() %}
+                <tr>
+                    <td rowspan="{{ expenses|length }}">{{ user_name }}</td>
+                    <td>{{ expenses[0].category_name }}</td>
+                    <td>₹{{ expenses[0].total_amount }}</td>
+                    <td rowspan="{{ expenses|length }}">₹{{ user_totals[user_name] }}</td>
+                </tr>
+                {% for expense in expenses[1:] %}
+                <tr>
+                    <td>{{ expense.category_name }}</td>
+                    <td>₹{{ expense.total_amount }}</td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Grand Total</strong></td>
+                    <td><strong>₹{{ total_expenses }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <p class="error">No data available for the selected time period.</p>
+        {% endif %}
+        <div style="display: flex; gap: 10px; align-items: center; margin-top:2.5%">
+            <form action="{{ url_for('user_reg.welcome') }}">
+                <input type="submit" value="Home">
+            </form>
+            <form action="{{ url_for('data_visualization.index') }}">
+                <input type="submit" value="More Details">
+            </form>
+        </div>
+
+
+</body>
+
+</html>

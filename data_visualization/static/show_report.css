@@ -1,48 +1,65 @@
 body {
     background-color: #f9f9f5;
+    /* Light beige */
 }
 
 h1 {
-    color: #2a4d69;
+    color: #16423C;
+    /* Dark blue */
     font-weight: bold;
 }
 
 .btn-info {
     background-color: #1a8b6f;
+    /* Teal green */
     border-color: #1a8b6f;
+    /* Teal green */
 }
 
 .btn-info:hover {
     background-color: #146b53;
+    /* Darker teal green */
     border-color: #146b53;
+    /* Darker teal green */
 }
 
 .btn-danger {
     background-color: #d9534f;
+    /* Red */
     border-color: #d9534f;
+    /* Red */
 }
 
 .btn-danger:hover {
     background-color: #c9302c;
+    /* Darker red */
     border-color: #c9302c;
+    /* Darker red */
 }
 
 .table {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 15%;
+    background-color: #ffffff;
+    /* White */
+    border: 1px solid #dddddd;
+    /* Light grey */
+    /* Rounded corners */
 }
 
 .table th {
-    background-color: #2a4d69;
-    color: white;
+    background-color: #16423C;
+    /* Dark blue */
+    color: #ffffff;
+    /* White */
 }
 
 .btn-primary {
     background-color: #1a8b6f;
-    border-color: #1a8b6f;
+    /* Teal green */
+    border-color: #16423C;
+    /* Teal green */
 }
 
 .btn-primary:hover {
-    background-color: #146b53;
+    background-color: #16423C;
+    /* Darker teal green */
 }

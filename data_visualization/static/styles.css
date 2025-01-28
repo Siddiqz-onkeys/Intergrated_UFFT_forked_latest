@@ -1,112 +1,116 @@
- body {
-     background-color: #f8f8ed;
-     /* Beige */
-     color: #2a4d69;
-     /* Dark blue */
- }
+body {
+    background-color: #F5F5F5;
+    /* Faint beige close to white */
+    color: #16423C;
+    /* Dark green */
+}
 
- h1,
- h2 {
-     color: #2a4d69;
-     /* Dark blue */
- }
+h1,
+h2 {
+    color: #16423C;
+    /* Dark green */
+}
 
- table {
-     border-radius: 10px;
-     /* Rounded corners */
-     border: 2px solid rgba(0, 0, 0, 0.1);
-     /* Black border */
-     overflow: hidden;
- }
+table {
+    border-radius: 10px;
+    /* Rounded corners */
+    border: 2px solid #D8C4B6;
+    /* Light cream border */
+    overflow: hidden;
+}
 
- table thead {
-     background-color: #2a4d69;
-     /* Dark blue */
-     color: #ffffff;
-     /* Beige */
- }
+table thead {
+    background-color: #16423C;
+    /* Dark green */
+    color: #FFFFFF;
+    /* White */
+}
 
- table tbody tr:hover {
-     background-color: #ffffff;
-     /* Light beige */
- }
+table tbody tr:hover {
+    background-color: #f0f8ff;
+    /* Very light blue */
+}
 
- .btn-primary {
-     background-color: #2a4d69;
-     /* Dark blue */
-     border-color: #2a4d69;
-     /* Dark blue */
- }
+.btn-primary {
+    background-color: #16423C;
+    /* Dark green */
+    border-color: #16423C;
+    /* Dark green */
+}
 
- .btn-primary:hover {
-     background-color: #f4a261;
-     /* Beige-orange */
-     border-color: #f4a261;
-     /* Beige-orange */
- }
+.btn-primary:hover {
+    background-color: #A8C8BF;
+    /* Slightly darker light green */
+    border-color: #A8C8BF;
+    /* Slightly darker light green */
+}
 
- #expensePieChart {
-     background-color: #ffffff;
-     /* White */
-     border: 2px solid #2a4d69;
-     /* Dark blue */
-     max-width: 400px;
-     /* Smaller size */
-     max-height: 400px;
-     /* Smaller size */
- }
+#expensePieChart {
+    background-color: #FFFFFF;
+    /* White */
+    border: 2px solid #16423C;
+    /* Dark green */
+    max-width: 400px;
+    /* Smaller size */
+    max-height: 400px;
+    /* Smaller size */
+}
 
- .table-striped tbody tr:nth-of-type(odd) {
-     background-color: #ffffff;
-     /* Light beige */
- }
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #FFFFFF;
+    /* White */
+}
 
- .table-striped tbody tr:nth-of-type(even) {
-     background-color: #ffffff;
-     /* White */
- }
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #F9F9F9;
+    /* Light grey */
+}
 
- #searchInput {
-     border: 1px solid black;
- }
+#searchInput {
+    border: 1px solid #16423C;
+    /* Dark green */
+}
 
- #noRecordsFound {
-     display: none;
-     text-align: center;
-     margin-top: 20px;
-     color: red;
- }
+#noRecordsFound {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+    color: #FF0000;
+    /* Red */
+}
 
- #loadingAnimation {
-     display: none;
-     text-align: center;
-     margin-top: 20px;
- }
+#loadingAnimation {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
 
- canvas {
-     max-width: 400px;
-     max-height: 400px;
-     margin: 0 auto;
-     background-color: white;
-     border-radius: 10px;
-     /* Add border-radius for rounded corners */
- }
+canvas {
+    max-width: 400px;
+    max-height: 400px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    /* White */
+    border-radius: 10px;
+    /* Add border-radius for rounded corners */
+}
 
- h5 {
-     margin-top: 20px;
-     font-weight: bold;
- }
+h5 {
+    margin-top: 20px;
+    font-weight: bold;
+}
 
- /* Style for the success message */
- .success-message {
-     display: none;
-     background-color: #28a745;
-     color: white;
-     padding: 10px;
-     border-radius: 5px;
-     margin-top: 20px;
- }
+.success-message {
+    display: none;
+    background-color: #C4DAD2;
+    /* Light green */
+    color: #16423C;
+    /* Dark green */
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
 
- .success-message.show {
-     display: block;
- }
+.success-message.show {
+    display: block;
+}

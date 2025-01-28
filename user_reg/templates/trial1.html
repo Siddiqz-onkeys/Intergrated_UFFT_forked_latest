@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg,#EFE3C2, #C4DAD2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color:#16423C;
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            color: #e8f3f1;
+        }
+
+        th {
+            width: 40%;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;  /* Horizontal padding for wider buttons */
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;  /* Minimum width for buttons */
+            text-align: center;
+        }
+
+        .back-btn {
+            background-color:#16423C;  /* Dark green */
+            color: #e8f3f1;
+        }
+
+        .delete-btn {
+            background-color: #e63946;  /* Red */
+            color: #e8f3f1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .button-group {
+                flex-direction: column;
+                align-items: center;  /* Stack buttons on small screens */
+                gap: 20px;
+            }
+            
+            button {
+                min-width: 150px;  /* Increase button size on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+   
+    <div class="container">
+        <h1>My Account</h1>
+        <table>
+            <tr>
+                <th>User ID</th><br>
+            </tr>
+    
+            <tr>
+                <td>{{row[0]}}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+            </tr>
+            <tr>
+                <td>{{row[1]}}</td>
+            </tr>
+            <tr>
+                <th>Username</th>
+            </tr>
+            <tr>
+                <td>{{row[2]}}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+            </tr>
+            <tr>
+                <td>{{row[7]}}</td>
+            </tr>
+            <tr>
+                <th>Phone Number</th>
+            </tr>
+            <tr>
+                <td>{{row[4]}}</td>
+            </tr>
+            <tr>
+                <th>Email ID</th>
+            </tr>
+            <tr>
+                <td>{{row[5]}}</td>
+            </tr>
+            <tr>
+                <th>Family ID</th>
+            </tr>
+            <tr>
+                <td>{{row[8]}}</td>
+            </tr>
+            <tr>
+                <th>Date of Birth</th>
+            </tr>
+            <tr>
+                <td>{{row[9]}}</td>
+            </tr>
+        </table>
+
+        <div class="button-group">
+            <form action="{{url_for('user_reg.welcome')}}">
+                <button type="submit" class="back-btn">Back</button>
+            </form>
+            <form action="{{url_for('user_reg.del_acc')}}">
+                <button type="submit" class="delete-btn">Delete account</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -3,7 +3,6 @@ from mysql.connector import Error
 import datetime
 from decimal import Decimal
 from db_connection import get_connection
-
 class SavingsGoalsManager:
     def __init__(self):
         try:
@@ -12,7 +11,7 @@ class SavingsGoalsManager:
             #     host='localhost',
             #     database='projectufft',
             #     user='root',
-            #     password='',
+            #     password='BabuRex@143',
             #     use_pure=True  # This helps with Decimal handling
             # )
             self.connection = get_connection()
@@ -42,7 +41,7 @@ class SavingsGoalsManager:
             query = "SELECT role FROM Users WHERE user_id = %s"
             self.cursor.execute(query, (user_id,))
             user = self.cursor.fetchone()
-            return user and user['role'].lower() == 'hof'
+            return user and user['role'].lower() == 'hof' 
         except Error as e:
             print(f"Database error checking admin status: {e}")
             return False
@@ -98,7 +97,7 @@ class SavingsGoalsManager:
             
             self.cursor.execute(update_query, (new_family_goal, new_family_goal, family_id))
             self.connection.commit()
-            print(f"Family goal set to ${new_family_goal} for all family members.")
+            print(f"Family goal set to Rs {new_family_goal} for all family members.")
             return True
 
         except Error as e:
@@ -141,7 +140,7 @@ class SavingsGoalsManager:
                 new_user_goal = float(input("Enter new User Goal Amount: "))
                 
                 # Confirm user goal update
-                confirm = input(f"Confirm updating your goal from ${existing_goal['user_goal']} to ${new_user_goal}? (yes/no): ").lower()
+                confirm = input(f"Confirm updating your goal from Rs {existing_goal['user_goal']} to Rs {new_user_goal}? (yes/no): ").lower()
                 if confirm != 'yes':
                     print("Goal update cancelled.")
                     return False
@@ -159,7 +158,7 @@ class SavingsGoalsManager:
                     user_id, 
                     family_id
                 ))
-                print(f"User goal updated to ${new_user_goal} successfully!")
+                print(f"User goal updated to Rs {new_user_goal} successfully!")
 
             elif update_type == 'family':
                 # Only admin can update family goal
@@ -170,14 +169,14 @@ class SavingsGoalsManager:
                 new_family_goal = float(input("Enter new Family Goal Amount: "))
                 
                 # Confirm family goal update
-                confirm = input(f"Confirm updating family goal from ${existing_goal['family_goal']} to ${new_family_goal}? (yes/no): ").lower()
+                confirm = input(f"Confirm updating family goal from Rs {existing_goal['family_goal']} to Rs {new_family_goal}? (yes/no): ").lower()
                 if confirm != 'yes':
                     print("Goal update cancelled.")
                     return False
 
                 # Update family goal for all family members
                 self.update_family_goal_for_family(family_id, new_family_goal)
-                print(f"Family goal updated to ${new_family_goal} successfully!")
+                print(f"Family goal updated to Rs {new_family_goal} successfully!")
 
             else:
                 print("Invalid goal type. Choose 'user' or 'family'.")
@@ -218,7 +217,7 @@ class SavingsGoalsManager:
                 family_id
             ))
             self.connection.commit()
-            return True, f"User goal updated to ${new_user_goal} successfully!"
+            return True, f"User goal updated to Rs {new_user_goal} successfully!"
 
         except (Error, ValueError) as e:
             self.connection.rollback()
@@ -248,7 +247,7 @@ class SavingsGoalsManager:
                 family_id
             ))
             self.connection.commit()
-            return True, f"Family goal updated to ${new_family_goal} successfully!"
+            return True, f"Family goal updated to Rs {new_family_goal} successfully!"
 
         except (Error, ValueError) as e:
             self.connection.rollback()
@@ -397,7 +396,7 @@ class SavingsGoalsManager:
                 self.cursor.execute(insert_participant_query, (joint_id, user_id))
 
             self.connection.commit()
-            return True, f"Joint goal of ${joint_goal_amount} created successfully for {len(user_ids)} users!"
+            return True, f"Joint goal of Rs {joint_goal_amount} created successfully for {len(user_ids)} users!"
         except Error as e:
             self.connection.rollback()
             return False, f"Error creating joint goal: {str(e)}"
@@ -430,7 +429,7 @@ class SavingsGoalsManager:
                 new_user_target = goal['user_target_amount'] - amount
                 if new_user_target < 0:
                     remaining = goal['user_target_amount']
-                    return False, f"Contribution exceeds remaining target! Maximum allowed contribution is ${remaining}"
+                    return False, f"Contribution exceeds remaining target! Maximum allowed contribution is Rs{remaining}"
 
                 # Update the user's savings goal
                 update_query = """
@@ -449,7 +448,7 @@ class SavingsGoalsManager:
                 new_family_target = goal['family_target_amount'] - amount
                 if new_family_target < 0:
                     remaining = goal['family_target_amount']
-                    return False, f"Contribution exceeds family target! Maximum allowed contribution is ${remaining}"
+                    return False, f"Contribution exceeds family target! Maximum allowed contribution is Rs{remaining}"
 
                 # Update the family target for all users in the same family
                 update_query_family_target = """
@@ -501,9 +500,9 @@ class SavingsGoalsManager:
             if len(joint_goals) > 1:
                 print("\nAvailable Joint Goals:")
                 for idx, goal in enumerate(joint_goals, 1):
-                    print(f"{idx}. Goal Amount: ${goal['joint_goal_amount']}, " 
-                        f"Remaining: ${goal['joint_target_amount']}, "
-                        f"Your Contribution: ${goal['contributed_amount']}, "
+                    print(f"{idx}. Goal Amount: Rs{goal['joint_goal_amount']}, " 
+                        f"Remaining: Rs{goal['joint_target_amount']}, "
+                        f"Your Contribution: Rs{goal['contributed_amount']}, "
                         f"Deadline: {goal['deadline']}")
                 
                 while True:
@@ -524,7 +523,7 @@ class SavingsGoalsManager:
 
             # Check if contribution exceeds remaining target
             if selected_goal['joint_target_amount'] < amount:
-                return False, f"Contribution exceeds remaining target! Maximum allowed: ${selected_goal['joint_target_amount']}"
+                return False, f"Contribution exceeds remaining target! Maximum allowed: Rs{selected_goal['joint_target_amount']}"
 
             # Update joint goal target and contribution
             update_joint_goal_query = """
@@ -542,7 +541,7 @@ class SavingsGoalsManager:
             self.cursor.execute(update_participant_query, (amount, selected_goal['joint_id'], user_id))
             
             self.connection.commit()
-            return True, f"Successfully contributed ${amount} to joint goal!"
+            return True, f"Successfully contributed Rs {amount} to joint goal!"
 
         except Error as e:
             self.connection.rollback()
@@ -569,16 +568,16 @@ class SavingsGoalsManager:
                 print("\n--- Family Savings Goals ---")
                 for goal in goals:
                     print(f"\nUser ID: {goal['user_id']}")
-                    print(f"User Goal: ${goal['user_goal']}")
-                    print(f"User Target Remaining: ${goal['user_target_amount']}")
+                    print(f"User Goal: Rs{goal['user_goal']}")
+                    print(f"User Target Remaining: Rs {goal['user_target_amount']}")
                     
                     # Only display family goal once
                     if goal == goals[0]:
-                        print(f"Family Goal: ${goal['family_goal']}")
-                        print(f"Family Target Remaining: ${goal['family_target_amount']}")
-                        print(f"User Goal Contributed Amount: ${goal['usergoal_contributed_amount']}")
-                        print(f"Family Goal Contributed Amount: ${goal['familygoal_contributed_amount']}")
-                        print(f"Total Contributed Amount: ${goal['familygoal_contributed_amount']+goal['usergoal_contributed_amount']}")
+                        print(f"Family Goal: Rs {goal['family_goal']}")
+                        print(f"Family Target Remaining: Rs {goal['family_target_amount']}")
+                        print(f"User Goal Contributed Amount: Rs {goal['usergoal_contributed_amount']}")
+                        print(f"Family Goal Contributed Amount: Rs {goal['familygoal_contributed_amount']}")
+                        print(f"Total Contributed Amount: Rs {goal['familygoal_contributed_amount']+goal['usergoal_contributed_amount']}")
                         print(f"Deadline: {goal['deadline']}")
             else:
                 print("No savings goals found for this family.")
@@ -616,9 +615,9 @@ class SavingsGoalsManager:
             print("\n=== Your Joint Goals ===")
             for goal in goals:
                 print(f"\nJoint Goal ID: {goal['joint_id']}")
-                print(f"Total Goal Amount: ${goal['joint_goal_amount']}")
-                print(f"Remaining Target: ${goal['joint_target_amount']}")
-                print(f"Your Contribution: ${goal['user_contribution']}")
+                print(f"Total Goal Amount: Rs {goal['joint_goal_amount']}")
+                print(f"Remaining Target: Rs {goal['joint_target_amount']}")
+                print(f"Your Contribution: Rs {goal['user_contribution']}")
                 print(f"Deadline: {goal['deadline']}")
                 
                 # Display all participants and their contributions
@@ -626,10 +625,76 @@ class SavingsGoalsManager:
                 contributions = goal['all_contributions'].split(',')
                 print("\nParticipants:")
                 for participant, contribution in zip(participants, contributions):
-                    print(f"- {participant}: ${contribution}")
+                    print(f"- {participant}: Rs {contribution}")
 
         except Error as e:
             print(f"Error displaying joint goals: {str(e)}")
+    
+    def delete_user_goal(self, user_id):
+        try:
+            # query = "DELETE FROM savings_goals WHERE user_id = %s"
+            query="UPDATE savings_goals SET user_goal=%s, user_target_amount=%s, usergoal_contributed_amount=%s WHERE user_id=%s"
+            self.cursor.execute(query, (None,None,None,user_id,))
+            self.connection.commit()
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            raise Exception(f"Error deleting user goal: {e}")
+
+    def delete_family_goal(self, family_id):
+        """
+        Delete all savings goals for a family.
+        """
+        try:
+            # query = "DELETE FROM savings_goals WHERE family_id = %s"
+            query="UPDATE savings_goals SET family_goal=%s, family_target_amount=%s, familygoal_contributed_amount=%s WHERE family_id=%s"
+            self.cursor.execute(query, (None,None,None,family_id,))
+            self.connection.commit()
+        except Error as e:
+            self.connection.rollback()
+            raise Exception(f"Error deleting family goal: {e}")
+
+    def delete_joint_goal(self, joint_id, user_id, leave_contributions):
+        """
+        Delete or adjust a joint goal based on user action.
+        Args:
+            joint_id: ID of the joint goal.
+            user_id: ID of the user performing the action.
+            leave_contributions: Flag to leave contributions (1) or withdraw (0).
+        """
+        try:
+            if leave_contributions == 1:
+                # Remove the user from the joint goal but keep contributions
+                delete_query = "DELETE FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
+                self.cursor.execute(delete_query, (joint_id, user_id))
+            else:
+                # Refund contributions and remove the user
+                refund_query = """
+                    UPDATE joint_goals 
+                    SET joint_target_amount = joint_target_amount + 
+                        (SELECT contributed_amount 
+                        FROM joint_goal_participants 
+                        WHERE joint_id = %s AND user_id = %s)
+                    WHERE joint_id = %s
+                """
+                self.cursor.execute(refund_query, (joint_id, user_id, joint_id))
+                delete_query = "DELETE FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
+                self.cursor.execute(delete_query, (joint_id, user_id))
+
+            # If no participants remain, delete the joint goal
+            self.cursor.execute("SELECT COUNT(*) AS count FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
+            result = self.cursor.fetchone()
+            if result and result['count']<2:
+                self.cursor.execute("DELETE FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
+                self.cursor.execute("DELETE FROM joint_goals WHERE joint_id = %s", (joint_id,))
+
+            self.connection.commit()
+        except Error as e:
+            self.connection.rollback()
+            raise Exception(f"Error managing joint goal deletion: {e}")
+
+
+
     def track(self, user_id):
         """
         Track progress of user and family goals. 

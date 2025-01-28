@@ -42,6 +42,7 @@
             margin: 0;
         }
 
+        button,
         input[type="submit"] {
             background-color: #2a4d69;
             /* Dark Blue */
@@ -52,14 +53,20 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            width: 200px;
+            width: 225px;
             /* Make buttons uniform in size */
             text-align: center;
         }
 
+        button,
         input[type="submit"]:hover {
             background-color: #37659d;
             /* Slightly lighter blue */
+        }
+
+        a {
+            text-decoration: none;
+            color: #ffffff;
         }
 
         /* Footer */
@@ -73,7 +80,7 @@
 </head>
 
 <body>
-    <h1>Account Created</h1>
+    <h1>Welcome {{ name }}.</h1>
     <div class="main-content">
         <form action="{{ url_for('expense.index') }}">
             <input type="submit" value="Expenses">
@@ -91,12 +98,33 @@
             <input type="submit" value="Budget">
         </form>
 
+       
+                <form action="{{ url_for('user_reg.MyAccount') }}">
+                    <input type="submit" value="My Account">
+                </form>
+
+
+        <!-- Family Summary here -->
+        <!-- Family we are using get request to pass the family id so replace the family_id with current user -->
+        {% if role == 'hof' %}
+        <form action="{{ url_for('data_visualization.fetch_family_summary') }}" method="GET">
+            <input type="hidden" name="family_id" value="{{ family_id }}">
+            <input class="onlyHOF" type="submit" value="View summary of members">
+        </form>
+        {% endif %}
+
+        <form action="{{url_for('user_reg.logout')}}">
+            <input type="submit" value="Log Out">
+        </form>
         <form action="{{ url_for('user_reg.del_acc') }}">
             <input type="submit" value="Delete Account">
         </form>
+
+
+
     </div>
     <footer>
-        &copy; 2025 Unified Family Finance Tracker | All Rights Reserved
+        &copy; 2025 Unified Family Finance Tracker
     </footer>
 </body>
 

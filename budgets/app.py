@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, request, redirect, flash, current_app,url_for
+from flask import Blueprint, render_template, request, redirect, flash, current_app,url_for,session
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_mail import Message
@@ -23,29 +23,11 @@ from flask_mail import Mail, Message
 #         password=DB_PASSWORD,
 #         database=DB_NAME
 #     )
-    
 
+ 
 def allowed_file(filename):
     """Check if the uploaded file is allowed based on extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'pdf'}
-
-def send_budget_alerts():
-    """Send alerts for budgets exceeding thresholds."""
-    #connection = get_db_connection()
-    connection=get_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM budgets')
-    budgets = cursor.fetchall()
-
-    for budget in budgets:
-        if budget['amount'] > budget['threshold_value']:
-            send_alert_email(budget['category_id'], budget['amount'], budget['threshold_value'])
-
-    connection.close()
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=send_budget_alerts, trigger='interval', minutes=60)
-scheduler.start()
 
 def send_alert_email(user_mail,name, total_expenses, threshold_value):
         """Send an alert email to the user when budget threshold is exceeded."""
@@ -72,20 +54,7 @@ def send_alert_email(user_mail,name, total_expenses, threshold_value):
         except Exception as e:
             print(f"Error sending email: {e}")
         
-        
-        
-# def send_user_alert_email(user_email, total_expenses, user_budget):
-#     message = Message(
-#         "Personal Budget Alert",
-#         sender="krishna939078@gmail.com",
-#         recipients=[user_email]
-#     )
-#     msg.body = (
-#         f"Alert! Your total expenses have exceeded your personal budget.\n"
-#         f"Total Expenses: ${total_expenses}\n"
-#         f"Your Budget: ${user_budget}"
-#     )
-#     mail.send(message)
+
 
 def send_user_alert_email(user_email, total_expenses, user_budget):
     """Send an alert email to the user when budget for user is exceeded."""
@@ -116,10 +85,7 @@ def send_user_alert_email(user_email, total_expenses, user_budget):
 
 # Blueprint definition
 budget_bp = Blueprint('budget', __name__, template_folder='templates', static_folder='static')
-# Routes for the blueprint (as provided earlier)
 
-
-# Add routes and logic here (e.g., `/add_budget`, `/report`, etc.)
 
 
 # Budget routes
@@ -495,3 +461,147 @@ def report():
         report_data=report_data,
         report_type=report_type
     )
+    
+    
+@budget_bp.route('/request_budget', methods=['GET', 'POST'])
+def request_budget():
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Fetch all users from the database
+    cursor.execute('SELECT user_id, user_name FROM users')
+    users = cursor.fetchall()
+
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        requested_amount = float(request.form['requested_amount'])
+        reason = request.form['reason']
+
+        # Fetch the family_id and user_name of the selected user
+        cursor.execute('SELECT family_id, user_name FROM users WHERE user_id = %s', (user_id,))
+        user = cursor.fetchone()
+
+        if not user:
+            flash('User not found!', 'error')
+            connection.close()
+            return redirect('/request_budget')
+
+        family_id = user['family_id']
+        user_name = user['user_name']
+
+        # Now search for the HOF (Head of Family) with the same family_id
+        cursor.execute('SELECT email, user_name FROM users WHERE family_id = %s AND role = "HOF"', (family_id,))
+        hof_user = cursor.fetchone()
+
+        if hof_user:
+            hof_email = hof_user['email']
+            hof_name = hof_user['user_name']
+             # Send an email to the HOF with Accept/Reject links
+            subject = "Budget Request Alert"
+            body = f"""
+            Dear {hof_name},
+
+            A budget request has been submitted by a family member.
+
+            User Name: {user_name}
+            Requested Amount: ₹{requested_amount}
+            Reason: {reason}
+
+            Please review and take the necessary action.
+            To approve the request and add the requested amount to the user's budget, click here:
+            {url_for('budget.approve_reject', user_id=user_id, action='accept', requested_amount=requested_amount, _external=True)}
+
+            To reject the request, click here:
+            {url_for('budget.approve_reject', user_id=user_id, action='reject',requested_amount=requested_amount, _external=True)}
+             
+            Regards,
+            Budget Tracker Team
+            """
+            message = Message(subject=subject, recipients=[hof_email], body=body)
+            try:
+                mail = current_app.extensions['mail']
+                mail.send(message)
+                flash('Budget request email sent successfully!', 'success')
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                flash('Failed to send email to the HOF.', 'danger')
+        else:
+            flash('HOF not found for this family.', 'error')
+
+        connection.close()
+        return redirect('/budget')
+
+    connection.close()
+    return render_template('request_budget.html', users=users)
+
+
+@budget_bp.route('/approve_reject/<int:user_id>/<string:action>', methods=['GET'])
+def approve_reject(user_id, action):
+    requested_amount = request.args.get('requested_amount', type=float)
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Fetch the user email and name
+    cursor.execute('SELECT email, user_name FROM users WHERE user_id = %s', (user_id,))
+    user = cursor.fetchone()
+
+    if not user:
+        flash('User not found!', 'danger')
+        connection.close()
+        return redirect('/budget')
+
+    user_email = user['email']
+    user_name = user['user_name']
+
+    if action == 'accept':
+        # Update the user's budget
+        cursor.execute('''
+            UPDATE budgets
+            SET amount = amount + %s
+            WHERE user_id = %s
+        ''', (requested_amount, user_id))
+        connection.commit()
+
+        # Send an acceptance email
+        subject = "Budget Request Accepted"
+        body = f"""
+        Dear {user_name},
+
+        Your budget request of ₹{requested_amount} has been accepted and added to your budget.
+
+        Regards,
+        Budget Tracker Team
+        """
+    elif action == 'reject':
+        # Send a rejection email
+        subject = "Budget Request Rejected"
+        body = f"""
+        Dear {user_name},
+
+        Unfortunately, your budget request of ₹{requested_amount} has been rejected.
+
+        Regards,
+        Budget Tracker Team
+        """
+    else:
+        flash('Invalid action!', 'danger')
+        connection.close()
+        return redirect('/budget')
+
+    # Send email notification
+    message = Message(subject=subject, recipients=[user_email], body=body)
+    try:
+        mail = current_app.extensions['mail']
+        mail.send(message)
+        flash(f'Budget request {action}ed successfully and email sent to the user!', 'success')
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        flash('Failed to send email to the user.', 'danger')
+
+    connection.close()
+    return redirect('/budget')
+
+
+
+ 

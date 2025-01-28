@@ -1,161 +1,108 @@
 import mysql.connector
 from datetime import datetime 
-from flask import Flask,request,render_template,jsonify,redirect,url_for,Blueprint
+from flask import Flask,request,render_template,jsonify,redirect,url_for
 import os,time
 from werkzeug.utils import secure_filename
-from db_connection import get_connection
+from threading import Timer
+
 
 ## initializing the flask application
 app=Flask(__name__)
 
 
-expense_bp = Blueprint('expense', __name__, template_folder='templates', static_folder='static')
-
-
 ########## DEFINING A PATH TO SAVE THE UPLOADED FILES ##########
-# UPLOAD_FOLDER = './static/uploads/receipts'
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# sort_order={'date':'default',
-#             'name':'default',
-#             'amount':'default',
-#             'description':'default',
-#             'receipt':'default'}
-
-
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'receipts')
-
-# Configure the upload folder for the Flask application
+UPLOAD_FOLDER = 'static/uploads/receipts'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+sort_order={'date':'default',
+            'name':'default',
+            'amount':'default',
+            'description':'default',
+            'receipt':'default'}
 
-# Sort order for sorting functionality
-sort_order = {
-    'date': 'default',
-    'name': 'default',
-    'amount': 'default',
-    'description': 'default',
-    'receipt': 'default',
+
+#configuring the connect_ with the database
+db_config={
+    'host':'localhost',
+    'user':'root',
+    'password':'$9Gamb@098',
+    'database':'project_ufft',
+    'port':3306
 }
 
-
-# #configuring the connect_ with the database
-# db_config={
-#     'host':'localhost',
-#     'user':'root',
-#     'password':'$9Gamb@098',
-#     'database':'project_ufft',
-#     'port':3306
-# }
-
-# #establishing a conenction with the database using the configuration
-# connect_=mysql.connector.connect(**db_config)
-# cursor=connect_.cursor()
-
 #establishing a conenction with the database using the configuration
-connect_=get_connection()
-#cursor=connect_.cursor()
-cursor = connect_.cursor(buffered=True)
-
+connect_=mysql.connector.connect(**db_config)
+cursor=connect_.cursor()
 
 
 ########### ESTABLISHING A ROUTE FOR THE HTML REQUEST ##########
-@expense_bp.route('/', methods=["GET", "POST"])
+@app.route('/',methods=["GET",'POST']) #creates a root route for the flask application
+ #index function that returnrs the HTML content from the file and sends it to the user as a response for accessing the root URL
 def index():
     global current_date
     current_date = datetime.now().strftime('%Y-%m-%d')
+    ######### fetching users data ########
+    cursor.execute("SELECT user_id,user_name,family_id FROM users")
+    users_list=cursor.fetchall()
     
-    # Fetching users data
-    try:
-        cursor.execute("SELECT user_id, user_name, family_id FROM users")
-        users_list = cursor.fetchall()
-        
-        users = [
-            {
-                'user_id': user[0],
-                'user_name': user[1],
-                'family_id': user[2]
-            } for user in users_list
-        ]
-    except mysql.connector.Error as err:
-        print(f"Error fetching users: {err}")
-        users = []
-
-    if request.method == "GET":
-        return render_template('index.html', users=users, max_date=current_date)
+    users=[
+        {
+            'user_id': user[0],
+            'user_name':user[1],
+            'family_id': user[2]
+            
+        } for user in users_list
+    ]
+    
+    if request.method=="GET":
+        return render_template('index.html',users=users,max_date=current_date)
     else:
         global curr_user
         curr_user = request.form.get('user_id')
-        
         # Fetch expenses for the user
-        try:
-            cursor.execute("""
-                SELECT expense_id, date, name, amount, description, receipt 
-                FROM expenses e1 
-                JOIN categories c1 ON e1.category_id = c1.category_id 
-                WHERE user_id=%s 
-                ORDER BY expense_id DESC
-            """, (curr_user,))
-            expenses = cursor.fetchall()
-            
-            expense_records = [
-                {
-                    'expense_id': exp[0],
-                    'date_in': exp[1],
-                    'category': exp[2],
-                    'amount': exp[3],
-                    'desc': exp[4],
-                    'receipt': exp[5]
-                }
-                for exp in expenses
-            ]
-        except mysql.connector.Error as err:
-            print(f"Error fetching expenses: {err}")
-            expense_records = []
+        cursor.execute("SELECT expense_id, date, name, amount, description, receipt FROM expenses e1 JOIN categories c1 ON e1.category_id = c1.category_id WHERE user_id=%s ORDER BY expense_id DESC ",(curr_user,))
+        expenses = cursor.fetchall()
+
+        expense_records = [
+            {
+                'expense_id': exp[0],
+                'date_in': exp[1],
+                'category': exp[2],
+                'amount': exp[3],
+                'desc': exp[4],
+                'receipt': exp[5]
+            }
+            for exp in expenses
+        ]
 
         # Fetch recurring expenses
-        try:
-            cursor.execute("SELECT rec_id, description, amount, user_id FROM recc_expenses")
-            recs = cursor.fetchall()
-            
-            rec_exps = [
-                {
-                    'rec_id': exp[0],
-                    'description': exp[1],
-                    'amount': exp[2],
-                    'user_id': exp[3]
-                }
-                for exp in recs
-            ]
-        except mysql.connector.Error as err:
-            print(f"Error fetching recurring expenses: {err}")
-            rec_exps = []
+        cursor.execute("SELECT rec_id, description, amount, user_id FROM recc_expenses")
+        recs = cursor.fetchall()
+
+        rec_exps = [
+            {
+                'rec_id': exp[0],
+                'description': exp[1],
+                'amount': exp[2],
+                'user_id': exp[3]
+            }
+            for exp in recs
+        ]
 
         # Fetch all categories
-        try:
-            cursor.execute("SELECT * FROM categories")
-            cats = cursor.fetchall()
-            
-            categories = [
-                {
-                    'cat_id': item[0],
-                    'cat_name': item[1]
-                }
-                for item in cats
-            ]
-        except mysql.connector.Error as err:
-            print(f"Error fetching categories: {err}")
-            categories = []
+        cursor.execute("SELECT * FROM categories")
+        cats = cursor.fetchall()
+        categories = [
+            {
+                'cat_id': item[0],
+                'cat_name': item[1]
+            }
+            for item in cats
+        ]
+        return render_template('index.html',expenses=expense_records,user_id=curr_user,users=users,
+                reccur_exps=rec_exps,
+                categories=categories,
+                max_date=current_date) #Flask by default looks for templkate forlder to render the html file
 
-        return render_template(
-            'index.html',
-            expenses=expense_records,
-            user_id=curr_user,
-            users=users,
-            reccur_exps=rec_exps,
-            categories=categories,
-            max_date=current_date
-        )
 
 def get_expenses():
     cursor.execute("SELECT expense_id, date, name, amount, description, receipt FROM expenses e1 JOIN categories c1 ON e1.category_id = c1.category_id WHERE user_id=%s ORDER BY expense_id DESC ",(curr_user,))
@@ -192,7 +139,7 @@ def get_users():
     
 
 ########## SAVING THE UPLOADED FILES IN A FOLDER ############
-@expense_bp.route('/upload_receipt', methods=['POST'])
+@app.route('/upload_receipt', methods=['POST'])
 def upload_receipt():
     file = request.files['file']
     if file:
@@ -202,7 +149,7 @@ def upload_receipt():
 
 
 ###### getting the form data and calling the add expense function
-@expense_bp.route('/get_form_data',methods=['POST'])
+@app.route('/get_form_data',methods=['POST'])
 def get_form_data():
     
     user_id=1
@@ -266,37 +213,83 @@ def add_expense(family_id, category_id, amount, date_in, description="", receipt
     cursor.execute(query, tuple(params))
     connect_.commit()
 
- ######### AGE VERIFICATION ############
+   
+ 
+deleted_cache = {}
+undo_timeout = 10
 
-
-@expense_bp.route('/verify_major',methods=["GET"])
+######### AGE VERIFICATION ############
+@app.route('/verify_major', methods=["GET"])
 def verify_major():
-    cursor.execute("SELECT dob FROM users WHERE user_id=%s",(curr_user,))
-    dob=cursor.fetchone()[0]
-    current_day=datetime.today()
-    
-    age=abs(dob.year-current_day.year)
+    cursor.execute("SELECT dob FROM users WHERE user_id=%s", (curr_user,))
+    dob = cursor.fetchone()[0]
+    current_day = datetime.today()
+
+    age = abs(dob.year - current_day.year)
     if (current_day.month, current_day.day) < (dob.month, dob.day):
         age -= 1
-    
-    is_major = age > 18
-    return jsonify({"is_major": is_major})           
- 
 
-deleted_expenses = {}
-undo_timeout = 10 
-   
-########## DELETE EXPENSE  #######
-@expense_bp.route('/delete_expense/<int:expense_id>', methods=['POST'])
+    is_major = age > 18
+    return jsonify({"is_major": is_major})
+
+########## DELETE EXPENSE WITH AGE VERIFICATION ##########
+@app.route('/delete_expense/<int:expense_id>', methods=["POST"])
 def delete_expense(expense_id):
-    # Delete the expense from the database
-    print("called in app")
-    cursor.execute(" DELETE FROM expenses WHERE expense_id = %s", (expense_id,))
-    connect_.commit()
-    return render_template('index.html',expenses=get_expenses(),users=get_users(),max_date=current_date)
+    # Verify if the user is a major
+    cursor.execute("SELECT dob FROM users WHERE user_id=%s", (curr_user,))
+    dob = cursor.fetchone()[0]
+    current_day = datetime.today()
+
+    age = abs(dob.year - current_day.year)
+    if (current_day.month, current_day.day) < (dob.month, dob.day):
+        age -= 1
+
+    if age > 18:
+        # Fetch the expense to delete
+        cursor.execute("SELECT * FROM expenses WHERE expense_id=%s", (expense_id,))
+        expense = cursor.fetchone()
+
+        if expense:
+            # Store the deleted expense in the cache
+            deleted_cache[expense_id] = expense
+
+            # Start a timer to permanently delete the expense after 4 seconds
+            Timer(4.0, permanently_delete_expense, [expense_id]).start()
+
+            # Delete the expense from the database
+            cursor.execute("DELETE FROM expenses WHERE expense_id=%s", (expense_id,))
+            connect_.commit()
+
+            return jsonify({"message": "Expense deleted. Rollback available for 4 seconds."})
+        else:
+            return jsonify({"error": "Expense not found."})
+    else:
+        return jsonify({"error": "User is not a major and cannot delete expenses."})
+
+########## PERMANENTLY DELETE EXPENSE ##########
+def permanently_delete_expense(expense_id):
+    # Remove the expense from the cache after 4 seconds
+    if expense_id in deleted_cache:
+        del deleted_cache[expense_id]
+
+########## ROLLBACK DELETION ##########
+@app.route('/rollback_deletion/<int:expense_id>', methods=["POST"])
+def rollback_deletion(expense_id):
+    # Check if the expense is in the cache
+    if expense_id in deleted_cache:
+        # Restore the expense to the database
+        expense = deleted_cache.pop(expense_id)
+        cursor.execute(
+            "INSERT INTO expenses (expense_id, date_in, category, amount, desc) VALUES (%s, %s, %s, %s, %s)",
+            expense
+        )
+        connect_.commit()
+        return jsonify({"message": "Rollback successful."})
+    else:
+        return jsonify({"error": "Rollback window expired or expense already permanently deleted."})
 
 ############ EDIT EXPENSE #######
-@expense_bp.route('/edit_expense/<int:expense_id>', methods=["POST"])
+@app.route('/edit_expense/<int:expense_id>', methods=["POST"])
 def edit_expense(expense_id):
     ##### old values ####
     cursor.execute("SELECT amount,date,category_id,description,receipt FROM expenses WHERE expense_id=%s",(expense_id,))
@@ -352,7 +345,7 @@ def edit_expense(expense_id):
            
 
 ###### ADD AMOUNT #####    
-@expense_bp.route('/add_amount/<int:expense_id>',methods=["POST"])
+@app.route('/add_amount/<int:expense_id>',methods=["POST"])
 def add_amount(expense_id):
     cursor.execute("SELECT amount FROM expenses WHERE expense_id=%s",(expense_id,))
     old_amount=cursor.fetchone()[0]
@@ -365,83 +358,66 @@ def add_amount(expense_id):
     return render_template('index.html',expenses=get_expenses(),users=get_users(),max_date=current_date)
 
 
-@expense_bp.route('/filter_expenses', methods=["GET"])
+@app.route('/filter_expenses', methods=["GET"])
 def filter_expenses():
-    min_amount = request.args.get('filter_amount_range_min')  # Minimum amount input
-    max_amount = request.args.get('filter_amount_range_max')  # Maximum amount input
-    category = request.args.get('filter_category')  # Category input
-    desc = request.args.get('description')  # Description
-    receipt = request.args.get('receipt')  # Receipt
+    min_amount = request.args.get('filter_amount_range_min')  # Minimum amount input from the frontend
+    max_amount = request.args.get('filter_amount_range_max')  # Maximum amount input from the frontend
+    category = request.args.get('filter_category')  # Category input from the frontend
+    desc=request.args.get('description') # Description
+    receipt=request.args.get('receipt') #receipt   
 
-    # Base query and parameters
-    query = """
-        SELECT e.expense_id, e.date, c.name, e.amount, e.description, e.receipt
-        FROM expenses e
-        JOIN categories c ON e.category_id = c.category_id
-        WHERE e.user_id = %s
-    """
+    # Initialize base query and parameters
+    query = "SELECT e.expense_id,e.date,c.name,e.amount,e.description,e.receipt FROM expenses e JOIN categories c ON e.category_id = c.category_id WHERE user_id=%s "
     params = [curr_user]
-
-    # Add filters dynamically
-    conditions = []
-
+    
     if category:
-        conditions.append("c.name = %s")
-        params.append(category)
+        query+="c.name=%s AND"
+        params+=[category]
     if min_amount and max_amount:
-        conditions.append("e.amount BETWEEN %s AND %s")
-        params.extend([min_amount, max_amount])
+        query+=" e.amount BETWEEN %s AND %s AND"
+        params+=[min_amount,max_amount]
     elif min_amount:
-        conditions.append("e.amount >= %s")
-        params.append(min_amount)
+        query+=" e.amount>=%s AND"
+        params+=[min_amount]
     elif max_amount:
-        conditions.append("e.amount <= %s")
-        params.append(max_amount)
+        query+=" e.amount<%s AND"
+        params+=[max_amount]
+        
     if desc:
-        conditions.append("e.description IS NOT NULL")
+        query+=" e.description IS NOT NULL AND"
     if receipt:
-        conditions.append("e.receipt IS NOT NULL")
+        query+=" e.receipt IS NOT NULL AND"
+        
 
-    # Add conditions to the query
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
-
-    # Debug: Print query and params for troubleshooting
-    print("Generated Query:", query)
-    print("Parameters:", params)
-
-    # Execute the query
+    query=query[:-4]
     cursor.execute(query, tuple(params))
     filtered_expenses = cursor.fetchall()
-
-    # Format the result
-    filtered_expenses_list = [
+    
+    filtered_expenses_list=[
         {
-            'expense_id': exp[0],
-            'date_in': exp[1],
-            'category': exp[2],
-            'amount': exp[3],
-            'desc': exp[4],
-            'receipt': exp[5]
+            'expense_id':exp[0],
+            'date_in':exp[1],
+            'category':exp[2],            
+            'amount':exp[3],
+            'desc':exp[4],
+            'receipt':exp[5]            
         }
         for exp in filtered_expenses
     ]
-
-    # Render the filtered data
+    
     current_date = datetime.now().strftime('%Y-%m-%d')
-    return render_template('index.html', expenses=filtered_expenses_list, max_date=current_date)
-
+    return render_template('index.html', expenses=filtered_expenses_list,max_date=current_date)
 
 
 ###### route to reset the view ########
-@expense_bp.route('/reset_filters')
+@app.route('/reset_filters')
 def reset_filters():
     # Redirect to the root route, where the unfiltered data is displayed
-    return redirect(url_for('expense.index'))
+    return redirect('/')
 
 
 ###### Sorting function ##
-@expense_bp.route('/sort_table/<sort_by>')
+@app.route('/sort_table/<sort_by>')
 def sort_table(sort_by):
     query="SELECT e.expense_id,e.date,c.name,e.amount,e.description,e.receipt FROM expenses e JOIN categories c ON e.category_id = c.category_id WHERE user_id=%s "
     print(sort_by,sort_order[sort_by])
@@ -475,9 +451,9 @@ def sort_table(sort_by):
     return render_template('index.html', expenses=expenses, max_date=current_date)
         
 ######## ADD RECCURRING EXPENSE TO THE EXPENSES #########
-@expense_bp.route('/add_rec_to_exp/<int:rec_id>',methods=["POST"])
+@app.route('/add_rec_to_exp/<int:rec_id>',methods=["POST"])
 def add_rec_to_exp(rec_id):
-    cursor.execute("SELECT user_id, family_id, amount, category_id,description,receipt,date FROM rec_expenses where rec_id=%s ",(rec_id,))
+    cursor.execute("SELECT user_id, family_id, amount, category_id,description,receipt,date FROM recc_expenses where rec_id=%s ",(rec_id,))
     params=cursor.fetchone()
     params=list(params)
     params[-1]=request.form.get('date')
@@ -487,7 +463,7 @@ def add_rec_to_exp(rec_id):
 
 
 ####### METHOD TO ADD A NEW RECCURING EXPENSE #######
-@expense_bp.route('/add_rec_exp',methods=["POST"])
+@app.route('/add_rec_exp',methods=["POST"])
 def add_rec_exp(): 
     user_id=1
     family_id=1   
@@ -504,63 +480,11 @@ def add_rec_exp():
     
     desc=request.form.get('desc')
     
-    cursor.execute("INSERT INTO rec_expenses (user_id,family_id,category_id,date,amount,description) VALUES (%s,%s,%s,%s,%s,%s) ",(user_id,family_id,category_id,date_in,amount,desc,))
+    cursor.execute("INSERT INTO recc_expenses (user_id,family_id,category_id,date,amount,description) VALUES (%s,%s,%s,%s,%s,%s) ",(user_id,family_id,category_id,date_in,amount,desc,))
     connect_.commit()
     
     return render_template('index.html',expenses=get_expenses(),users=get_users(),max_date=current_date)
 
-
-@expense_bp.route('/overview',methods=["POST"])
-def overview():
-    select_par=int(request.form.get('duration'))    
-    # Define the base query
-    base_query = """
-    WITH category_totals AS (
-        SELECT 
-            c.name AS category_name, 
-            SUM(e.amount) AS total_spent_on_category
-        FROM expenses e
-        JOIN categories c ON e.category_id = c.category_id
-        WHERE e.user_id = {curr_user} {date_filter}
-        GROUP BY c.name
-        ORDER BY total_spent_on_category DESC
-        LIMIT 1
-    )
-    SELECT 
-        ROUND(SUM(e.amount), 2) AS total_spent,
-        (SELECT category_name FROM category_totals) AS most_spent_on_category,
-        (SELECT total_spent_on_category FROM category_totals) AS amount_spent_on_top_category,
-        ROUND(AVG(e.amount), 2) AS average_amount_spent,
-        COUNT(*) AS total_expenses_logged
-    FROM expenses e
-    WHERE e.user_id = {curr_user} {date_filter};
-    """
-
-    # Define date filters based on the option selected
-    date_filter = ""
-    match select_par:  # `select_par` determines the time range       
-        case 1:
-            date_filter = "AND e.date >= CURDATE() - INTERVAL 10 DAY"
-        case 2:
-            date_filter = "AND e.date >= CURDATE() - INTERVAL 15 DAY"
-        case 3:
-            date_filter = "AND e.date >= CURDATE() - INTERVAL 1 MONTH"
-        case 4:
-            date_filter = "AND e.date >= CURDATE() - INTERVAL 3 MONTH"
-        case 5:
-            date_filter = "AND e.date >= CURDATE() - INTERVAL 1 YEAR"
-        case 6:
-            date_filter = ""  # No date filter for all-time expenses
-
-    # Inject the date filter into the query
-    final_query = base_query.format(date_filter=date_filter,curr_user=curr_user)
-
-    # Execute the query
-    cursor.execute(final_query)
-   
-    tot=cursor.fetchone()
-    summary_=[tot[0],tot[1],tot[2],tot[3],tot[4]]
-    return render_template('index.html',summary=summary_,expenses=get_expenses(),users=get_users(),max_date=current_date,method="POST")
 
 if __name__=="__main__":
     app.run(debug=True)

@@ -41,11 +41,13 @@ def check_account(login_name,login_pass):
         cur.execute("select password from users where user_name = %s", (login_name,))
         row=cur.fetchone()
         if row==(login_pass,):
-            return True,"Successfull login"
+            cur.execute("select role from users where user_name=%s",(login_name,))
+            role=cur.fetchone()[0]
+            return True,"Successfull login",role
         else:
-            return False,"Invalid password"
+            return False,"Invalid password",None
     else:
-        return False,"Invalid username"
+        return False,"Invalid username",None
 
 def is_valid_password(password):
     special_characters = "!@#$%^&*(),.?\":{}|<>"
@@ -156,7 +158,6 @@ def member_code(mem_code):
 @user_reg_bp.route("/")
 def index():
     return render_template("home1.html")
-    
 
 @user_reg_bp.route("/signup",methods=['GET','POST'])
 def signup():
@@ -205,13 +206,25 @@ def signin():
     else:
          login_name = request.form['login_name']
          login_pass = request.form['login_pass']
+         session['login_name']=login_name
          
-         val, mess =check_account(login_name,login_pass)
+         val,mess,role =check_account(login_name,login_pass)
+         session['role']=role 
+         # After successfull login storing the Users Details in Session
+         if val:
+            session['username'] = login_name
+            # Fetch all required user details in a query
+            cur.execute("SELECT user_id,family_id, name FROM users WHERE user_name = %s", (login_name,))
+            user_data = cur.fetchone()
+            # Add user details to session
+            if user_data:
+                session['user_id'],session['family_id'], session['name'] = user_data
+            else:
+                print("User not found.")
          if not val:
             return render_template('signin.html', error=f"{mess}")
          
     return redirect(url_for('user_reg.welcome'))
-
 @user_reg_bp.route('/get_mail',methods=['GET','POST'])
 def get_mail():
     if request.method=='GET':
@@ -266,23 +279,20 @@ def otp():
         mail_otp=session.get('otp')
 
         if user_otp==mail_otp:
-            return redirect(url_for('user_reg.bankAcc'))
+            return redirect(url_for('user_reg.role'))
         else:
             return render_template('otp.html',error="Incorrect OTP")
 
 
 
 
-@user_reg_bp.route("/bankAcc",methods=['GET','POST'])
-def bankAcc():
+@user_reg_bp.route("/role",methods=['GET','POST'])
+def role():
     if request.method=='GET':
-        return render_template("bankAcc.html")
+        return render_template("role.html")
     else:
-        bank_acc_no=request.form['acc']
         role=request.form['role']
-
-        if not validate_account_number(bank_acc_no):
-            return render_template('bankAcc.html', error="Invalid account number. It must be a digit and between 9 and 18 digits long.")
+        session['role']=role
 
         name=session.get('name')
         user_name=session.get('user_name')
@@ -290,7 +300,7 @@ def bankAcc():
         dob=session.get('dob')
         phone_no=session.get('phone_no')
         email=session.get('email')
-        cur.execute("insert into users (name,user_name,password,phone_no,email,bank_acc_no,role,dob) values (%s,%s,%s,%s,%s,%s,%s,%s)",(name,user_name,password,phone_no,email,bank_acc_no,role,dob))
+        cur.execute("insert into users (name,user_name,password,phone_no,email,role,dob) values (%s,%s,%s,%s,%s,%s,%s)",(name,user_name,password,phone_no,email,role,dob))
         con.commit()
 
         if role=='HOF':
@@ -301,7 +311,7 @@ def bankAcc():
         elif role=='Member':
             return redirect(url_for('user_reg.member'))
         else:
-            return redirect(url_for('user_reg.welcome'))
+            return redirect(url_for('user_reg.signin'))
 
 
 
@@ -315,11 +325,11 @@ def hof():
          fam_name=request.form['fam_name']
          user_name=session.get('user_name')
          hof_code=session.get('hof_code')
-         cur.execute("insert into families (family_id,family_name) values(%s,%s)",(hof_code,fam_name))
+         cur.execute("insert into family (family_id,family_name) values(%s,%s)",(hof_code,fam_name))
          con.commit()
          cur.execute("update users set family_id=%s where user_name=%s",(hof_code,user_name))
          con.commit()
-    return redirect(url_for('user_reg.welcome'))
+    return redirect(url_for('user_reg.signin'))
     
 @user_reg_bp.route("/member",methods=['GET','POST'])
 def member():
@@ -334,7 +344,7 @@ def member():
         else:
             cur.execute("update users set family_id=%s where user_name=%s",(mem_code,user_name))
             con.commit()
-    return redirect(url_for('user_reg.welcome'))
+    return redirect(url_for('user_reg.signin'))
 
 
 
@@ -374,8 +384,10 @@ def options():
         elif opt=='full' :
             user=session.get('user')
             fam_id=session.get('family_id')
-            cur.execute("UPDATE users SET family_id = NULL WHERE family_id = %s", (fam_id,))
+            cur.execute("update users set role='None' where family_id=%s",(fam_id,) )
 
+            cur.execute("UPDATE users SET family_id = NULL WHERE family_id = %s", (fam_id,))
+           
 
             cur.execute("DELETE FROM users WHERE user_name = %s", (user,))
             con.commit()
@@ -383,9 +395,9 @@ def options():
 
         elif opt=='fam' :
             fam_id=session.get('family_id')
-            cur.execute("DELETE FROM families WHERE family_id = %s", (fam_id,))
-            con.commit()
+            cur.execute("update users set role='None' where family_id=%s",(fam_id,) )
             cur.execute("UPDATE users SET family_id = NULL WHERE family_id = %s", (fam_id,))
+            con.commit()
 
             return redirect(url_for('user_reg.welcome'))
 
@@ -404,7 +416,7 @@ def new_hof():
     else :
         new_hof=request.form['new_hof']
         user=session.get('user')
-        cur.execute("UPDATE users SET role = 'hof' WHERE user_name = %s", (new_hof,))
+        cur.execute("UPDATE users SET role = 'HOF' WHERE user_name = %s", (new_hof,))
         cur.execute("delete from users where user_name=%s", (user,))
         con.commit()
         return redirect(url_for('user_reg.index'))
@@ -416,7 +428,23 @@ def new_hof():
 
 @user_reg_bp.route("/welcome")
 def welcome():
-    return render_template('welcome.html')
+    family_id=session['family_id'] 
+    role=session['role']
+    role=role.lower()
+    name=session['name']
+    return render_template('welcome.html', family_id=family_id,role=role,name=name)
+
+@user_reg_bp.route('/MyAccount')
+def MyAccount():
+    username=session.get('login_name')
+    cur.execute('select user_id,name,user_name,role,phone_no,email,family_id,dob from users where user_name=%s',(username,))
+    row=cur.fetchone()
+    return render_template('account.html',row=row)
+
+@user_reg_bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('user_reg.index'))
     
 
 

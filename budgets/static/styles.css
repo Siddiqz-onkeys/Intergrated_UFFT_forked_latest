@@ -8,7 +8,7 @@
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #e3eaf5, #f9f6f1); 
-    color: #2c3e50; 
+    color: #16423C; 
     line-height: 1.6;
     padding: 20px;
     display: flex;
@@ -21,7 +21,7 @@ body {
 .container {
     width: 90%;
     max-width: 1200px;
-    background: #ffffff;
+    background: white;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     padding: 30px;
@@ -32,12 +32,12 @@ body {
 header {
     text-align: center;
     padding-bottom: 20px;
-    border-bottom: 2px solid #b3c6e0; 
+    border-bottom: 2px solid #C4DAD2; 
 }
 
 header h1 {
     font-size: 3rem;
-    color: #3b5998; 
+    color: #16423C; 
     margin-bottom: 10px;
 }
 
@@ -54,7 +54,7 @@ header img.logo {
     margin: 15px;
     font-size: 1.2rem;
     color: white;
-    background: linear-gradient(90deg, #5a9bd6, #3b5998); 
+    background: linear-gradient(90deg, #C4DAD2, #16423C); 
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -63,14 +63,14 @@ header img.logo {
 }
 
 .btn:hover {
-    background: linear-gradient(90deg, #3b5998, #2a4373); 
+    background: linear-gradient(90deg, #C4DAD2, #16423C); 
     transform: scale(1.05);
 }
 
 
 form {
     margin: 20px auto;
-    background: #f9f6f1; 
+    background: white; 
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -80,7 +80,7 @@ form label {
     display: block;
     margin: 10px 0 5px;
     font-size: 1rem;
-    color: #2c3e50; 
+    color: #16423C; /* Dark green for form labels */
 }
 
 form input,
@@ -88,9 +88,10 @@ form select {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid white;
     border-radius: 8px;
     font-size: 1rem;
+    color: #16423C; /* Dark green for input text */
 }
 
 form button {
@@ -99,7 +100,7 @@ form button {
     padding: 12px;
     font-size: 1rem;
     color: white;
-    background: #3b5998; 
+    background: #16423C;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -107,10 +108,9 @@ form button {
 }
 
 form button:hover {
-    background: #2a4373; 
+    background: #16423C;
     transform: scale(1.05);
 }
-
 /* Table Styling */
 table {
     width: 100%;
@@ -118,7 +118,7 @@ table {
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
-    background: #ffffff; 
+    background: white; 
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -130,21 +130,16 @@ table td {
 }
 
 table th {
-    background: linear-gradient(90deg, #5a9bd6, #3b5998); 
+    background: linear-gradient(90deg, #C4DAD2, #16423C); 
     color: white;
     font-size: 1rem;
 }
 
 table tr:hover {
-    background: #f2f5fa; 
+    background: white; 
     transform: scale(1.01);
     transition: transform 0.2s ease-in-out;
 }
-
-
-
-
-
 .checkbox-container {
     display: flex;
     align-items: center;
@@ -162,40 +157,31 @@ table tr:hover {
     font-weight: bold;
     color: #555;
 }
-
-
-
-
 .file-input {
     margin-top: 10px;
     font-size: 1rem;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid white;
     border-radius: 5px;
     width: 100%;
 }
-
-
 .actions {
     margin-top: 20px;
     text-align: center;
+    word-spacing: 20%;
 }
-
 .actions .btn {
     display: inline-block;
     margin: 10px auto;
+    background-color: #16423C;
+    word-spacing: 20%;
 }
-
-
-
-
-
 /* Add this to your existing styles.css file */
 .go-back-btn {
     display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #16423C;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -204,13 +190,8 @@ table tr:hover {
 }
 
 .go-back-btn:hover {
-    background-color: #0056b3;
+    background-color: #C4DAD2;
 }
-
-
-
-
-
 .flash-messages {
     margin-bottom: 20px;
 }

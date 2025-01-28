@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify,Blueprint
 from decimal import Decimal
-from savings_goals_manager import SavingsGoalsManager
+from .savings_goals_manager import SavingsGoalsManager
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for flash messages
 
-saving_bp = Blueprint('saving', __name__, template_folder='templates', static_folder='static')
-
-
 # Initialize the SavingsGoalsManager
 manager = SavingsGoalsManager()
+
+
+saving_bp = Blueprint('saving', __name__, template_folder='templates', static_folder='static')
 
 @saving_bp.route('/')
 def index():
@@ -83,7 +83,7 @@ def create_goal():
             if success:
                 flash("Savings goal created successfully!", "success")
             else:
-                flash("Failed to create savings goal.saving goal adready exits", "error")
+                flash("Failed to create savings goal. Saving goal already exits", "error")
         except ValueError as e:
             flash(f"Invalid input: {str(e)}", "error")
             
@@ -120,7 +120,7 @@ def contribute():
                     return "ERROR:No joint goal found."
 
                 if goal_info['joint_target_amount'] < amount:
-                    return f"ERROR:Contribution exceeds joint target! Maximum allowed: ${float(goal_info['joint_target_amount'])}"
+                    return f"ERROR:Contribution exceeds joint target! Maximum allowed: Rs {float(goal_info['joint_target_amount'])}"
 
                 # Update joint goal
                 update_query = """
@@ -151,7 +151,7 @@ def contribute():
                 if updated_goal['joint_target_amount'] == 0:
                     return "GOAL_COMPLETED:joint:Congratulations! The joint goal has been achieved!"
                 
-                return f"SUCCESS:Joint goal contribution successful! Remaining: ${float(updated_goal['joint_target_amount'])}"
+                return f"SUCCESS:Joint goal contribution successful! Remaining: Rs {float(updated_goal['joint_target_amount'])}"
 
             else:
                 # Handle existing user/family contribution logic
@@ -165,24 +165,118 @@ def contribute():
 
     return render_template('contribute.html')
 
-
 @saving_bp.route('/display_goals', methods=['GET', 'POST'])
 def display_goals():
-    goals = None
-    if request.method == 'POST':
-        try:
-            user_id = int(request.form['user_id'])
-            family_id = manager.get_family_id(user_id)
+    user_id = None
+    goals = []
+    family_goals = []
+    joint_goals = []
+    form_submitted = False
+    selected_goal_type = None
 
-            if family_id:
-                # Fetch goals from database
-                manager.cursor.execute("SELECT * FROM savings_goals WHERE family_id = %s", (family_id,))
+    if request.method == 'POST':
+        form_submitted = True
+        user_id = int(request.form.get('user_id'))
+        selected_goal_type = request.form.get('goal_type')
+        try:
+            if selected_goal_type == "user_goal":
+                # Fetch user-specific goals
+                manager.cursor.execute("""
+                    SELECT 
+                        user_id, 
+                        user_goal, 
+                        user_target_amount, 
+                        deadline 
+                    FROM savings_goals 
+                    WHERE user_id = %s 
+                    AND user_goal IS NOT NULL
+                """, (user_id,))
                 goals = manager.cursor.fetchall()
 
-        except ValueError as e:
-            flash(f'Invalid input: {str(e)}', 'error')
+            elif selected_goal_type == "family_goal":
+                # Fetch family goals
+                family_id = manager.get_family_id(user_id)
+                if family_id:
+                    manager.cursor.execute("""
+                        SELECT 
+                            family_goal, 
+                            family_target_amount, 
+                            deadline 
+                        FROM savings_goals 
+                        WHERE family_id = %s 
+                        AND family_goal IS NOT NULL
+                        LIMIT 1
+                    """, (family_id,))
+                    family_goals = manager.cursor.fetchall()
+                else:
+                    flash("Invalid user ID or user does not belong to any family.", "error")
 
-    return render_template('display_goals.html', goals=goals)
+            elif selected_goal_type == "joint_goal":
+                # Fetch joint goals
+                manager.cursor.execute("""
+                    SELECT 
+                        jg.joint_id,
+                        jg.joint_goal_amount,
+                        jg.joint_target_amount,
+                        jg.deadline
+                    FROM joint_goals jg
+                    JOIN joint_goal_participants jgp ON jg.joint_id = jgp.joint_id
+                    WHERE jgp.user_id = %s
+                """, (user_id,))
+                joint_goals = manager.cursor.fetchall()
+
+        except Exception as e:
+            flash(f"An unexpected error occurred: {str(e)}", "error")
+
+    return render_template('display_goals.html', 
+                           goals=goals, 
+                           family_goals=family_goals, 
+                           joint_goals=joint_goals, 
+                           form_submitted=form_submitted, 
+                           selected_goal_type=selected_goal_type,
+                           user_id=user_id)
+
+@saving_bp.route('/delete_goal/<goal_type>/<int:goal_id>', methods=['POST'])
+def delete_goal(goal_type, goal_id):
+    r=0
+    try:
+        if goal_type == 'user':
+            manager.delete_user_goal(goal_id)
+            # flash(f"Joint goal with ID {goal_id} deleted successfully.")
+        elif goal_type == 'family':
+            manager.delete_family_goal(goal_id)
+        elif goal_type == 'joint':
+            user_id = request.form.get('user_id')
+            # Validate user_id
+            if not user_id:
+                flash("User ID is required for joint goals.", "error")
+                return redirect(url_for('saving.display_goals'))
+
+            if not user_id.isdigit():
+                flash(f"Invalid user ID: {user_id}. Must be a numeric value.", "error")
+                return redirect(url_for('saving.display_goals'))
+            query="SELECT COUNT(%s) FROM joint_goal_participants WHERE joint_id=%s"
+            manager.cursor.execute(query,(goal_id,goal_id,))
+            cou=manager.cursor.fetchone()
+            print(cou)
+            for i in cou.values():
+                r=i
+                break
+            print(r)
+            if r<=2:
+                num=0
+            else:
+                num=1
+            manager.delete_joint_goal(goal_id, user_id,num)  # Pass user_id to this method
+            if num==0:
+                flash(f"Entire Joint goal deleted successfully.")
+            else:
+                flash(f"User {user_id} is withdrawn from the joint goal.")
+
+    except Exception as e:
+        flash(f"Failed to delete goal: {str(e)}", "error")
+    return redirect(url_for('saving.display_goals'))
+
 @saving_bp.route('/create_joint_goal', methods=['GET', 'POST'])
 def create_joint_goal():
     if request.method == 'POST':
@@ -259,11 +353,34 @@ def get_joint_goals(user_id):
         print(f"Error fetching joint goals: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@saving_bp.route('/get_user_joint_goals/<int:user_id>')
+def get_user_joint_goals(user_id):
+    try:
+        query = """
+        SELECT 
+            jg.joint_id,
+            jg.joint_goal_amount,
+            jg.joint_target_amount,
+            jg.deadline
+        FROM joint_goals jg
+        JOIN joint_goal_participants jgp ON jg.joint_id = jgp.joint_id
+        WHERE jgp.user_id = %s
+        """
+        manager.cursor.execute(query, (user_id,))
+        goals = manager.cursor.fetchall()
+        return jsonify([{
+            'joint_id': goal['joint_id'],
+            'joint_goal_amount': float(goal['joint_goal_amount']),
+            'joint_target_amount': float(goal['joint_target_amount']),
+            'deadline': goal['deadline'].strftime('%Y-%m-%d')
+        } for goal in goals])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @saving_bp.route('/get_joint_contributions/<int:joint_id>')
 def get_joint_contributions(joint_id):
-    """Get contribution details for a joint goal"""
     try:
-        # Get joint goal details
         query = """
         SELECT 
             jg.joint_goal_amount,
@@ -282,7 +399,6 @@ def get_joint_contributions(joint_id):
         if not results:
             return jsonify({'error': 'Joint goal not found'}), 404
 
-        # Calculate total contributed amount
         total_contributed = sum(float(result['contributed_amount']) for result in results)
         joint_goal_amount = float(results[0]['joint_goal_amount'])
         remaining = float(results[0]['joint_target_amount'])
@@ -291,7 +407,7 @@ def get_joint_contributions(joint_id):
             'joint_goal_amount': joint_goal_amount,
             'total_contributed': total_contributed,
             'remaining': remaining,
-            'progress': ((joint_goal_amount - remaining) / joint_goal_amount * 100),
+            'progress': 0 if joint_goal_amount == 0 else ((total_contributed / joint_goal_amount) * 100),  # Fixed progress calculation
             'participants': [{
                 'user_id': result['user_id'],
                 'name': result['name'] if result['name'] else f'User {result["user_id"]}',
@@ -303,9 +419,34 @@ def get_joint_contributions(joint_id):
     except Exception as e:
         print(f"Error fetching joint contributions: {str(e)}")
         return jsonify({'error': str(e)}), 500
+    
+@saving_bp.route('/delete_joint_goal_action/<int:joint_id>', methods=['POST'])
+def delete_joint_goal_action(joint_id):
+    """
+    Handle the deletion of a joint goal based on user selection:
+    - Withdraw contributions.
+    - Leave contributions made.
+    """
+    action = request.form.get('action')
+    user_id = int(request.form.get('user_id'))
+
+    try:
+        if action == "withdraw":
+            manager.delete_joint_goal(joint_id, user_id, 0)  # Withdraw contributions
+            flash("Contributions withdrawn and joint goal deleted.", "success")
+        elif action == "leave":
+            manager.delete_joint_goal(joint_id, user_id, 1)  # Leave contributions
+            flash("Left contributions as it is and joint goal deleted.", "success")
+        else:
+            flash("Invalid action for joint goal deletion.", "error")
+    except Exception as e:
+        flash(f"Error deleting joint goal: {str(e)}", "error")
+
+    return redirect(url_for('saving.display_goals'))
+
+
 @saving_bp.route('/update_goal', methods=['GET', 'POST'])
 def update_goal():
-    # Get URL parameters for pre-filling the form
     pre_fill_user_id = request.args.get('user_id', '')
     pre_fill_goal_type = request.args.get('goal_type', 'user')
 
@@ -321,21 +462,41 @@ def update_goal():
                 flash('Update cancelled by user.', 'error')
                 return redirect(url_for('saving.update_goal'))
 
-            if update_type == 'user':
+            if update_type == 'joint':
+                joint_id = int(request.form['joint_id'])
+                
+                # Verify user participation
+                query = "SELECT 1 FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
+                manager.cursor.execute(query, (joint_id, user_id))
+                if not manager.cursor.fetchone():
+                    flash('You are not a participant in this joint goal.', 'error')
+                    return redirect(url_for('saving.update_goal'))
+
+                # Update joint goal
+                update_query = """
+                UPDATE joint_goals 
+                SET joint_target_amount = %s,
+                    deadline = %s
+                WHERE joint_id = %s
+                """
+                manager.cursor.execute(update_query, (new_goal, deadline, joint_id))
+                manager.connection.commit()
+                flash('Joint goal updated successfully!', 'success')
+
+            elif update_type == 'user':
                 success, message = manager.new_update_goal(user_id, new_goal, deadline)
+                flash(message, 'success' if success else 'error')
             else:  # family
                 if not manager.is_admin(user_id):
                     flash('Only administrators can update family goals.', 'error')
                     return redirect(url_for('saving.update_goal'))
                 success, message = manager.new_update_family_goal(user_id, new_goal, deadline)
-
-            if success:
-                flash(message, 'success')
-            else:
-                flash(message, 'error')
+                flash(message, 'success' if success else 'error')
 
         except ValueError as e:
             flash(f'Invalid input: {str(e)}', 'error')
+        except Exception as e:
+            flash(f'Error updating goal: {str(e)}', 'error')
 
         return redirect(url_for('saving.update_goal'))
 

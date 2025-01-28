@@ -6,47 +6,23 @@
         <title>Expense Tracker</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-        <link rel="stylesheet" href="static/styles.css">
+        <link rel="stylesheet" href="{{ url_for('data_visualization.static', filename='styles.css') }}"> 
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script src="static/js/Expanse.js"></script>
     </head>
     <body>
         <div class="container py-4">
             
-            <h1 class="text-center">Expense Data</h1>
+            <h1 class="text-center">Expense Report</h1>
             <!-- Top Navigation -->
             <div class="d-flex justify-content-end align-items-end mb-4">
                 <a href="{{ url_for('user_reg.welcome') }}" class="btn btn-danger mx-2">Back to Home</a>
                 <a href="{{ url_for('data_visualization.show_history') }}" class="btn btn-success">Show History</a>
             </div>
-
-            <!-- Family Dropdown and Fetch Button -->
-            <div class="row justify-content-center my-3">
-                <div class="col-md-4">
-                    <label for="family_id" class="form-label">Select Family:</label>
-                    <select name="family_id" id="family_id" class="form-select">
-                        <option value="">-- Select Family --</option>
-                        {% for family in families %}
-                        <option value="{{ family.family_id }}" {% if family.family_id|string==family_id|string %}selected{%
-                            endif %}>
-                            {{ family.family_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-primary mt-4" id="fetchFamilyMembersBtn">Fetch Members</button>
-                </div>
-            </div>
-            <script>
-                const fetchFamilyUrl = "{{ url_for('data_visualization.fetch_family_members') }}";
-            </script>
-
+            
             <!-- Hidden Family ID -->
             <form method="POST"  action="{{ url_for('data_visualization.index') }}"  class="row g-3 align-items-center justify-content-center">
-                <input type="hidden" name="family_id" id="hidden_family_id" value="{{ family_id }}">
-
+                <!-- <input type="hidden" name="family_id" id="hidden_family_id" value="{{ family_id }}"> -->
                 <!-- User Dropdown, Search, and Time Range -->
                 <div class="col-md-3">
                     <label for="user_id" class="form-label">Select User:</label>
@@ -59,7 +35,9 @@
                             {{ member.name }}
                         </option>
                         {% endfor %}
+                        {% if u_role =='hof' %}
                         <option value="all" {% if selected_user_id=='all' %}selected{% endif %}>All Family Members</option>
+                        {% endif %}
                         {% endif %}
                     </select>
                 </div>
@@ -103,7 +81,7 @@
             {% endif %}
             <!-- Expense Table -->
             {% if expenses %}
-            <h2 class="text-center mt-5">Expense Report</h2>
+            <h2 class="text-center mt-5">Expense Data</h2>
             <div class="d-flex justify-content-center my-3">
                 <input type="text" id="searchInput" class="form-control w-25" placeholder="Search expenses..."
                     oninput="filterExpenses()">
@@ -233,31 +211,34 @@
         </div>
         {% endif %}
         </div>
-        
-        
-        <!-- <script>
-            document.getElementById("generate-summary-btn").addEventListener("click", function () {
-                fetch("/generate_summary", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.summary) {
-                            document.getElementById("summary-result").innerHTML = `<strong>Summary:</strong> ${data.summary}`;
-                        } else {
-                            document.getElementById("summary-result").innerHTML = `<strong>Error:</strong> ${data.error}`;
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        document.getElementById("summary-result").innerHTML = `<strong>Error generating summary.</strong>`;
-                    });
-            });
-        </script> -->
 
+        <!-- summary part -->
+        
+        <div class="container mt-4">
+            <!-- Generate Summary Section -->
+            {% if expenses %}
+            <div class="card shadow-lg p-4">
+                <h2 >Expense Analysis</h2>
+                <button id="generate-summary-btn" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-chart-line"></i> Generate Summary
+                </button>
+                <div id="summary-result" class="mt-4 alert alert-info d-none"></div>
+        
+                <!-- Brief Summary Section -->
+                <div id="brief-summary-section" class="mt-4 d-none">
+                    <button id="generate-brief-summary-btn" class="btn btn-secondary btn-lg" style="background-color: #2a4d69; color: white;">
+                        <i class="fas fa-list"></i> Generate Brief Summary
+                    </button>
+                    <div id="brief-summary-result" class="mt-4 alert alert-secondary d-none"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- JavaScript Logic -->
+        <script src="static/js/summary.js"> </script>
+        <!-- summary ends -->
+         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Bootstrap Icons for success icon -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">

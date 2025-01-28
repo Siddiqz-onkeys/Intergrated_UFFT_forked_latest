@@ -44,6 +44,11 @@
             <button class="btn" onclick="toggleOverview('category')">Category Budgets</button>
             <button class="btn" onclick="toggleOverview('user')">User Budgets</button>
         </div>
+                <!-- Link to Request Additional Budget -->
+                <div>
+                    <h2>Request Additional Budget</h2>
+                    <a href="{{ url_for('budget.request_budget') }}" class="btn">Click here to request additional budget</a>
+                </div>
 
         <!-- Category Budgets Overview -->
         <div id="category-budgets" class="visible">
@@ -105,10 +110,8 @@
             <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
             <a href="{{ url_for('budget.expenses') }}" class="btn">Add Expense</a>
             <a href="{{ url_for('budget.report') }}" class="btn">View Reports</a>
-            <a href="{{ url_for('user_reg.welcome') }}" class="btn">Back to Home</a>
+            <a href="{{ url_for('user_reg.welcome') }}" class="btn">Back to home</a>
         </div>
     </div>
-
-
 </body>
 </html>

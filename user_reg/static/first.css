@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 *{
     margin:0;
     padding:0;
     box-sizing: border-box;
-    font-family: "Outfit", sans-serif;
+    font-family: "Montserrat", serif;
 }
 
 body{
@@ -14,7 +14,7 @@ body{
     min-height: 100vh;
     background-size: cover;
     background-position: center;
-    background-image: url(./background.jpeg);
+    background-image: linear-gradient(to right, #16423C , #C4DAD2);
 }
 
 .container{
@@ -34,7 +34,25 @@ h1{
     font-weight: 600;
     padding-bottom:26px;
     letter-spacing: 0.5;
-    color:#213555;
+    color:#16423C;
+}
+
+ul{
+    text-align:center;
+    font-size: 25px;
+    font-weight: 600;
+    padding-bottom:26px;
+    letter-spacing: 0.5;
+    color:#16423C;
+    appearance: none;
+}
+li{
+    text-align:center;
+    font-size: 25px;
+    font-weight: 600;
+    padding-bottom:16px;
+    letter-spacing: 0.5;
+    color:#16423C;
 }
 
 .sl {
@@ -46,13 +64,13 @@ h1{
 .google-btn{
     width:48%;
     height: 45px;
-    background: transparent;
+    background: #16423C;
     border: 2px solid rgba(216, 196, 182, .2);
     border-radius: 40px;
     box-shadow: 0 0 10px  rgba(0, 0, 0, .2);
     cursor: pointer;
     font-size: 16px;
-    color:#D8C4B6 ;
+    color:  #C4DAD2;
     font-weight: 500;
     line-height: 1;
     transition:all .4s ease-in-out;
@@ -69,14 +87,20 @@ input{
     background: transparent;
     border: 2px solid rgba(255,255,255,.2);
     border-radius: 40px;
-    font-size: 24px;
-    color:#D8C4B6;
+    font-size: 20px;
+    color:#EFE3C2;
     padding: 20px,45px,20px,20px;
     padding-left:20px;
+    outline: none; 
+}
+
+input:focus{
+    border-color: #16423C;
 }
 
 input::placeholder{
     color:#D8C4B6;
+    font-size: 20px;
 }
 
 p {
@@ -116,3 +140,12 @@ legend{
     color:#D8C4B6;
 }
 
+
+input[type="date"]::placeholder {
+    color: transparent; /* Hides the default placeholder */
+}
+
+input[type="date"] {
+    font-size: 20px;
+    color: #D8C4B6;
+}

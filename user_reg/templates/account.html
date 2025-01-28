@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Montserrat", serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-image: linear-gradient(to right, #16423C , #C4DAD2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 43px;
+            font-weight: 600;
+            padding-bottom: 26px;
+            letter-spacing: 0.5;
+            color: #16423C;
+        }
+
+        th,
+        td {
+            font-size: 24px;
+            color: #16423C;
+            padding: 10px;
+        }
+
+        .container {
+            width: 600px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 13px;
+            padding: 30px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: rgb(62, 88, 121);
+            backdrop-filter: blur(9px);
+        }
+
+        .google-btn {
+            width: 200px;         
+            height: 45px;
+            background: #16423C;
+            border: 2px solid rgba(216, 196, 182, 0.2);
+            border-radius: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 20px;
+            color: #C4DAD2;
+            font-weight: 500;
+            transition: all 0.4s ease-in-out;
+            padding: 0;
+        }
+
+        .google-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background-color: #960019;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-spacing: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>My ACCOUNT</h1>
+
+        <table>
+            <tr>
+                <th>User ID</th>
+                <td>{{ row[0] }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ row[1] }}</td>
+            </tr>
+            <tr>
+                <th>Username</th>
+                <td>{{ row[2] }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ row[3] }}</td>
+            </tr>
+            <tr>
+                <th>Phone Number</th>
+                <td>{{ row[4] }}</td>
+            </tr>
+            <tr>
+                <th>Email ID</th>
+                <td>{{ row[5] }}</td>
+            </tr>
+            <tr>
+                <th>Family ID</th>
+                <td>{{ row[6] }}</td>
+            </tr>
+            <tr>
+                <th>Date of Birth</th>
+                <td>{{ row[7] }}</td>
+            </tr>
+        </table>
+
+        <div class="form-container">
+            <form action="{{ url_for('user_reg.welcome') }}">
+                <input type="submit" value="Back" class="google-btn">
+            </form>
+            <form action="{{ url_for('user_reg.del_acc') }}">
+                <input type="submit" value="Delete Account" class="google-btn delete-btn">
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

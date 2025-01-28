@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Additional Budget</title>
+     
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 40%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #007BFF;  /* Changed to a blue color */
+            margin-top: 250px;
+        }
+
+        form {
+            width: 70%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        select, input[type="number"], input[type="date"], textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input, .form-group select {
+            width: calc(100% - 10px);
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .form-group input:last-child, .form-group select:last-child {
+            margin-right: 0;
+        }
+
+        .form-group label {
+            font-size: 1.2rem;
+            margin-bottom: 7px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group input, .form-group select {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+     
+    
+    <h1>Request Additional Budget</h1>
+    <form method="POST" action="/budget/request_budget" method="post">
+        <label for="user_id">Select User:</label>
+        <select name="user_id" required>
+            {% for user in users %}
+                <option value="{{ user.user_id }}">{{ user.user_name }}</option>
+            {% endfor %}
+        </select>
+    
+        <label for="requested_amount">Requested Amount:</label>
+        <input type="number" name="requested_amount" step="0.01" required>
+    
+        <label for="reason">Reason:</label>
+        <textarea name="reason" required></textarea>
+    
+        <button type="submit">Submit Request</button>
+    </form>
+    
+
+</body>
+</html>

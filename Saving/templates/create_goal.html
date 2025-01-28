@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Savings Goal</title>
     <style>
-        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -13,144 +12,192 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #F5EFE7;
-            color: #213555;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 2rem;
         }
 
         .container {
-            background-color: #FFFFFF;
-            padding: 40px 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            max-width: 450px;
+            background: rgba(196, 218, 210, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
             width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            animation: fadeScale 0.8s ease-out;
         }
 
         h1 {
-            color: #3E5879;
-            margin-bottom: 30px;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
             text-align: center;
-        }
-
-        .flash-message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .flash-success {
-            background-color: lightgreen;
-            color: #155724;
-        }
-
-        .flash-error {
-            background-color: #F8D7DA;
-            color: #721C24;
+            margin-bottom: 2rem;
+            color: #C4DAD2;
         }
 
         .form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 1.5rem;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            gap: 0.5rem;
         }
 
         label {
-            margin-bottom: 5px;
-            font-weight: bold;
             font-size: 0.9rem;
-            color: #213555;
+            letter-spacing: 0.5px;
+            color: #D8C4B6;
         }
 
         input, select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #D8C4B6;
-            border-radius: 5px;
-            background-color: #FFFFFF;
-            transition: all 0.3s;
+            background: rgba(196, 218, 210, 0.05);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            color: #C4DAD2;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         input:focus, select:focus {
-            border-color: #3E5879;
             outline: none;
+            border-color: #C4DAD2;
+            background: rgba(196, 218, 210, 0.1);
+        }
+
+        /* Style for date input calendar icon */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) opacity(0.7);
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            line-height: 1.5;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #16423C;
         }
 
         .checkbox-group label {
             margin: 0;
+            font-size: 0.9rem;
         }
 
-        input[type="checkbox"] {
-            transform: scale(1.2);
-            cursor: pointer;
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .flash-success {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid rgba(72, 187, 120, 0.2);
+            color: #C4DAD2;
+        }
+
+        .flash-error {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid rgba(245, 101, 101, 0.2);
+            color: #C4DAD2;
         }
 
         .btn {
-            background-color: #213555;
-            color: #F5EFE7;
-            border: none;
-            padding: 12px;
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
+            padding: 1rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
             font-size: 1rem;
             cursor: pointer;
-            border-radius: 5px;
-            text-align: center;
-            transition: all 0.3s;
-            width: 100%;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
         }
 
         .btn:hover {
-            background-color: #3E5879;
+            background: linear-gradient(135deg, #1a4e47 0%, #16423C 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .back-link {
-            display: block;
-            margin-top: 20px;
-            text-align: center;
+            display: inline-block;
+            margin-top: 1.5rem;
             text-decoration: none;
-            color: #213555;
+            color: #D8C4B6;
             font-size: 0.9rem;
-            padding: 10px;
-            border: 1px solid #213555;
-            border-radius: 5px;
-            transition: all 0.3s;
+            text-align: center;
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
+            transition: all 0.3s ease;
         }
 
         .back-link:hover {
-            background-color: #213555;
-            color: #F5EFE7;
+            background: rgba(196, 218, 210, 0.1);
+            transform: translateY(-2px);
         }
 
         #family_goal_section {
             display: none;
-            margin-top: 10px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Create Savings Goal</h1>
-         <div aria-live="polite">
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -160,40 +207,45 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
         <form method="POST" action="{{ url_for('saving.create_goal') }}" class="form">
             <div class="form-group">
-                <label for="user_id">User ID:</label>
+                <label for="user_id">User ID</label>
                 <input type="number" id="user_id" name="user_id" required>
             </div>
+            
             <div class="form-group">
-                <label for="user_goal">User Goal Amount:</label>
+                <label for="user_goal">User Goal Amount</label>
                 <input type="number" id="user_goal" name="user_goal" step="1" required>
             </div>
+            
             <div class="form-group">
-                <label for="deadline">Deadline (YYYY-MM-DD):</label>
+                <label for="deadline">Deadline</label>
                 <input type="date" id="deadline" name="deadline" required>
             </div>
+            
             <div class="checkbox-group">
                 <input type="checkbox" id="create_family_goal" name="create_family_goal">
-                <label for="create_family_goal">I want to create a Family Goal (Admin only)</label>
+                <label for="create_family_goal">Create Family Goal (Admin only)</label>
             </div>
+            
             <div id="family_goal_section" class="form-group">
-                <label for="family_goal">Family Goal Amount:</label>
+                <label for="family_goal">Family Goal Amount</label>
                 <input type="number" id="family_goal" name="family_goal" step="1">
             </div>
+            
             <button type="submit" class="btn">Create Goal</button>
         </form>
+        
         <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
-        // Show/Hide family goal section based on checkbox
-        document.getElementById('create_family_goal').addEventListener('change', function () {
+        document.getElementById('create_family_goal').addEventListener('change', function() {
             const familyGoalSection = document.getElementById('family_goal_section');
             familyGoalSection.style.display = this.checked ? 'block' : 'none';
         });
 
-        // Set minimum date to today for the deadline input
         const deadlineInput = document.getElementById('deadline');
         const today = new Date().toISOString().split('T')[0];
         deadlineInput.setAttribute('min', today);

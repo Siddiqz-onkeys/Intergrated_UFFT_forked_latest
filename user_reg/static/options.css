@@ -12,20 +12,20 @@ body{
     min-height: 100vh;
     background-size: cover;
     background-position: center;
-    background-image: url(./background.jpeg);
+    background-image: linear-gradient(to right, #16423C , #C4DAD2);;
 }
 
 
 .google-btn{
     width:48%;
     height: 45px;
-    background: transparent;
+    background: #16423C;
     border: 2px solid rgba(216, 196, 182, .2);
     border-radius: 40px;
     box-shadow: 0 0 10px  rgba(0, 0, 0, .2);
     cursor: pointer;
     font-size: 16px;
-    color:#D8C4B6 ;
+    color: #C4DAD2;;
     font-weight: 500;
     line-height: 1;
     transition:all .4s ease-in-out;
@@ -42,7 +42,7 @@ h1{
     font-weight: 600;
     padding-bottom:26px;
     letter-spacing: 0.5;
-    color:#213555;
+    color:#16423C;
 }
 
 p{
@@ -51,7 +51,7 @@ p{
     font-weight: 600;
     padding-bottom:26px;
     letter-spacing: 0.5;
-    color:#213555;
+    color:#16423C;
 }
 
 .container{
@@ -59,7 +59,7 @@ p{
     background: transparent;
     border: 2px solid rgba(62, 88, 121,.2);
     backdrop-filter: blur(9px);
-    color:#D8C4B6 ;
+    color:#EFE3C2;
     border-radius: 13px;
     padding: 30px 40px;
     align-items: center;
@@ -73,4 +73,22 @@ p{
     display: flex;
     justify-content: center;
     margin: 20px 0;
+}
+
+input[type="radio"] {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #D8C4B6;
+    border-radius: 50%;
+    
+    
+    
+   
+}
+
+/* Style for checked radio button */
+input[type="radio"]:checked {
+    background-color: #16423C; /* Inner circle color */
+    border-color: #D8C4B6;
 }
