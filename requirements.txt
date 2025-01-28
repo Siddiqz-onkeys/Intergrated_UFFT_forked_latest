@@ -1,6 +1,6 @@
 Flask==2.3.2
 Flask-Mail==0.9.1
-mysql-connector-python==8.0.34
+mysql-connector-python
 transformers==4.33.3
 apscheduler==3.10.1
 pandas==2.1.1
