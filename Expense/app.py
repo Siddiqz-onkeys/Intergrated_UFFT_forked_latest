@@ -115,7 +115,7 @@ def index():
 
         # Fetch recurring expenses
         try:
-            cursor.execute("SELECT rec_id, description, amount, user_id FROM recc_expenses")
+            cursor.execute("SELECT rec_id, description, amount, user_id FROM recc_expenses WHERE user_id=%s",(curr_user,))
             recs = cursor.fetchall()
             
             rec_exps = [
