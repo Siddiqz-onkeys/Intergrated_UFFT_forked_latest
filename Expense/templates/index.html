@@ -41,19 +41,8 @@
                     <!-- ####### ADD EXPENSE FORM #######-->
                     <div class="add_expense_form">
                         <!-- #############  START OF THE FORM ###############-->
-
-                             <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                 
-                            <!-- ######### User_ID #######-->
-                            <label for="user_ID" name="user_id">User_ID</label>
-                            <input type="number" value="1" disabled>
-                            <br><br>
-
-
-                            <!-- ######### family_ID #######-->
-                            <label for="family_ID" name="family_id">Family_ID</label>
-                            <input type="number" value="1" disabled><br><br>
-
-
+                        <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                 
+                            
                             <!-- ########## the input for category ##########-->
                            <select id="category" name="category">
         
