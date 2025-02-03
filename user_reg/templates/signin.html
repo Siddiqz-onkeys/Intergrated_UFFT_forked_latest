@@ -3,18 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>SignIn</title>
     <link rel="stylesheet" href="/user_reg/static/first.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        #togglePassword {
+            position: absolute;
+            right: 28px; 
+            top: 53%;
+            transform: translateY(-109%);
+            cursor: pointer;
+  }
+  .error{
+    color: #960019;
+  font-size: 18px;
+  }
+  .pass-input{
+    position: relative;
+  }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Sign In</h1>
         {% if error %}
-        <p style="color: white;">{{error}}</p>
+        <p class="error">{{error}}</p>
         {% endif %}
-        <form action="{{url_for('user_reg.signin')}}" method="POST">
+        <form action="{{url_for('user_reg.signin')}}" method="POST" id="passwordForm">
             <input type="text" placeholder="Username" name="login_name" required="required"><br><br>
-            <input type="text" placeholder="Password" name="login_pass" required="required"><br><br>
+            <div class="pass-input">
+            <input type="password" placeholder="Password" name="login_pass" required="required" id="password">
+            <span id="togglePassword"><i class="far fa-eye-slash"></i></span><br><br></div>
             <p>Forgot Password ? <a href="{{url_for('user_reg.get_mail')}}">Reset password </a></p>
             <div class="sl">
                 <input type="submit" class="google-btn" value="Sign In">
@@ -24,6 +43,6 @@
         </form>
         <p>Don't have an account ? <a href="{{url_for('user_reg.signup')}}">Sign Up </a></p>
     </div>
-    
+    <script src="/user_reg/static/pass.js"></script>
 </body>
 </html>

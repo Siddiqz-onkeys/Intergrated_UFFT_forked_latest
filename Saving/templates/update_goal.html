@@ -307,7 +307,7 @@
         });
 
         function loadJointGoals(userId) {
-            fetch(`/saving/get_user_joint_goals/${userId}`)
+            fetch(`/get_user_joint_goals/${userId}`)
                 .then(response => response.json())
                 .then(goals => {
                     jointIdSelect.innerHTML = goals.length 

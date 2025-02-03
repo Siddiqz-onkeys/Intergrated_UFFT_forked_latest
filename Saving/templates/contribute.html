@@ -250,7 +250,7 @@
 
         async function checkJointGoals(userId) {
             try {
-                const response = await fetch(`/saving/get_joint_goals/${userId}`);
+                const response = await fetch(`/get_joint_goals/${userId}`);
                 const data = await response.json();
                 
                 const jointGoalSelect = document.getElementById('jointGoalSelect');

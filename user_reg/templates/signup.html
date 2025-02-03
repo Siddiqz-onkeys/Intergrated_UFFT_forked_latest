@@ -3,28 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>SignUp</title>
     <link rel="stylesheet" href="/user_reg/static/first.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        #togglePassword {
+    position: absolute;
+    right: 28px; 
+    top: 49%;
+    transform: translateY(-100%);
+    cursor: pointer;
+  }
+  .error{
+    color: #960019;
+  font-size: 18px;
+  }
+
+  .pass-input{
+    position: relative;
+  }
+
+ 
+ 
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>CREATE AN ACCOUNT</h1>
         {% if error %}
-        <p style="color: white;">{{error}}</p>
+        <p class="error">{{error}}</p>
         {% endif %}
-        <form action="{{ url_for('user_reg.signup') }}" method="POST">
-        <input type="text" placeholder="   Name" name="name" required="required"><br><br>
-        <input type="text" placeholder="   User name" name="username" required="required"><br><br>
-        <input type="password" placeholder="   Password" name="password" required="required"><br><br>
-        <input type="date" placeholder="Date of Birth" name="DOB" required="required" value="Dtae of birth"><br><br>
-        <input type="text" placeholder="   Phone number" name="phone" required="required"><br><br>
-        <input type="email" placeholder="   Email" name="email" required="required"><br><br>
+        <br><br>
+        <form action="{{ url_for('user_reg.signup') }}" method="POST" id="passwordForm">
+        <input type="text" placeholder="   Name" name="name" required="required" value="{{ name or '' }}"><br><br>
+        <input type="text" placeholder="   User name" name="username" required="required" value="{{ username or '' }}"><br><br>
+        
+        <div class="pass-input">
+
+        <input type="password" placeholder="   Password" name="password" required="required" id="password">
+        <span id="togglePassword"><i class="far fa-eye-slash"></i></span><br><br>
+    </div>
+        <div id="requirements">
+            <p id="length"> <i class="fa-solid fa-xmark"></i>  Atleast 8 characters long</p>
+            <p id="uppercase"> <i class="fa-solid fa-xmark"></i>  Atleast one uppercase letter</p>
+            <p id="lowercase"> <i class="fa-solid fa-xmark"></i>  Atleast one lowercase letter</p>
+            <p id="number"> <i class="fa-solid fa-xmark"></i>  Atleast one digit</p>
+            <p id="special"> <i class="fa-solid fa-xmark"></i>  Atleast one special character</p>
+
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <input type="text" placeholder="   Date of Birth" name="DOB" required="required" max="{{max_date}}" value="{{ dob or '' }}" id="d"><br><br>
+        <input type="text" placeholder="   Phone number" name="phone" required="required" value="{{ phone or '' }}"><br><br>
+        <input type="email" placeholder="   Email" name="email" required="required" value="{{ email or '' }}"><br><br>
         <div class="sl">
             <input type="submit" class="google-btn" value="Proceed">
         </div>
         </form>
         <p>Already have an account ? <a href="{{url_for('user_reg.signin')}}">Sign In </a></p>
     </div>
-    
+    <script src="/user_reg/static/pass.js"></script>
+
 </body>
 </html>

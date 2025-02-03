@@ -9,13 +9,52 @@
 
         <script src="{{ url_for('expense.static', filename='script.js') }}"></script>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     </head>
     <body> 
         
         <header> <h1 id="header_text"> UNIFIED FAMILY FINANCE TRACKER</h1></header>
 
-        <!-- ##### user selection section ###### -->
+        <!-- #### REPLACE THE USER SECTION BELOW THIS CODE WITH THE FOLLOWING CODE 
+            {% if user_role=='hof'%}
+            <form id="user-selection" method="POST" action="{{url_for('expense.index')}}" enctype="multipart/form">
+                <label> User: </label>
+                <select id="user_id" name="user_id">
+                    <option value="" disabled selected> -- Select user --- </option>
+                    {% for user in users %}
+                    <option value={{ user.user_id}}>{{ user.user_name}}</option>
+                    {% endfor %}
+                </select>
+                <button > FETCH ALL </button>
+            </form>
+            <button > My Expenses </button>
+
+            {% endif %}
+        
+        -->
+
+        <header>
+            <h1 id="header_text"> TRACK YOUR EXPENSES, {{ curr_user_name }}</h1>
+        </header>
+        
+        {% if curr_user_role == 'hof' %}
+        <div class="hof-spl" style="display: flex; justify-content: space-between; gap: 20px; margin:20px">
+            <!-- ##### user selection section ###### -->
+            <form id="user-selection" method="POST" action="{{ url_for('expense.index') }}" enctype="multipart/form-data">
+                <label> User: </label>
+                <select id="user_id" name="user_id">
+                    <option value="" disabled selected> -- Select user --- </option>
+                    {% for user in users %}
+                    <option value="{{ user.user_id }}">{{ user.user_name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit"> FETCH ALL </button>
+                <button type="button" onclick="fetch_back()"> My Expenses </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- ##### user selection section ######
         <form id="user-selection" method="POST" action="{{url_for('expense.index')}}" enctype="multipart/form">
             <label> User: </label>
             <select id="user_id" name="user_id">
@@ -24,8 +63,8 @@
                 <option value={{ user.user_id}}>{{ user.user_name}}</option>
                 {% endfor %}
             </select>
-            <button > FETCH ALL </button>
-        </form>
+            <button type="submit" > FETCH ALL </button>
+        </form> -->
 
 
         <div id="main-container">
@@ -41,29 +80,49 @@
                     <!-- ####### ADD EXPENSE FORM #######-->
                     <div class="add_expense_form">
                         <!-- #############  START OF THE FORM ###############-->
-
-                             <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                 
-                            <!-- ######### User_ID #######-->
-                            <label for="user_ID" name="user_id">User_ID</label>
-                            <input type="number" value="1" disabled>
-                            <br><br>
-
-
-                            <!-- ######### family_ID #######-->
-                            <label for="family_ID" name="family_id">Family_ID</label>
-                            <input type="number" value="1" disabled><br><br>
-
-
+                        <form id="add_expense" method="POST" action="/expense/get_form_data" enctype="multipart/form-data" style="display: none;">                  
                             <!-- ########## the input for category ##########-->
-                           <select id="category" name="category">
-        
-                                    <option value="" disabled selected>Select a Category</option>
-        
-                                    {% for item in categories%}
-                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
-                                    {% endfor %}  
-                                    
-                                </select>
+                            <label for="category"> Category:</label>
+                            <select id="category" name="category">
+                                <option value="" disabled selected>Select a Category</option>
+
+                                <!-- Housing section-->
+                                <optgroup label="house hold expenses">
+                                    <option value="rent"> rent </option>
+                                    <option value="furniture"> Furniture </option>
+                                    <option value="maid"> Maid </option>
+                                    <option value="appliances"> Appliances </option>
+                                    <option value="grociries">Grociries</option>
+                                    <option value="bills">Bills</option>
+                                </optgroup>
+
+                                <!-- Financial Commitmetns -->
+                                <optgroup label="Financial Commitments">
+                                    <option value="fees">Fees</option>
+                                    <option value="emi">EMI</option>
+                                    <option value="investment">Investments</option>
+                                </optgroup>
+
+                                <!--LifeStyle expenses-->
+                                <optgroup label="Lifestyle Expenses">
+                                    <option value="Food">Food</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Clothes">Clothes</option>
+                                </optgroup>
+
+                                <!--Health and Medical-->
+                                <option value="health">Health</option>
+                                <option value="Medical">Medical</option>
+
+                                <!-- Vehicle Maintainance -->
+                                <option value="vehicle maintainace"> vehicle maintainance</option>
+
+                                <!--Mischellenous -->
+                                <option value="miscellaneous">Mischellenous</option>
+
+                                <!--Others -->
+                                <option value="others">Others</option>
+                            </select>
                             <br><br>
 
                             <!-- ###########  DATE INPUT  ##########-->
@@ -91,7 +150,7 @@
                     
                     <!-- ########### OVERIEW SECTION ######-->
                     <div class="overview-section" id="overview-section" >
-                        <form id="interval-selection" action="{{url_for('expense.overview')}}" enctype="multipart/form" method="POST" >
+                        <form id="interval-selection" action="/expense/overview" enctype="multipart/form" method="POST" >
                             <label> SELECT THE DURATION </label>
                             </br></br>
 
@@ -147,21 +206,35 @@
                     
                     <!-- ####### SORTING AND FILTERING FORM #######-->        
                     <div class="sorting_filtering_form">
-                        <form id="sorting_filtering" method="GET" action="{{url_for('expense.filter_expenses')}}"  enctype="multipart/form-data" style="display: none;">
+                        <form id="sorting_filtering" method="GET" action="/expense/filter_expenses" enctype="multipart/form-data" style="display: none;">
                             
                             <!-- ########### Filtering Options ########### -->
                             <div class="filtering_options">
                                 <h3>Filter By:</h3>
 
-                                <select id="category" name="category">
-        
+                                <label for="filter_catego">Category:</label>
+                                <select id="filter_category" name="filter_category">
                                     <option value="" disabled selected>Select a Category</option>
-        
-                                    {% for item in categories%}
-                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
-                                    {% endfor %}  
-                                    
+                                    <option value="rent">Rent</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="maid">Maid</option>
+                                    <option value="appliances">Appliances</option>
+                                    <option value="grociries">Groceries</option>
+                                    <option value="bills">Bills</option>
+                                    <option value="fees">Fees</option>
+                                    <option value="emi">EMI</option>
+                                    <option value="investment">Investments</option>
+                                    <option value="food">Food</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="clothes">Clothes</option>
+                                    <option value="health">Health</option>
+                                    <option value="medical">Medical</option>
+                                    <option value="vehicle_maintenance">Vehicle Maintenance</option>
+                                    <option value="miscellaneous">Miscellaneous</option>
+                                    <option value="others">Others</option>
                                 </select>
+                                <br><br>
+
                                 <label for="filter_amount_range_min">Amount Range (Min):</label>
                                 <input type="number" id="filter_amount_range_min" name="filter_amount_range_min"
                                     step="0.01"><br><br>
@@ -181,7 +254,7 @@
                             <button type="submit">APPLY FILTERS</button>
 
                             <button type="button" id="reset">
-                                    <a href="{{url_for('expense.reset_filters')}}" style="text-decoration: none; color: inherit;">RESET</a>
+                                <a href="/reset_filters" style="text-decoration: none; color: inherit;">RESET</a>
                             </button>
                             
                             
@@ -194,15 +267,15 @@
                     <!-- ###### RECURRING EXPENSES SECTION ####-->
                     <div class="recurring-expenses-section">
                         <div class="reccuring expenses" id="recc_exps" style="display:none">
-                            {% for exp in reccur_exps %}
-                                    <div class="rec_id" style="display:none">{{ exp.rec_id}}</div>
-                                    <button>EDIT</button>                               
-                                    {{exp.description}} 
-                                    {{exp.amount}}
-                                    <button onclick="verify_age({{ exp.user_id }},{{ exp.rec_id }})"> DELETE </button>
-                                    <button onclick="load_rec_to_exp({{exp.rec_id}})"> ADD TO EXPENSES </button>
-                                    <br><br>
-                            {% endfor %}
+                                {% for exp in reccur_exps %}
+                                        <div id="rec_exp_items" class="rec_id" style="display:none">{{ exp.rec_id}}</div>
+                                        <i id="rec_exp_items" class="fas fa-edit"></i>                               
+                                        {{exp.description}} 
+                                        {{exp.amount}}
+                                        <i id="rec_exp_items" class="fas fa-trash" onclick="verify_age('{{ exp.user_id }}','{{ exp.rec_id }}')"></i>
+                                        <i id="rec_exp_items" class="fas fa-add" onclick="load_rec_to_exp('{{exp.rec_id}}')"></i>
+                                        <br><br>
+                                {% endfor %}
                             <button type='button' onclick= " document.getElementById('new_rec_form').style.display='block' " > ADD NEW RECURRING EXPENSE</button>
                             <button type='button' onclick= " document.getElementById('recc_exps').style.display='none' " > CANCEL </button>
                         </div>
@@ -219,7 +292,7 @@
                         </div>
         
                         <div class="new_rec_form_div">
-                            <form id="new_rec_form" style="display:none" action="{{url_for('expense.add_rec_exp')}}" enctype="multipart/form-data" method="POST">
+                            <form id="new_rec_form" style="display:none" action="/expense/add_rec_exp" enctype="multipart/form-data" method="POST">
                                 <label for="category"> Category:</label>
         
                                 <select id="category" name="category">
@@ -277,13 +350,44 @@
                                 <!-- ########## the input for category ##########-->
                                 <label for="category"> Category:</label>
                                 <select id="category" name="category">
-        
                                     <option value="" disabled selected>Select a Category</option>
-        
-                                    {% for item in categories%}
-                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
-                                    {% endfor %}  
-                                    
+
+                                    <!-- Housing section-->
+                                    <optgroup label="house hold expenses">
+                                        <option value="rent"> rent </option>
+                                        <option value="furniture"> Furniture </option>
+                                        <option value="maid"> Maid </option>
+                                        <option value="appliances"> Appliances </option>
+                                        <option value="grociries">Grociries</option>
+                                        <option value="bills">Bills</option>
+                                    </optgroup>
+
+                                    <!-- Financial Commitmetns -->
+                                    <optgroup label="Financial Commitments">
+                                        <option value="fees">Fees</option>
+                                        <option value="emi">EMI</option>
+                                        <option value="investment">Investments</option>
+                                    </optgroup>
+
+                                    <!--LifeStyle expenses-->
+                                    <optgroup label="Lifestyle Expenses">
+                                        <option value="Food">Food</option>
+                                        <option value="Travel">Travel</option>
+                                        <option value="Clothes">Clothes</option>
+                                    </optgroup>
+
+                                    <!--Health and Medical-->
+                                    <option value="health">Health</option>
+                                    <option value="Medical">Medical</option>
+
+                                    <!-- Vehicle Maintainance -->
+                                    <option value="vehicle maintainace"> vehicle maintainance</option>
+
+                                    <!--Mischellenous -->
+                                    <option value="miscellaneous">Mischellenous</option>
+
+                                    <!--Others -->
+                                    <option value="others">Others</option>
                                 </select>
                                 <br><br>
 
@@ -321,26 +425,26 @@
                                 <button onclick="document.getElementById('add_amount').style.display='none'" type="button"> CANCEL </button>
                             </form>
                         </div>
-
                     </div>
+
                     <!-- DELETE CONFIRMATION SECTION -->
-                    <form id="deleteConfirmationSection" style="display:none" method="POST" action="">
-
+                    <form id="deleteConfirmationSection" style="display:none" action="">
                         <p>Are you sure you want to delete this record?</p>
+                        <button type="button" class="confirm_btn" onclick="deletion_f()" >Confirm</button>
+                        <button type="button" onclick="close_delete()">Cancel</button>
+                    </form>
 
-                        <button type="button" class="confirm_btn" onclick="deletion_f()">Confirm</button>
+                    {% if status_delete %}
+                    <!-- Snackbar for Undo -->
+                    <form id="snackbarForm" class="snackbar" action="/expense/rollback_deletion" method="POST">
+                        <span>Expense deleted</span>
+                        <button type="submit">Undo Delete 🤷‍♂️</button>
+                        <button type="button" onclick="document.getElementById('snackbarForm').style.display='none'">×</button>
+                    </form>
+                    {% endif %}
 
-                        <button onclick="document.getElementById('deleteConfirmationSection').style.display='none'" type="button">Cancel</button>
-                        
-                        <!-- Undo Section -->
-                        <div id="undoSection" style="display:none;">
-
-                            <p>Record deleted. <button id="undoButton" onclick="undoDeletion()">Undo</button></p>
-                            
-                        </div>
-                    </form>    
-                </div>
-                
+        </div>
+                                
                 <!-- ###### DEFAULT VIEW OF THE TABLE #####-->
                 <div class="default_view_table">
 
@@ -364,51 +468,63 @@
                             </tr>
                         </thead> 
                         <tbody>
-                            {% for expense in expenses %}
+                            {% if isfiltered and not expenses%}
+                            <h3 style="color:red"> NO EXPENSES FOUND WITH THE APPLIED FILTERS </h3>
+                            {% else %}
+                                {% for expense in expenses %}
 
-                            <div class="exp_id" style="display:none">{{ expense.expense_id}}</div>
-                            <tr>                    
-                                <td>
-                                    <i class="fas fa-edit" onclick="showEditMenu({{ expense.expense_id}} ,{{expense.amount}})" ></i>                                
-                                </td>
-                                <td>{{expense.date_in}}</td>                    
-                                <td>{{expense.category}}</td>
-                                <td>{{expense.amount}}</td>
-                                <td>
-                                    {% if expense.desc %}
-                                        {{expense.desc}}
-                                    {% else %}
-                                    ## No Description ##
+                                <div class="exp_id" style="display:none">{{ expense.expense_id}}</div>
+                                <tr>                    
+                                    <td>
+                                        <i class="fas fa-edit" onclick="showEditMenu('{{ expense.expense_id}}' ,'{{expense.amount}}')" ></i>                                
+                                    </td>
+                                    <td>{{expense.date_in}}</td>                    
+                                    <td>{{expense.category}}</td>
+                                    <td>{{expense.amount}}</td>
+                                    <td>
+                                        {% if expense.desc %}
+                                            {{expense.desc}}
+                                        {% else %}
+                                        ## No Description ##
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if expense.receipt %}
+                                        <a href="{{ url_for('expense.static', filename='uploads/receipts/' + expense.receipt) }}" target="_blank">
+                                            View Receipt
+                                        </a>
+                                        {% else %}
+                                        ## No Receipt ##
+                                        {% endif %}
+                                    </td>
+                                    <td>    
+                                    {% if major %}                          
+                                    <!-- Trash Icon to directly trigger the deletion -->                            
+                                    <i class="fas fa-trash" onclick="delete_expense('{{ expense.expense_id }}')"></i>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    {% if expense.receipt %}
-                                    <a href="{{ url_for('expense.static', filename='uploads/receipts/' + expense.receipt) }}" target="_blank">
-                                        View Receipt
-                                    </a>
-                                    {% else %}
-                                    ## No Receipt ##
-                                    {% endif %}
-                                </td>
-                                <td>                              
-                                <i class="fas fa-trash" onclick="verify_age({{ user_id }},{{ expense.expense_id }})"></i>
-                                </td>
-                            </tr>
-                            <!-- ####### POP UP MESSAGES ####### -->                            
-                                <div id="pop-up messages">
-                                    <div id="ageMessage" > Action Restricted, Since You are a minor </div>
+
+                                    </td>
+                                </tr>
+                                
+                                                                
                                 </div>
-                                <div id="deleteMessage"> Record Deleteion Successfull!!! </div>                            
-                            </div>
-                            {% endfor %}
+                                {% endfor %}
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
+
+                <!-- ####### POP UP MESSAGES ####### -->                            
+                <div id="pop-up messages" .style.display="block">
+                    {% if status_undo %}
+                        <div id="undoSuccess" class="message">Record Restored 👍</div>
+                    {% elif new_exp %}
+                        <div id="new_exp" class="message"> New Expense added 👌 </div> 
+                    {% endif %}
+
+                </div>
             </div>
         </div>
-        <a href="{{url_for('user_reg.welcome')}}" <button
-            style="padding: 10px 20px; margin:2%; background-color:  #2a4d69; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-            Back to Home
-            </button>
+        
     </body>
 </html>

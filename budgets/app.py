@@ -23,8 +23,7 @@ from flask_mail import Mail, Message
 #         password=DB_PASSWORD,
 #         database=DB_NAME
 #     )
-
- 
+        
 def allowed_file(filename):
     """Check if the uploaded file is allowed based on extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'pdf'}
@@ -38,8 +37,8 @@ def send_alert_email(user_mail,name, total_expenses, threshold_value):
 
         Your expenses for the category '{name}' have exceeded the budget threshold.
         
-        Total Expenses: ${total_expenses}
-        Threshold: ${threshold_value}
+        Total Expenses: ₹{total_expenses}
+        Threshold: ₹{threshold_value}
         
         Please review your spending.
         
@@ -65,8 +64,8 @@ def send_user_alert_email(user_email, total_expenses, user_budget):
 
     Alert! Your total expenses have exceeded your personal budget.
     
-    Total Expenses: ${total_expenses}
-    Threshold: ${user_budget}
+    Total Expenses: ₹{total_expenses}
+    Threshold: ₹{user_budget}
     
     Please review your spending.
     
@@ -86,15 +85,30 @@ def send_user_alert_email(user_email, total_expenses, user_budget):
 # Blueprint definition
 budget_bp = Blueprint('budget', __name__, template_folder='templates', static_folder='static')
 
-
-
+ 
 # Budget routes
 @budget_bp.route('/')
 def home():
-    # connection = get_db_connection()
-    connection=get_connection()
+    connection = get_connection()
     cursor = connection.cursor(dictionary=True)
-    
+
+    # Get the logged-in user's ID from the session
+    logged_in_user_name = session.get('login_name') 
+
+    if not logged_in_user_name:
+        flash("Please log in first.", "warning")
+        return redirect(url_for('user_reg.signin'))  # Redirect to login page if not logged in
+
+    # Fetch the logged-in user's role
+    cursor.execute('SELECT role FROM users WHERE user_name = %s', (logged_in_user_name,))
+    user = cursor.fetchone()
+
+    if not user:
+        flash("User not found!", "error")
+        return redirect(url_for('user_reg.signin'))  
+
+    user_role = user['role']  # Get the role (either 'HOF' or 'Member')
+
     # Fetch category budgets
     cursor.execute('''
         SELECT 
@@ -108,7 +122,7 @@ def home():
             budgets.category_id = categories.category_id
     ''')
     category_budgets = cursor.fetchall()
-    
+
     # Fetch user budgets
     cursor.execute('''
         SELECT 
@@ -122,11 +136,13 @@ def home():
             budgets.user_id = users.user_id
     ''')
     user_budgets = cursor.fetchall()
-    
+
     connection.close()
+
     return render_template('home2.html', 
                            category_budgets=category_budgets, 
-                           user_budgets=user_budgets)
+                           user_budgets=user_budgets, 
+                           user_role=user_role)  # Pass user role to template
 
 
 @budget_bp.route('/add_category', methods=['GET', 'POST'])
@@ -271,9 +287,8 @@ def edit_budget(id):
 
 @budget_bp.route('/expenses', methods=['GET', 'POST'])
 def expenses():
-    # connection = get_db_connection()
-    connection=get_connection()
-    cursor = connection.cursor(dictionary=True)
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True, buffered=True)  # Use buffered cursor
 
     if request.method == 'POST':
         user_id = request.form.get('user_id')
@@ -281,6 +296,7 @@ def expenses():
         amount = float(request.form['amount'])
         date = request.form['date']
         category_id = int(request.form['category_id'])
+        family_id = session['family_id']
 
         # Validate user_id and fetch email
         cursor.execute('SELECT email FROM users WHERE user_id = %s', (user_id,))
@@ -288,6 +304,7 @@ def expenses():
 
         if not user:
             flash('Please enter a valid User ID.', 'error')
+            cursor.close()
             connection.close()
             return redirect('/budget')
 
@@ -295,9 +312,9 @@ def expenses():
 
         # Insert the new expense
         cursor.execute('''
-            INSERT INTO expenses (user_id, description, amount, date, category_id)
-            VALUES (%s, %s, %s, %s, %s)
-        ''', (user_id, description, amount, date, category_id))
+            INSERT INTO expenses (user_id, description, amount, date, category_id, family_id)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (user_id, description, amount, date, category_id, family_id))
         connection.commit()
 
         # Calculate user's total expenses dynamically
@@ -306,13 +323,14 @@ def expenses():
             FROM expenses
             WHERE user_id = %s
         ''', (user_id,))
-        total_expenses = cursor.fetchone()['total_expenses'] or 0
+        total_expenses = cursor.fetchone()
+        total_expenses = total_expenses['total_expenses'] if total_expenses else 0
 
-        # Fetch user's personal budget from budgets table
+        # Fetch user's personal budget
         cursor.execute('SELECT amount AS user_budget FROM budgets WHERE user_id = %s', (user_id,))
         budget_data = cursor.fetchone()
 
-        # Send email if user's total expenses exceed their budget
+        # Send alert email if expenses exceed budget
         if budget_data and total_expenses > budget_data['user_budget']:
             send_user_alert_email(user_email, total_expenses, budget_data['user_budget'])
 
@@ -333,19 +351,23 @@ def expenses():
             FROM expenses
             WHERE category_id = %s
         ''', (category_id,))
-        category_total_expenses = cursor.fetchone()['category_total_expenses'] or 0
+        category_total_expenses = cursor.fetchone()
+        category_total_expenses = category_total_expenses['category_total_expenses'] if category_total_expenses else 0
 
-        # Send email if category total expenses exceed the category threshold
+        # Send email if category expenses exceed the threshold
         if budget and category_total_expenses > budget['threshold_value']:
             send_alert_email(user_email, budget['category_name'], category_total_expenses, budget['threshold_value'])
 
         flash('Expense added successfully!', 'success')
+        cursor.close()
         connection.close()
         return redirect('/budget')
 
     # Fetch categories for the dropdown
     cursor.execute('SELECT * FROM categories')
     categories = cursor.fetchall()
+
+    cursor.close()
     connection.close()
 
     return render_template('expenses.html', categories=categories)
@@ -468,16 +490,26 @@ def request_budget():
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    # Fetch all users from the database
-    cursor.execute('SELECT user_id, user_name FROM users')
-    users = cursor.fetchall()
+    # Get the logged-in user's user_name from the session
+    logged_in_user_name = session.get('login_name')
+
+    # Fetch user_id using user_name
+    cursor.execute('SELECT user_id FROM users WHERE user_name = %s', (logged_in_user_name,))
+    user_data = cursor.fetchone()
+
+    if not user_data:
+        flash('User not found!', 'error')
+        connection.close()
+        return redirect('/request_budget')
+
+    logged_in_user_id = user_data['user_id']  # Now we have user_id
 
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
+        user_id = logged_in_user_id  # Automatically set the user_id to the logged-in user
         requested_amount = float(request.form['requested_amount'])
         reason = request.form['reason']
 
-        # Fetch the family_id and user_name of the selected user
+        # Fetch the family_id and user_name of the logged-in user
         cursor.execute('SELECT family_id, user_name FROM users WHERE user_id = %s', (user_id,))
         user = cursor.fetchone()
 
@@ -496,7 +528,7 @@ def request_budget():
         if hof_user:
             hof_email = hof_user['email']
             hof_name = hof_user['user_name']
-             # Send an email to the HOF with Accept/Reject links
+            # Send an email to the HOF with Accept/Reject links
             subject = "Budget Request Alert"
             body = f"""
             Dear {hof_name},
@@ -512,8 +544,8 @@ def request_budget():
             {url_for('budget.approve_reject', user_id=user_id, action='accept', requested_amount=requested_amount, _external=True)}
 
             To reject the request, click here:
-            {url_for('budget.approve_reject', user_id=user_id, action='reject',requested_amount=requested_amount, _external=True)}
-             
+            {url_for('budget.approve_reject', user_id=user_id, action='reject', requested_amount=requested_amount, _external=True)}
+
             Regards,
             Budget Tracker Team
             """
@@ -531,8 +563,11 @@ def request_budget():
         connection.close()
         return redirect('/budget')
 
+    # If the method is GET, render the template with the logged-in user's info pre-filled
     connection.close()
-    return render_template('request_budget.html', users=users)
+    return render_template('request_budget.html', logged_in_user_id=logged_in_user_id)
+
+
 
 
 @budget_bp.route('/approve_reject/<int:user_id>/<string:action>', methods=['GET'])
@@ -603,5 +638,23 @@ def approve_reject(user_id, action):
     return redirect('/budget')
 
 
-
  
+ 
+@budget_bp.route('/delete_budget/<int:id>/<budget_type>', methods=['POST', 'GET'])
+def delete_budget(id, budget_type):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        # Delete the budget from the budgets table
+        cursor.execute("DELETE FROM budgets WHERE budget_id = %s", (id,))
+        connection.commit()
+        flash("Budget deleted successfully!", "success")
+    except Exception as e:
+        connection.rollback()
+        flash("Error deleting budget: " + str(e), "error")
+    finally:
+        connection.close()
+
+    return redirect(url_for('budget.home'))  # Redirect back to home page
+

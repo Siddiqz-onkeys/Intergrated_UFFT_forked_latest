@@ -1,11 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="../static/home.css">
 </head>
+
 <body>
-    <h1>Home page</h1>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">FAMORA</div>
+
+
+            <div class="Register">
+
+                <form action="{{ url_for('user_reg.signin') }}" method="get">
+                    <input type="submit" value="SIGN IN" class="login-btn">
+                </form>
+
+                <form action="{{ url_for('user_reg.signup') }}" method="get">
+                    <input type="submit" value="SIGN UP" class="Register-btn">
+                </form>
+            </div>
+        </nav>
+    </header>
+    <hr>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>UNIFIED <br>FAMILY <br>FINANCE TRACKER</h1>
+                <p>Your Family's Financial Compass</p>
+            </div>
+        </section>
+
+        <section class="services">
+
+            <div class="main-section">
+
+                <div class="main-cards">
+                    <div class="card">
+                        <div class="icon">📈</div>
+                        <h3>Track your Expenses</h3>
+                        <p>Effortlessly<br> track every penny with our intuitive expense tracker<br>and gain valuable
+                            insights into your financial habits </p>
+                        <img src="../static/expense.jpeg">
+                    </div>
+                    <div class="card">
+                        <div class="icon">🔔</div>
+                        <h3>Alerts That Keep Your Budget in Check</h3>
+                        <p>Take control of your finances with our <br>powerful budget management tools <br>Create
+                            personalized budgets,<br>and track your progress towards your financial goals</p>
+                        <img src="../static/alert.jpeg">
+                    </div>
+                    <div class="card">
+                        <div class="icon">💴</div>
+                        <h3>Effortless Savings, Big Rewards</h3>
+                        <p>Our service empowers you to save consistently, <br>achieve your financial dreams, <br>and
+                            build a secure financial future</p>
+                        <img src="../static/saving.jpeg">
+                    </div>
+                    <div class="card">
+                        <div class="icon">📃</div>
+                        <h3>Your Finances, Decoded<br></h3>
+                        <p>Gain valuable insights<br> into your financial health <br>with our Visualization features</p>
+                        <img src="../static/vis.jpeg">
+                    </div>
+                    <div class="card">
+                        <div class="icon">📊</div>
+                        <h3>Gain Clear Insights with Visual Data</h3>
+                        <p>Gain valuable insights into your financial health<br> with our comprehensive reporting
+                            features</p>
+                        <img src="../static/report">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
 </body>
+
 </html>

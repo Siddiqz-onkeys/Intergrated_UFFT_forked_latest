@@ -1,141 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account</title>
+
     <style>
-        * {
+        body {
+            font-family: "Roboto", serif;;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: "Montserrat", serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #004d40 30%, #f5f5dc 70%);
+            position: relative;
+            overflow: hidden;
         }
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-size: cover;
-            background-position: center;
-            background-image: linear-gradient(to right, #16423C , #C4DAD2);
+        /* Decorative circles */
+        body::before, body::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        body::before {
+            width: 60vw;
+            height: 60vw;
+            background-color: #004d40;
+            top: -20%;
+            left: -20%;
+        }
+
+        body::after {
+            width: 50vw;
+            height: 50vw;
+            background-color: #f5f5dc;
+            bottom: -15%;
+            right: -15%;
         }
 
         h1 {
+            color: #ffffff;  /* Heading color set to white */
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
             text-align: center;
-            font-size: 43px;
-            font-weight: 600;
-            padding-bottom: 26px;
-            letter-spacing: 0.5;
-            color: #16423C;
-        }
-
-        th,
-        td {
-            font-size: 24px;
-            color: #16423C;
-            padding: 10px;
         }
 
         .container {
-            width: 600px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 13px;
-            padding: 30px 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            color: rgb(62, 88, 121);
-            backdrop-filter: blur(9px);
-        }
-
-        .google-btn {
-            width: 200px;         
-            height: 45px;
-            background: #16423C;
-            border: 2px solid rgba(216, 196, 182, 0.2);
-            border-radius: 40px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            font-size: 20px;
-            color: #C4DAD2;
-            font-weight: 500;
-            transition: all 0.4s ease-in-out;
-            padding: 0;
-        }
-
-        .google-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .delete-btn {
-            background-color: #960019;
-        }
-
-        .form-container {
+            width: 90%;
+            max-width: 600px;
+            background: #F5F5DC;  /* Changed to #EED9C4 */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
             display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;  /* Centering content */
+            justify-content: center; /* Vertically centering content */
         }
 
         table {
             width: 100%;
-            border-spacing: 10px;
-            margin-top: 20px;
+            margin-bottom: 30px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            color: #004d40;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        td {
+            color: #004d40;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .back-btn {
+            background-color: #004d40;
+            color: #ffffff;
+        }
+
+        .delete-btn {
+            background-color: #e63946;
+            color: #ffffff;
+        }
+
+        .back-btn:hover {
+            background-color: #00332e;
+            transform: scale(1.05);
+        }
+
+        .delete-btn:hover {
+            background-color: #c1272d;
+            transform: scale(1.05);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            button {
+                min-width: 150px;
+            }
         }
     </style>
 </head>
-
 <body>
 
+    <h1>My Account</h1>
     <div class="container">
-        <h1>My ACCOUNT</h1>
-
         <table>
             <tr>
                 <th>User ID</th>
-                <td>{{ row[0] }}</td>
+                <td>{{row[0]}}</td>
             </tr>
             <tr>
                 <th>Name</th>
-                <td>{{ row[1] }}</td>
+                <td>{{row[1]}}</td>
             </tr>
             <tr>
                 <th>Username</th>
-                <td>{{ row[2] }}</td>
+                <td>{{row[2]}}</td>
             </tr>
             <tr>
                 <th>Role</th>
-                <td>{{ row[3] }}</td>
+                <td>{{row[6]}}</td>
             </tr>
             <tr>
                 <th>Phone Number</th>
-                <td>{{ row[4] }}</td>
+                <td>{{row[4]}}</td>
             </tr>
             <tr>
                 <th>Email ID</th>
-                <td>{{ row[5] }}</td>
+                <td>{{row[5]}}</td>
             </tr>
             <tr>
                 <th>Family ID</th>
-                <td>{{ row[6] }}</td>
+                <td>{{row[7]}}</td>
             </tr>
             <tr>
                 <th>Date of Birth</th>
-                <td>{{ row[7] }}</td>
+                <td>{{row[8]}}</td>
             </tr>
         </table>
 
-        <div class="form-container">
-            <form action="{{ url_for('user_reg.welcome') }}">
-                <input type="submit" value="Back" class="google-btn">
+        <div class="button-group">
+            <form action="{{url_for('user_reg.welcome')}}">
+                <button type="submit" class="back-btn">Back</button>
             </form>
-            <form action="{{ url_for('user_reg.del_acc') }}">
-                <input type="submit" value="Delete Account" class="google-btn delete-btn">
+            <form action="{{url_for('user_reg.del_acc')}}">
+                <button type="submit" class="delete-btn">Delete account</button>
             </form>
         </div>
     </div>
 
 </body>
-
 </html>

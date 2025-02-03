@@ -7,7 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
+    <div class="containers">
+        
+        <div class="logo">
+            
+            
+        </div>   
         <header>
             <h1>Budget Performance Report</h1>
         </header>
@@ -16,7 +21,7 @@
             <a href="{{ url_for('budget.report', report_type='category') }}" class="btn">Category Budgets</a>
             <a href="{{ url_for('budget.report', report_type='user') }}" class="btn">User Budgets</a>
         </div>
-
+        <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -43,7 +48,7 @@
                 {% endfor %}
             </tbody>
         </table>
-
+        </div>
         <div class="actions">
             <a href="{{ url_for('budget.home') }}" class="btn">Go Back</a>
         </div>
