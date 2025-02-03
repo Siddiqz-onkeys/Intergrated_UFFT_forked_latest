@@ -1,23 +1,57 @@
+/* Global Styles */
 body {
     background-color: #F5F5F5;
     /* Faint beige close to white */
     color: #16423C;
     /* Dark green */
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 550;
+    margin: 0;
+    padding: 0;
+    text-transform: capitalize;
+    display: grid;
+    place-items: center;
 }
 
-h1,
-h2 {
+/* Global Styles */
+body {
+    background-color: #F5F5F5;
+    /* Faint beige close to white */
     color: #16423C;
     /* Dark green */
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 550;
+    margin: 0;
+    padding: 0;
+    text-transform: capitalize;
+    display: grid;
+    place-items: center;
 }
 
+/* Headings */
+h1, h2 {
+    color: #16423C;
+    /* Dark green */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s ease-in-out;
+    /* Smoother effect */
+}
+
+
+/* Table Styles */
 table {
     border-radius: 10px;
-    /* Rounded corners */
     border: 2px solid #D8C4B6;
     /* Light cream border */
     overflow: hidden;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    /* Faster transition */
 }
+
 
 table thead {
     background-color: #16423C;
@@ -29,31 +63,8 @@ table thead {
 table tbody tr:hover {
     background-color: #f0f8ff;
     /* Very light blue */
-}
-
-.btn-primary {
-    background-color: #16423C;
-    /* Dark green */
-    border-color: #16423C;
-    /* Dark green */
-}
-
-.btn-primary:hover {
-    background-color: #A8C8BF;
-    /* Slightly darker light green */
-    border-color: #A8C8BF;
-    /* Slightly darker light green */
-}
-
-#expensePieChart {
-    background-color: #FFFFFF;
-    /* White */
-    border: 2px solid #16423C;
-    /* Dark green */
-    max-width: 400px;
-    /* Smaller size */
-    max-height: 400px;
-    /* Smaller size */
+    transition: background-color 0.2s ease;
+    /* Faster transition */
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -66,40 +77,65 @@ table tbody tr:hover {
     /* Light grey */
 }
 
-#searchInput {
-    border: 1px solid #16423C;
+/* Buttons */
+.btn-primary {
+    background-color: #16423C;
     /* Dark green */
+    border-color: #2F4658;
+    /* Dark teal */
+    color: #FFFFFF;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    /* Adjusted transition */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#noRecordsFound {
-    display: none;
-    text-align: center;
-    margin-top: 20px;
-    color: #FF0000;
-    /* Red */
+.btn-primary:hover {
+    background-color: #A8C8BF;
+    /* Slightly darker light green */
+    border-color: #1A4E47;
+    /* Darker green */
+    transform: scale(1.02);
+    /* Less intense effect */
 }
 
-#loadingAnimation {
-    display: none;
-    text-align: center;
-    margin-top: 20px;
-}
-
-canvas {
+/* Card and Popup Styling */
+#expensePieChart, .summary-info {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid #2F4658;
+    /* Dark teal */
+    border-radius: 15px;
+    padding: 20px;
     max-width: 400px;
     max-height: 400px;
-    margin: 0 auto;
-    background-color: #FFFFFF;
-    /* White */
-    border-radius: 10px;
-    /* Add border-radius for rounded corners */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
 }
 
-h5 {
-    margin-top: 20px;
-    font-weight: bold;
+#expensePieChart:hover, .summary-info:hover {
+    transform: scale(1.02);
+    /* Smoother hover effect */
 }
 
+/* Input Fields */
+#searchInput {
+    border: 1px solid #16423C;
+    padding: 10px;
+    border-radius: 5px;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+#searchInput:focus {
+    box-shadow: 0 0 8px rgba(26, 78, 71, 0.4);
+    outline: none;
+}
+
+/* Messages */
 .success-message {
     display: none;
     background-color: #C4DAD2;
@@ -109,8 +145,68 @@ h5 {
     padding: 10px;
     border-radius: 5px;
     margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeIn 0.4s ease-in-out forwards;
 }
 
 .success-message.show {
     display: block;
+}
+
+/* No Records Found */
+#noRecordsFound {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+    color: #FF0000;
+    /* Red */
+    font-weight: bold;
+}
+
+/* Delete Confirmation Box */
+#deleteConfirmationSection {
+    position: fixed;
+    background-color: #f9f8f1;
+    /* Softer beige */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.4s ease-out forwards;
+    display: none;
+}
+
+/* Chart */
+canvas {
+    max-width: 600px;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        right: -100%;
+    }
+
+    to {
+        right: 10%;
+        transform: translateY(-50%);
+    }
 }

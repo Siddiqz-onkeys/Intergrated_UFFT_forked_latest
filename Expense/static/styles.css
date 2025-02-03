@@ -4,11 +4,296 @@
 }
 
 body {
-    background-color: #F5F5F5;
-    /* Faint beige close to white */
-    color: #16423C;
-    /* Dark green */
-    display: grid;
+    background-color: #F5F5F5; /* Faint beige close to white */
+    color: #16423C; /* Dark green */
+    display: grid;* {
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-weight: 550;
+    }
+    
+    body {
+        background-color: #F5F5F5;
+        /* Faint beige close to white */
+        color: #16423C;
+        /* Dark green */
+        display: grid;
+        place-items: center;
+        margin: 0;
+        padding: 0;
+        text-transform: capitalize;
+    }
+    
+    #main-container {
+        width: 1000px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.8);
+        /* Lightened background */
+        padding: 30px;
+        /* Increased padding */
+        border-radius: 15px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    header {
+        width: 100%;
+        height: 75px;
+        background: #16423C;
+        /* Solid dark green header */
+        color: #C4DAD2;
+        /* Light green */
+        font-style: oblique;
+        font-size: 1.5rem;
+        text-align: center;
+        border: #2F4658 3px solid;
+        border-radius: 10px;
+        padding: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    #header_text {
+        margin: 0;
+    }
+    
+    button {
+        background: #C4DAD2;
+        /* Light green */
+        color: #16421be9;
+        /* Dark green for text */
+        cursor: pointer;
+        padding: 10px 18px;
+        min-width: 90px;
+        height: 42px;
+        border-radius: 10px;
+        border: none;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    
+    button:hover {
+        background: #A8C8BF;
+        /* Slightly darker light green on hover */
+        transform: scale(1.05);
+        backdrop-filter: blur(5px);
+        /* Add glassy blur effect on hover */
+    }
+    
+    .feature_buttons {
+        margin: 20px auto;
+        display: flex;
+        justify-content: space-evenly;
+        width: 65%;
+        padding: 20px;
+        background: #C4DAD2;
+        /* Light green */
+        border-radius: 20px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    #add_expense, #edit_expense, #sorting_filtering, #new_rec_form, #recc_exps, #edit_menu, #add_amount_form, #interval-selection {
+        padding: 50px;
+        margin-top: 10px;
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        /* Semi-transparent border */
+        background: rgba(255, 255, 255, 0.1);
+        /* Lightened background */
+        backdrop-filter: blur(10px);
+        /* Glassy blur effect */
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        color: #032a42;
+        /* Dark green text */
+        width: 350px;
+        margin: 0 auto;
+        display: none;
+        position: fixed;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(0);
+        z-index: 1000;
+        transition: opacity 1s ease, transform 1s ease;
+        animation: slideInFromBottom 0.5s ease-out forwards;
+    }
+    
+    @keyframes slideInFromBottom {
+        from {
+            top: 100%;
+            opacity: 0;
+        }
+    
+        to {
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            opacity: 1;
+        }
+    }
+    
+    table {
+        border-collapse: collapse;
+        margin: 20px auto;
+        width: 100%;
+        border: #D8C4B6 solid 2px;
+        /* Light cream border */
+        color: #16423C;
+        /* Dark green */
+        border-radius: 10px;
+        background-color: #FFFFFF;
+        /* White background for tables */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    table th,
+    table td {
+        text-align: center;
+        padding: 15px 20px;
+        border: 2px solid #C4DAD2;
+        /* Light green border */
+    }
+    
+    table th {
+        background-color: #C4DAD2;
+        /* Light green for header */
+        color: #16423C;
+        /* Dark green text */
+        font-weight: bold;
+    }
+    
+    table td {
+        background-color: #FFFFFF;
+        /* White for table rows */
+    }
+    
+    table td:hover {
+        background-color: #f0f8ff;
+        /* Very light blue on hover */
+        backdrop-filter: blur(5px);
+        /* Add blur effect on hover */
+    }
+    
+    table tr:nth-child(even) {
+        background-color: #F9F9F9;
+        /* Light grey for even rows */
+    }
+    
+    table tr:nth-child(odd) {
+        background-color: #FFFFFF;
+        /* White for odd rows */
+    }
+    
+    .delete_btn {
+        background-color: #C4DAD2;
+        /* Light green */
+        color: #16423C;
+        /* Dark green */
+        font-size: 1rem;
+        padding: 5px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .delete_btn:hover {
+        background-color: #A8C8BF;
+        /* Slightly darker light green */
+    }
+    
+    a {
+        text-decoration: none;
+    }
+    
+    i:hover {
+        color: #FF0000;
+        /* Red for icons */
+    }
+    
+    #deleteMessage, #ageMessage {
+        font-size: 1rem;
+        font-weight: bold;
+        background-color: #D8C4B6;
+        /* Light cream */
+        color: red;
+        padding: 20px;
+        border: 1px solid #16423C;
+        /* Dark green border */
+        border-radius: 10px;
+        width: 320px;
+        text-align: center;
+        display: none;
+    }
+    
+    .summary-info {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        height: 400px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        /* Glassy effect */
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        z-index: 1000;
+        padding: 20px;
+        color: black;
+    }
+    
+    .flashcards {
+        display: none;
+        text-align: center;
+        margin: 10px;
+        padding: 20px;
+        border: 1px solid #D8C4B6;
+        /* Light cream */
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .flashcards.active {
+        display: block;
+    }
+    
+    .arrows i {
+        font-size: 24px;
+        cursor: pointer;
+        margin: 0 10px;
+        color: #1A4E47;
+        /* Darker green */
+        transition: color 0.3s ease;
+    }
+    
+    .arrows i.disabled {
+        cursor: not-allowed;
+        color: #ccc;
+        /* Light grey */
+    }
+    
+    #deleteConfirmationSection {
+        position: fixed;
+        animation: right_slide 0.5s ease-out forwards;
+        display: none;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f8f1;
+        /* Softer beige */
+    }
+    
+    @keyframes right_slide {
+        from {
+            right: -100%;
+        }
+    
+        to {
+            right: 0.5%;
+            transform: translateY(-100%) translateX(-10%);
+        }
+    }
     place-items: center;
     margin: 0;
     padding: 0;
@@ -18,10 +303,8 @@ body {
 #main-container {
     width: 1000px;
     align-items: center;
-    background: rgba(255, 255, 255, 0.8);
-    /* Lightened background */
-    padding: 30px;
-    /* Increased padding */
+    background: rgba(255, 255, 255, 0.8); /* Lightened background */
+    padding: 30px; /* Increased padding */
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
@@ -29,10 +312,8 @@ body {
 header {
     width: 100%;
     height: 75px;
-    background: #16423C;
-    /* Solid dark green header */
-    color: #C4DAD2;
-    /* Light green */
+    background: #16423C; /* Solid dark green header */
+    color: #C4DAD2; /* Light green */
     font-style: oblique;
     font-size: 1.5rem;
     text-align: center;
@@ -52,10 +333,8 @@ header {
 }
 
 button {
-    background: #C4DAD2;
-    /* Light green */
-    color: #16421be9;
-    /* Dark green for text */
+    background: #C4DAD2; /* Light green */
+    color: #16421be9; /* Dark green for text */
     cursor: pointer;
     padding: 10px 18px;
     min-width: 90px;
@@ -68,11 +347,9 @@ button {
 }
 
 button:hover {
-    background: #A8C8BF;
-    /* Slightly darker light green on hover */
+    background: #A8C8BF; /* Slightly darker light green on hover */
     transform: scale(1.05);
-    backdrop-filter: blur(5px);
-    /* Add glassy blur effect on hover */
+    backdrop-filter: blur(5px); /* Add glassy blur effect on hover */
 }
 
 .feature_buttons {
@@ -81,25 +358,20 @@ button:hover {
     justify-content: space-evenly;
     width: 65%;
     padding: 20px;
-    background: #C4DAD2;
-    /* Light green */
+    background: #C4DAD2; /* Light green */
     border-radius: 20px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
-#add_expense, #edit_expense, #sorting_filtering, #new_rec_form, #recc_exps, #edit_menu, #add_amount_form, #interval-selection {
+#add_expense, #edit_expense, #sorting_filtering, #new_rec_form, #recc_exps,#edit_menu,#add_amount_form,#interval-selection,#rec_exp_conf_div {
     padding: 50px;
     margin-top: 10px;
     border-radius: 15px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    /* Semi-transparent border */
-    background: rgba(255, 255, 255, 0.1);
-    /* Lightened background */
-    backdrop-filter: blur(10px);
-    /* Glassy blur effect */
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Semi-transparent border */
+    background: rgba(255, 255, 255, 0.1); /* Lightened background */
+    backdrop-filter: blur(10px); /* Glassy blur effect */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    color: #032a42;
-    /* Dark green text */
+    color: #032a42; /* Dark green text */
     width: 350px;
     margin: 0 auto;
     display: none;
@@ -117,7 +389,6 @@ button:hover {
         top: 100%;
         opacity: 0;
     }
-
     to {
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
@@ -129,13 +400,10 @@ table {
     border-collapse: collapse;
     margin: 20px auto;
     width: 100%;
-    border: #D8C4B6 solid 2px;
-    /* Light cream border */
-    color: #16423C;
-    /* Dark green */
+    border: #D8C4B6 solid 2px; /* Light cream border */
+    color: #16423C; /* Dark green */
     border-radius: 10px;
-    background-color: #FFFFFF;
-    /* White background for tables */
+    background-color: #FFFFFF; /* White background for tables */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -143,77 +411,105 @@ table th,
 table td {
     text-align: center;
     padding: 15px 20px;
-    border: 2px solid #C4DAD2;
-    /* Light green border */
+    border: 2px solid #C4DAD2; /* Light green border */
 }
 
 table th {
-    background-color: #C4DAD2;
-    /* Light green for header */
-    color: #16423C;
-    /* Dark green text */
+    background-color: #C4DAD2; /* Light green for header */
+    color: #16423C; /* Dark green text */
     font-weight: bold;
 }
 
 table td {
-    background-color: #FFFFFF;
-    /* White for table rows */
+    background-color: #FFFFFF; /* White for table rows */
 }
 
 table td:hover {
-    background-color: #f0f8ff;
-    /* Very light blue on hover */
-    backdrop-filter: blur(5px);
-    /* Add blur effect on hover */
+    background-color: #f0f8ff; /* Very light blue on hover */
+    backdrop-filter: blur(5px); /* Add blur effect on hover */
 }
 
 table tr:nth-child(even) {
-    background-color: #F9F9F9;
-    /* Light grey for even rows */
+    background-color: #F9F9F9; /* Light grey for even rows */
 }
 
 table tr:nth-child(odd) {
-    background-color: #FFFFFF;
-    /* White for odd rows */
+    background-color: #FFFFFF; /* White for odd rows */
 }
 
 .delete_btn {
-    background-color: #C4DAD2;
-    /* Light green */
-    color: #16423C;
-    /* Dark green */
+    background-color: #C4DAD2; /* Light green */
+    color: #16423C; /* Dark green */
     font-size: 1rem;
     padding: 5px;
     transition: background-color 0.3s ease;
 }
 
 .delete_btn:hover {
-    background-color: #A8C8BF;
-    /* Slightly darker light green */
+    background-color: #A8C8BF; /* Slightly darker light green */
 }
-
-a {
+a{
     text-decoration: none;
 }
 
 i:hover {
-    color: #FF0000;
-    /* Red for icons */
+    color: #FF0000; /* Red for icons */
+}
+#deleteMessage{
+    color:red;
+}
+#undoSuccess,#new_exp{
+    color:rgb(180, 168, 4);
+}
+ 
+@keyframes bounceInRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(-10px);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
 }
 
-#deleteMessage, #ageMessage {
-    font-size: 1rem;
+@keyframes fadeOutRight {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+ #undoSuccess ,#new_exp{
+    position: fixed;
+    top: 15%;
+    right: 20px;
+    background-color: #333;
+    font-size: 0.9rem;
     font-weight: bold;
-    background-color: #D8C4B6;
-    /* Light cream */
-    color: red;
-    padding: 20px;
-    border: 1px solid #16423C;
-    /* Dark green border */
+    padding: 10px 20px;
     border-radius: 10px;
+    border: 1px solid #16423C;
+    opacity: 0;
     width: 320px;
     text-align: center;
-    display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    animation: bounceInRight 3s ease-out forwards;
+}
+
+.message.fade-out {
+    animation: fadeOutRight 0.5s ease-in forwards;
 }
 
 .summary-info {
@@ -228,8 +524,7 @@ i:hover {
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    /* Glassy effect */
+    backdrop-filter: blur(10px); /* Glassy effect */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
     z-index: 1000;
     padding: 20px;
@@ -241,8 +536,7 @@ i:hover {
     text-align: center;
     margin: 10px;
     padding: 20px;
-    border: 1px solid #D8C4B6;
-    /* Light cream */
+    border: 1px solid #D8C4B6; /* Light cream */
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -255,15 +549,13 @@ i:hover {
     font-size: 24px;
     cursor: pointer;
     margin: 0 10px;
-    color: #1A4E47;
-    /* Darker green */
+    color: #1A4E47; /* Darker green */
     transition: color 0.3s ease;
 }
 
 .arrows i.disabled {
     cursor: not-allowed;
-    color: #ccc;
-    /* Light grey */
+    color: #ccc; /* Light grey */
 }
 
 #deleteConfirmationSection {
@@ -272,17 +564,43 @@ i:hover {
     display: none;
     margin: 20px auto;
     padding: 20px;
-    background-color: #f9f8f1;
-    /* Softer beige */
+    background-color: #f9f8f1; /* Softer beige */
 }
 
 @keyframes right_slide {
     from {
         right: -100%;
     }
-
     to {
         right: 0.5%;
         transform: translateY(-100%) translateX(-10%);
     }
 }
+
+.snackbar {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 16px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 250px;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+    opacity: 0;
+    animation: bounceInRight 5s ease-out forwards;
+}
+
+.snackbar button {
+    background: none;
+    border: none;
+    color: #ffcc00;
+    font-weight: bold;
+    margin-left: 10px;
+    cursor: pointer;
+}
+

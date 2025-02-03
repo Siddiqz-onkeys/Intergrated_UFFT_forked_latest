@@ -10,7 +10,7 @@ import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-from db_connection import get_connection
+from db_connection import get_connection,create_session
 
 
 app = Flask(__name__)
@@ -43,11 +43,16 @@ def check_account(login_name,login_pass):
         if row==(login_pass,):
             cur.execute("select role from users where user_name=%s",(login_name,))
             role=cur.fetchone()[0]
-            return True,"Successfull login",role
+            return True,"Successfull login"
         else:
-            return False,"Invalid password",None
+            return False,"Invalid password"
     else:
-        return False,"Invalid username",None
+        return False,"Invalid username"
+    
+def ret_role(login_name):
+    cur.execute("select role from users where user_name=%s",(login_name,))
+    role=cur.fetchone()[0]
+    return role
 
 def is_valid_password(password):
     special_characters = "!@#$%^&*(),.?\":{}|<>"
@@ -86,8 +91,6 @@ def validate_phone_number(phone_no):
     return None
 
 
-
-
 def validate_email(email):
     regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     return re.match(regex, email)
@@ -98,9 +101,9 @@ def otp_gen(email):
         otp+=str(random.randint(0,9))
     server=smtplib.SMTP('smtp.gmail.com',587)
     server.starttls()
-    server.login('dum31555@gmail.com',"dweg wzyz mbfa wvkv")
+    server.login('noreply.famora@gmail.com',"otbx orlh qedk vszl")
     to_mail=email
-    from_mail="dum31555@gmail.com"
+    from_mail="noreply.famora@gmail.com"
     msg=EmailMessage()
     msg['Subject']="OTP Verification"
     msg['From']=from_mail
@@ -121,9 +124,9 @@ def reset_pass(email):
         pass_otp+=str(random.randint(0,9))
     server=smtplib.SMTP('smtp.gmail.com',587)
     server.starttls()
-    server.login('dum31555@gmail.com',"dweg wzyz mbfa wvkv")
+    server.login('noreply.famora@gmail.com',"otbx orlh qedk vszl")
     to_mail=email
-    from_mail="dum31555@gmail.com"
+    from_mail="noreply.famora@gmail.com"
     msg=EmailMessage()
     msg['Subject']="Reset password"
     msg['From']=from_mail
@@ -162,7 +165,8 @@ def index():
 @user_reg_bp.route("/signup",methods=['GET','POST'])
 def signup():
     if request.method=="GET":
-        return render_template("signup.html")
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        return render_template("signup.html",max_date=current_date)
     else:
          name = request.form['name']
          user_name = request.form['username']
@@ -180,18 +184,18 @@ def signup():
          session['email'] = email
 
          if is_username_taken(user_name):
-             return render_template('signup.html', error="The username already exists. Please choose a different one.")
+             return render_template('signup.html', error="The username already exists. Please choose a different one.",name=name, dob=dob, phone=phone_no, email=email)
          
          is_valid, message = is_valid_password(password)
          if not is_valid:
-            return render_template('signup.html', error=f"{message}")
+            return render_template('signup.html', error=f"{message}",name=name, username=user_name, dob=dob, phone=phone_no, email=email)
          
          error_message = validate_phone_number(phone_no)
          if error_message:
-            return render_template('signup.html', error=f"{error_message}")
+            return render_template('signup.html', error=f"{error_message}",name=name, username=user_name, dob=dob, email=email)
          
          if not validate_email(email):
-            return render_template('signup.html', error="Not a valid email adress")
+            return render_template('signup.html', error="Not a valid email adress",name=name, username=user_name, dob=dob, phone=phone_no)
          
          otp=otp_gen(email)
          session['otp']=otp
@@ -206,25 +210,20 @@ def signin():
     else:
          login_name = request.form['login_name']
          login_pass = request.form['login_pass']
-         session['login_name']=login_name
-         
-         val,mess,role =check_account(login_name,login_pass)
-         session['role']=role 
-         # After successfull login storing the Users Details in Session
+         val, mess =check_account(login_name,login_pass)
+         # make a session 
          if val:
-            session['username'] = login_name
-            # Fetch all required user details in a query
-            cur.execute("SELECT user_id,family_id, name FROM users WHERE user_name = %s", (login_name,))
-            user_data = cur.fetchone()
-            # Add user details to session
-            if user_data:
-                session['user_id'],session['family_id'], session['name'] = user_data
-            else:
-                print("User not found.")
+            create_session(session, cur, login_name)
+         
          if not val:
             return render_template('signin.html', error=f"{mess}")
+         else:
+             role=ret_role(login_name)
+             session['role']=role
+
          
     return redirect(url_for('user_reg.welcome'))
+
 @user_reg_bp.route('/get_mail',methods=['GET','POST'])
 def get_mail():
     if request.method=='GET':
@@ -268,8 +267,6 @@ def reset():
     return redirect(url_for('user_reg.signin'))
 
 
-
-
 @user_reg_bp.route("/otp",methods=['GET','POST'])
 def otp():
     if request.method=='GET':
@@ -282,8 +279,6 @@ def otp():
             return redirect(url_for('user_reg.role'))
         else:
             return render_template('otp.html',error="Incorrect OTP")
-
-
 
 
 @user_reg_bp.route("/role",methods=['GET','POST'])
@@ -312,7 +307,6 @@ def role():
             return redirect(url_for('user_reg.member'))
         else:
             return redirect(url_for('user_reg.signin'))
-
 
 
 @user_reg_bp.route("/hof",methods=['GET','POST'])
@@ -347,8 +341,6 @@ def member():
     return redirect(url_for('user_reg.signin'))
 
 
-
-
 @user_reg_bp.route("/del_acc",methods=['GET','POST'])
 def del_acc():
     if request.method=='GET':
@@ -372,7 +364,6 @@ def del_acc():
             return redirect(url_for('user_reg.index'))
         
 
-    
 @user_reg_bp.route("/options",methods=['GET','POST'])
 def options():
     if request.method=='GET':
@@ -401,9 +392,6 @@ def options():
 
             return redirect(url_for('user_reg.welcome'))
 
-        
-    
-
 @user_reg_bp.route("/new_hof",methods=['GET','POST'])
 def new_hof():
     if request.method=='GET':
@@ -422,22 +410,17 @@ def new_hof():
         return redirect(url_for('user_reg.index'))
     
 
-
-       
-
-
 @user_reg_bp.route("/welcome")
 def welcome():
-    family_id=session['family_id'] 
-    role=session['role']
-    role=role.lower()
-    name=session['name']
-    return render_template('welcome.html', family_id=family_id,role=role,name=name)
+    role=session.get('role').lower()
+    login_name=session.get('login_name')
+    family_id=session['family_id']
+    return render_template('welcome.html',role=role,login_name=login_name,family_id=family_id)
 
 @user_reg_bp.route('/MyAccount')
 def MyAccount():
     username=session.get('login_name')
-    cur.execute('select user_id,name,user_name,role,phone_no,email,family_id,dob from users where user_name=%s',(username,))
+    cur.execute('select * from users where user_name=%s',(username,))
     row=cur.fetchone()
     return render_template('account.html',row=row)
 
@@ -446,7 +429,5 @@ def logout():
     session.clear()
     return redirect(url_for('user_reg.index'))
     
-
-
 if __name__ == '__main__':
     app.run(debug=True,port=8000)

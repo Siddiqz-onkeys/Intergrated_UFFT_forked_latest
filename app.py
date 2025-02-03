@@ -4,6 +4,7 @@ from user_reg.main import user_reg_bp
 from Saving.app import saving_bp
 from data_visualization.app import data_visualization_bp
 from budgets.app import budget_bp 
+from flask_mail import Mail
 
 
 
@@ -12,6 +13,19 @@ def create_app():
 
     app = Flask(__name__)
     app.secret_key = 'ProjectUFFT'
+    
+    app.config['SESSION_COOKIE_NAME'] = 'ProjectUFFT_Session'
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USE_SSL'] = False
+    app.config['MAIL_USERNAME'] = 'alertmessage98@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'tayd qjqr zfoy rwaz'
+    app.config['MAIL_DEFAULT_SENDER'] = 'alertmessage98@gmail.com'
+
+    # Initialize Flask-Mail
+    mail = Mail(app)
+
 
     @app.route('/')
     def home():

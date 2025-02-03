@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+:root {
+    --primary-color: #2B5741;
+    --secondary-color: #F5F5F5;
+    --text-color: #333;
+    --white: #FFFFFF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family:"Roboto", serif;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+h3{
+    font-size: 40px;
+    margin-bottom: 3rem;
+  
+
+}
+
+.card p{
+    font-size: 30px;
+    display: inline-block;
+    text-wrap:wrap;
+}
+
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--white);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.Register {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.Register-btn {
+    color:  white;
+    padding: 0.5rem 1rem;
+    border: solid ;
+    height: 50px;
+    width:120px;
+    background: #16423C;
+    border: 2px solid rgba(216, 196, 182, .2);
+    border-radius: 40px;
+    box-shadow: 0 0 10px  rgba(0, 0, 0, .2);
+    cursor: pointer;
+}
+.login-btn {
+    color: #16423C;
+    padding: 0.5rem 1rem;
+    border: solid ;
+    height: 50px;
+    width:120px;
+    background: #C4DAD2;
+    border: 2px solid rgba(216, 196, 182, .2);
+    border-radius: 40px;
+    box-shadow: 0 0 10px  rgba(0, 0, 0, .2);
+    cursor: pointer;
+    border-color: #16423C;
+}
+
+.Register-btn:hover{
+    transform: scale(1.05);
+}
+
+.login-btn:hover{
+    transform: scale(1.05);
+}
+
+.hero {
+    background-image: linear-gradient(to right, #16423C , #C4DAD2);
+    color: var(--white);
+    padding: 12rem 2rem;
+    position: relative;
+    overflow: hidden;
+    height: 700px;
+    margin-bottom: 2rem;
+}
+
+
+.hero h1 {
+    font-size: 5.8rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    font-family: "Roboto", serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;}
+
+.hero p{
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    font-family: "Roboto", serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;
+}
+
+
+
+.services {
+    padding: 4rem 2rem;
+    background-color: #fff8e7;
+    color: #16423C;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    font-family: "Roboto", serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;
+}
+
+.subtitle {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.main-section {
+    margin-top: 4rem;
+    
+    width: 100%;
+}
+
+.main-cards {
+    display: grid;
+   
+    gap: 4rem;
+    margin-top: 2rem;
+    
+    width: 100%;
+    display: block;
+}
+
+.card {
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    margin-bottom: 5rem;
+   height: 35rem;
+   
+    
+}
+
+
+.card:hover{
+    transform: translateY(-18px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    
+}
+
+.card .icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.additional-services {
+    margin-top: 3rem;
+    padding: 2rem 0;
+}
+
+.service {
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+
+img{
+    float: right;
+    width: 30%;
+    height: 70%;
+    position: relative;
+    margin-right: 10%;
+    top: -100px;
+}
+
+@media only screen and (max-width:480px) {
+    .planning-cards {
+        display: grid;
+       
+        gap: 2rem;
+        margin-bottom: 1rem;
+        
+        width: 100%;
+        display: block;
+    }
+
+    .card {
+        padding: 2rem;
+       height: 25rem;
+       
+        
+    }
+
+    h3{
+        font-size: 19px;
+        margin-bottom: 1rem;
+      
+    
+    }
+    
+    .card p{
+        font-size: 10px;
+    }
+
+    img{
+        width: 20%;
+        height: 40%;
+        margin-right: -15px;
+        top: -40px;
+        text-wrap: wrap;
+    }
+
+    .Register-btn {
+        width:60px;
+        padding: 0.1rem 0.1rem;
+        font-size: 9px;
+    }
+    .login-btn {
+        width:60px;
+        padding: 0.1rem 0.1rem;
+        font-size: 9px;
+    }
+
+    .hero {
+        padding: 17rem 2rem;
+        height: 640px;
+    }
+    
+    
+    .hero h1 {
+        font-size: 3.8rem;
+        margin-bottom: 1rem;}
+    
+    .hero p{
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    
+}
+ 
+
+

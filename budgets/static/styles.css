@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +6,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #e3eaf5, #f9f6f1); 
+    background: linear-gradient(to right, #C4DAD2, #16423C); 
     color: #16423C; 
     line-height: 1.6;
     padding: 20px;
@@ -15,85 +14,97 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    flex-direction: column;
 }
 
-
+/* Responsive Containers */
 .container {
     width: 90%;
     max-width: 1200px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    padding: 30px;
+    padding: 20px;
     animation: fadeIn 1.5s ease-in-out;
 }
 
+.containers {
+    width: 100%;
+    max-width: 1200px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 5px;
+    animation: fadeIn 1.5s ease-in-out;
+}
 
+/* Header Styling */
 header {
     text-align: center;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 2px solid #C4DAD2; 
 }
 
 header h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     color: #16423C; 
     margin-bottom: 10px;
 }
 
 header img.logo {
-    width: 100px;
-    margin-bottom: 15px;
+    width: 80px;
+    margin-bottom: 10px;
     border-radius: 50%;
 }
 
-
+/* Button Styling */
 .btn {
     display: inline-block;
-    padding: 12px 20px;
-    margin: 15px;
-    font-size: 1.2rem;
+    padding: 10px 18px;
+    font-size: 1rem;
     color: white;
-    background: linear-gradient(90deg, #C4DAD2, #16423C); 
+    background: linear-gradient(90deg, #C4DAD2, #16423C);
     border: none;
-    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     transition: background 0.3s ease, transform 0.3s ease;
+    border-radius: 8px;
 }
 
 .btn:hover {
-    background: linear-gradient(90deg, #C4DAD2, #16423C); 
+    background: #16423C;
     transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
 }
 
-
+/* Form Styling */
 form {
-    margin: 20px auto;
-    background: white; 
-    padding: 25px;
+    margin: 15px auto;
+    padding: 20px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    background: white;
 }
 
 form label {
     display: block;
     margin: 10px 0 5px;
+    font-weight: bold;
     font-size: 1rem;
-    color: #16423C; /* Dark green for form labels */
+    color: #16423C;
 }
 
 form input,
 form select {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid white;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid grey;
     border-radius: 8px;
     font-size: 1rem;
-    color: #16423C; /* Dark green for input text */
 }
 
+/* Button inside Forms */
 form button {
     display: block;
     width: 100%;
@@ -108,13 +119,22 @@ form button {
 }
 
 form button:hover {
-    background: #16423C;
+    background: #C4DAD2;
     transform: scale(1.05);
 }
-/* Table Styling */
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adds space between the buttons */
+    margin-top: 20px; /* Adds space from the content above */
+}
+
+/* Center tables, reduce size and ensure proper alignment */
 table {
-    width: 100%;
-    margin-top: 20px;
+    width: 90%; /* Reduce width slightly to avoid stretching */
+    max-width: 1000px; /* Limit max-width for better alignment */
+    margin: 20px auto;
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
@@ -122,24 +142,35 @@ table {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-table th,
-table td {
-    padding: 15px;
+/* Table headers and cells styling */
+table th, table td {
+    padding: 8px 12px; /* Smaller padding for compact table */
     text-align: center;
-    border-bottom: 1px solid #e3eaf5; 
+    font-weight: bold;
+    font-size: 0.95rem; /* Reduce font size slightly */
+    font-family: 'Poppins', sans-serif;
+    border-bottom: 1px solid #e3eaf5;
 }
 
+/* Table headers */
 table th {
-    background: linear-gradient(90deg, #C4DAD2, #16423C); 
+    background: #16423C;
     color: white;
     font-size: 1rem;
 }
 
-table tr:hover {
-    background: white; 
-    transform: scale(1.01);
-    transition: transform 0.2s ease-in-out;
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Enables horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    /*margin: 20px 0;  Add some margin for spacing */
+    margin-top: 30px; /* Adds space above the table */
+    margin-bottom: 30px;
+    
 }
+
+
+/* Checkbox and File Input */
 .checkbox-container {
     display: flex;
     align-items: center;
@@ -148,50 +179,39 @@ table tr:hover {
 }
 
 .checkbox-container input[type="checkbox"] {
-    margin-right: 10px;
-    width: 20px;
-    height: 20px;
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
 }
 
-.checkbox-label {
-    font-weight: bold;
-    color: #555;
-}
 .file-input {
     margin-top: 10px;
-    font-size: 1rem;
     padding: 5px;
     border: 1px solid white;
     border-radius: 5px;
     width: 100%;
 }
-.actions {
-    margin-top: 20px;
-    text-align: center;
-    word-spacing: 20%;
-}
-.actions .btn {
-    display: inline-block;
-    margin: 10px auto;
-    background-color: #16423C;
-    word-spacing: 20%;
-}
-/* Add this to your existing styles.css file */
+
+/* Go Back Button */
 .go-back-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
+    display: block;
+    margin: 2px auto;
+    padding: 2px 5px;
     background-color: #16423C;
     color: white;
     text-decoration: none;
     border-radius: 5px;
     text-align: center;
-    font-size: 16px;
+    font-size: 1rem;
+    width: 50%;
+    max-width: 200px;
 }
 
 .go-back-btn:hover {
     background-color: #C4DAD2;
 }
+
+/* Flash Messages */
 .flash-messages {
     margin-bottom: 20px;
 }
@@ -199,9 +219,8 @@ table tr:hover {
 .alert {
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .alert.error {
@@ -216,7 +235,7 @@ table tr:hover {
     border-color: #c3e6cb;
 }
 
-
+/* Fade In Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -227,3 +246,73 @@ table tr:hover {
         transform: scale(1);
     }
 }
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+    table {
+        width: 95%; /* Adjust width for medium screens */
+    }
+
+    table th, table td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Adjustments for tablets */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 0.9rem;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+
+    table th, table td {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+
+    .actions {
+        gap: 10px;
+    }
+
+    .table-wrapper {
+        margin-top: 20px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 0.7rem;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    table th, table td {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .actions {
+        gap: 5px;
+    }
+
+    .table-wrapper {
+        margin-top: 15px;
+    }
+}
+

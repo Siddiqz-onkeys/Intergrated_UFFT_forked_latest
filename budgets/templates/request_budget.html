@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7fc;
+            background: linear-gradient(to right, #C4DAD2, #16423C);
+            color: #16423C;
             margin: 0;
             padding: 0;
         }
@@ -22,7 +23,7 @@
         h1 {
             text-align: center;
             font-size: 2.5rem;
-            color: #007BFF;  /* Changed to a blue color */
+            color: #155724;  /* Changed to a blue color */
             margin-top: 250px;
         }
 
@@ -41,6 +42,9 @@
             font-size: 1.2rem;
             color: #333;
             margin-bottom: 10px;
+            font-weight: bold;
+            
+            font-family: 'Poppins', sans-serif;
         }
 
         select, input[type="number"], input[type="date"], textarea, input[type="text"] {
@@ -54,7 +58,7 @@
         }
 
         button {
-            background-color: #007BFF;
+            background-color:#155724;
             color: white;
             padding: 12px 20px;
             font-size: 1.1rem;
@@ -65,7 +69,7 @@
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color:#155724;
         }
 
         .form-group {
@@ -85,6 +89,9 @@
         .form-group label {
             font-size: 1.2rem;
             margin-bottom: 7px;
+            font-weight: bold;
+            
+            font-family: 'Poppins', sans-serif;
         }
 
         @media (max-width: 768px) {
@@ -97,16 +104,19 @@
 </head>
 <body>
      
+     
     
     <h1>Request Additional Budget</h1>
-    <form method="POST" action="/budget/request_budget" method="post">
-        <label for="user_id">Select User:</label>
+    <form action="{{ url_for('budget.request_budget') }}"  method="post">
+       <!--<label for="user_id">Select User:</label>
         <select name="user_id" required>
             {% for user in users %}
                 <option value="{{ user.user_id }}">{{ user.user_name }}</option>
             {% endfor %}
         </select>
-    
+       
+        <input type="hidden" name="user_id" value="{{ session.user_id }}">-->
+        <input type="hidden" name="user_id" value="{{ logged_in_user_id }}">  
         <label for="requested_amount">Requested Amount:</label>
         <input type="number" name="requested_amount" step="0.01" required>
     

@@ -1,6 +1,6 @@
 import mysql.connector
 from datetime import datetime 
-from flask import Flask,request,render_template,jsonify,redirect,url_for,Blueprint
+from flask import Flask,request,render_template,jsonify,redirect,url_for,Blueprint,session
 import os,time
 from werkzeug.utils import secure_filename
 from db_connection import get_connection
@@ -8,19 +8,7 @@ from db_connection import get_connection
 ## initializing the flask application
 app=Flask(__name__)
 
-
 expense_bp = Blueprint('expense', __name__, template_folder='templates', static_folder='static')
-
-
-########## DEFINING A PATH TO SAVE THE UPLOADED FILES ##########
-# UPLOAD_FOLDER = './static/uploads/receipts'
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# sort_order={'date':'default',
-#             'name':'default',
-#             'amount':'default',
-#             'description':'default',
-#             'receipt':'default'}
-
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -62,32 +50,44 @@ cursor = connect_.cursor(buffered=True)
 ########### ESTABLISHING A ROUTE FOR THE HTML REQUEST ##########
 @expense_bp.route('/', methods=["GET", "POST"])
 def index():
+    #carry the user id
+    global curr_user
+    curr_user=session['user_id']
+    
+    #carry the user role
+    global curr_user_role
+    curr_user_role=session['role'].lower()
+    
+    #carry the current date
     global current_date
     current_date = datetime.now().strftime('%Y-%m-%d')
     
+    #carry the fmaily id
+    global curr_family_id
+    curr_family_id=session['family_id']
+    
+    #carry the user name
+    global curr_user_name
+    curr_user_name=session['login_name']
+    
     # Fetching users data
-    try:
-        cursor.execute("SELECT user_id, user_name, family_id FROM users")
-        users_list = cursor.fetchall()
-        
-        users = [
-            {
-                'user_id': user[0],
-                'user_name': user[1],
-                'family_id': user[2]
-            } for user in users_list
-        ]
-    except mysql.connector.Error as err:
-        print(f"Error fetching users: {err}")
-        users = []
-
     if request.method == "GET":
-        return render_template('index.html', users=users, max_date=current_date)
-    else:
-        global curr_user
-        curr_user = request.form.get('user_id')
+        #fetching the family members
+        try:
+            cursor.execute("SELECT user_id, user_name FROM users WHERE family_id=(SELECT family_id FROM users WHERE user_id=%s)",(curr_user,))
+            users_list = cursor.fetchall()
+            
+            users = [
+                {
+                    'user_id': user[0],
+                    'user_name': user[1],
+                } for user in users_list
+            ]
+        except mysql.connector.Error as err:
+            print(f"Error fetching users: {err}")
+            users = []
         
-        # Fetch expenses for the user
+        #fetching all the expenses of the user
         try:
             cursor.execute("""
                 SELECT expense_id, date, name, amount, description, receipt 
@@ -148,13 +148,84 @@ def index():
             categories = []
 
         return render_template(
-            'index.html',
+            'index.html',major=verify_major(),
             expenses=expense_records,
             user_id=curr_user,
             users=users,
             reccur_exps=rec_exps,
             categories=categories,
-            max_date=current_date
+            max_date=current_date,user_role=curr_user_role,
+            user_name=curr_user_name
+        )
+    else:
+        
+        family_user = request.form.get('user_id')
+        #fetching the family members
+        try:
+            cursor.execute("SELECT user_id, user_name FROM users WHERE family_id=(SELECT family_id FROM users WHERE user_id=%s)",(curr_user,))
+            users_list = cursor.fetchall()
+            
+            users = [
+                {
+                    'user_id': user[0],
+                    'user_name': user[1],
+                } for user in users_list
+            ]
+        except mysql.connector.Error as err:
+            print(f"Error fetching users: {err}")
+            users = []
+        
+        
+        # Fetch expenses for the user
+        try:
+            cursor.execute("""
+                SELECT expense_id, date, name, amount, description, receipt 
+                FROM expenses e1 
+                JOIN categories c1 ON e1.category_id = c1.category_id 
+                WHERE user_id=%s 
+                ORDER BY expense_id DESC
+            """, (family_user,))
+            expenses = cursor.fetchall()
+            
+            expense_records = [
+                {
+                    'expense_id': exp[0],
+                    'date_in': exp[1],
+                    'category': exp[2],
+                    'amount': exp[3],
+                    'desc': exp[4],
+                    'receipt': exp[5]
+                }
+                for exp in expenses
+            ]
+        except mysql.connector.Error as err:
+            print(f"Error fetching expenses: {err}")
+            expense_records = []
+
+        # Fetch all categories
+        try:
+            cursor.execute("SELECT * FROM categories")
+            cats = cursor.fetchall()
+            
+            categories = [
+                {
+                    'cat_id': item[0],
+                    'cat_name': item[1]
+                }
+                for item in cats
+            ]
+        except mysql.connector.Error as err:
+            print(f"Error fetching categories: {err}")
+            categories = []
+        return render_template(
+            'index.html',major=verify_major(),
+            expenses=expense_records,
+            user_id=curr_user,
+            users=users,
+            categories=categories,
+            max_date=current_date,user_role=curr_user_role,
+            user_name=curr_user_name
+            
         )
 
 def get_expenses():
@@ -205,10 +276,6 @@ def upload_receipt():
 @expense_bp.route('/get_form_data',methods=['POST'])
 def get_form_data():
     
-    user_id=1
-    
-    family_id=1
-    
     category=request.form.get('category')
     #print("Category being queried:", category)
 
@@ -238,17 +305,17 @@ def get_form_data():
         receipt = receipt_filename
     
     # Add the expense to the database
-    add_expense(family_id, category_id, amount, date_in, description, receipt)
+    add_expense(category_id, amount, date_in, description, receipt)
     
     
     return render_template('index.html',expenses=get_expenses(),users=get_users(),max_date=current_date) ##### this returns a success message 
 
 
 ####### ADD EXPENSE ###########
-def add_expense(family_id, category_id, amount, date_in, description="", receipt=""):
+def add_expense(category_id, amount, date_in, description="", receipt=""):
     # Start constructing the query
-    query = "INSERT INTO EXPENSES (user_id, category_id, date, amount, family_id"
-    params = [curr_user, category_id, date_in, amount, family_id]
+    query = "INSERT INTO expenses (user_id, category_id, date, amount, family_id"
+    params = [curr_user, category_id, date_in, amount, curr_family_id]
     
     # Dynamically add optional columns
     if description:
@@ -488,9 +555,7 @@ def add_rec_to_exp(rec_id):
 
 ####### METHOD TO ADD A NEW RECCURING EXPENSE #######
 @expense_bp.route('/add_rec_exp',methods=["POST"])
-def add_rec_exp(): 
-    user_id=1
-    family_id=1   
+def add_rec_exp():   
     category=request.form.get('category')
     #print("Category being queried:", category)
 
@@ -504,7 +569,7 @@ def add_rec_exp():
     
     desc=request.form.get('desc')
     
-    cursor.execute("INSERT INTO rec_expenses (user_id,family_id,category_id,date,amount,description) VALUES (%s,%s,%s,%s,%s,%s) ",(user_id,family_id,category_id,date_in,amount,desc,))
+    cursor.execute("INSERT INTO recc_expenses (user_id,family_id,category_id,date,amount,description) VALUES (%s,%s,%s,%s,%s,%s) ",(curr_user,curr_family_id,category_id,date_in,amount,desc,))
     connect_.commit()
     
     return render_template('index.html',expenses=get_expenses(),users=get_users(),max_date=current_date)

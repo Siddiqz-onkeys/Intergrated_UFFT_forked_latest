@@ -1,8 +1,11 @@
+from datetime import datetime
+import calendar
 import mysql.connector
 from mysql.connector import Error
 import datetime
 from decimal import Decimal
 from db_connection import get_connection
+
 class SavingsGoalsManager:
     def __init__(self):
         try:
@@ -41,7 +44,7 @@ class SavingsGoalsManager:
             query = "SELECT role FROM Users WHERE user_id = %s"
             self.cursor.execute(query, (user_id,))
             user = self.cursor.fetchone()
-            return user and user['role'].lower() == 'hof' 
+            return user and user['role'].lower() == 'hof'
         except Error as e:
             print(f"Database error checking admin status: {e}")
             return False
@@ -783,6 +786,147 @@ class SavingsGoalsManager:
         except Error as e:
             print(f"Error getting user goal info: {e}")
             return None
+    def create_investment(self, user_id, principal_amount, interest_rate):
+        """
+        Create a new fixed investment for a user
+        
+        Args:
+            user_id (int): User's ID
+            principal_amount (float): Investment principal amount
+            interest_rate (float): Annual interest rate as a percentage
+            
+        Returns:
+            tuple: (success_bool, message_string)
+        """
+        try:
+            # Validate user
+            if not self.validate_user(user_id):
+                return False, "Invalid user ID"
+                
+            # Validate inputs
+            if principal_amount <= 0:
+                return False, "Principal amount must be greater than zero"
+            if interest_rate <= 0 or interest_rate > 100:
+                return False, "Interest rate must be between 0 and 100"
+                
+            # Convert to Decimal for precision
+            principal_amount = Decimal(str(principal_amount))
+            interest_rate = Decimal(str(interest_rate))
+            
+            # Get current date
+            current_date = datetime.datetime.now().date()
+            
+            # Insert new investment
+            query = """
+            INSERT INTO fixed_investment 
+            (user_id, principal_amount, interest_rate, start_date)
+            VALUES (%s, %s, %s, %s)
+            """
+            self.cursor.execute(query, (user_id, principal_amount, interest_rate, current_date))
+            self.connection.commit()
+            
+            return True, "Investment created successfully!"
+            
+        except Error as e:
+            self.connection.rollback()
+            return False, f"Error creating investment: {str(e)}"
+
+    def display_investment(self, user_id):
+        """
+        Display investment details with calculated daily interest
+        
+        Args:
+            user_id (int): User's ID
+            
+        Returns:
+            tuple: (success_bool, data_dict or error_message)
+        """
+        try:
+            # Validate user
+            if not self.validate_user(user_id):
+                return False, "Invalid user ID"
+                
+            # Get investment details
+            query = """
+            SELECT investment_id, principal_amount, interest_rate, start_date
+            FROM fixed_investment
+            WHERE user_id = %s
+            """
+            self.cursor.execute(query, (user_id,))
+            investments = self.cursor.fetchall()
+            
+            if not investments:
+                return False, "No investments found for this user"
+                
+            current_date = datetime.datetime.now().date()
+            investment_details = []
+            
+            for inv in investments:
+                # Calculate days since investment
+                days_invested = (current_date - inv['start_date']).days
+                
+                # Calculate interest earned
+                annual_interest = (inv['principal_amount'] * inv['interest_rate']) / Decimal('100')
+                daily_interest = annual_interest / Decimal('365')
+                total_interest_earned = daily_interest * Decimal(str(days_invested))
+                
+                # Get current month's days
+                current_month_days = calendar.monthrange(current_date.year, current_date.month)[1]
+                monthly_interest = annual_interest / Decimal('12')
+                current_daily_interest = monthly_interest / Decimal(str(current_month_days))
+                
+                investment_details.append({
+                    'investment_id': inv['investment_id'],
+                    'principal_amount': float(inv['principal_amount']),
+                    'interest_rate': float(inv['interest_rate']),
+                    'start_date': inv['start_date'].strftime('%Y-%m-%d'),
+                    'days_invested': days_invested,
+                    'total_interest_earned': float(total_interest_earned),
+                    'current_daily_interest': float(current_daily_interest)
+                })
+                
+            return True, investment_details
+            
+        except Error as e:
+            return False, f"Error displaying investment: {str(e)}"
+
+    def delete_investment(self, user_id, investment_id=None):
+        """
+        Delete investment(s) for a user
+        
+        Args:
+            user_id (int): User's ID
+            investment_id (int, optional): Specific investment ID to delete
+            
+        Returns:
+            tuple: (success_bool, message_string)
+        """
+        try:
+            # Validate user
+            if not self.validate_user(user_id):
+                return False, "Invalid user ID"
+                
+            if investment_id:
+                # Delete specific investment
+                query = """
+                DELETE FROM fixed_investment 
+                WHERE user_id = %s AND investment_id = %s
+                """
+                self.cursor.execute(query, (user_id, investment_id))
+            else:
+                # Delete all investments for user
+                query = "DELETE FROM fixed_investment WHERE user_id = %s"
+                self.cursor.execute(query, (user_id,))
+                
+            if self.cursor.rowcount == 0:
+                return False, "No investments found to delete"
+                
+            self.connection.commit()
+            return True, "Investment(s) deleted successfully"
+            
+        except Error as e:
+            self.connection.rollback()
+            return False, f"Error deleting investment: {str(e)}"
 
 def main():
     manager = SavingsGoalsManager()

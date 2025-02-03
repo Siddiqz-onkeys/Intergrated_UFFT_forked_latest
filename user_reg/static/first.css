@@ -142,10 +142,37 @@ legend{
 
 
 input[type="date"]::placeholder {
-    color: transparent; /* Hides the default placeholder */
+    color: transparent;
 }
 
 input[type="date"] {
     font-size: 20px;
     color: #D8C4B6;
 }
+
+#requirements {
+    position: absolute;
+    background: #fff8e7;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    z-index: 10;
+}
+
+#requirements.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+#requirements p {
+    margin: 5px 0; 
+    text-align: left; 
+    color:#C4DAD2;
+}
+
+

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .container {
+            background: rgba(196, 218, 210, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            animation: fadeScale 0.8s ease-out;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #C4DAD2;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .tab {
+            background: rgba(22, 66, 60, 0.5);
+            border: none;
+            padding: 1rem 2rem;
+            color: #C4DAD2;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+        }
+
+        .tab:hover, .tab.active {
+            background: rgba(196, 218, 210, 0.2);
+        }
+
+        .form {
+            background: rgba(196, 218, 210, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #D8C4B6;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(196, 218, 210, 0.05);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 10px;
+            color: #C4DAD2;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #C4DAD2;
+            background: rgba(196, 218, 210, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
+            color: #C4DAD2;
+            padding: 1rem 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #1a4e47 0%, #16423C 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 2rem;
+            background: rgba(196, 218, 210, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(196, 218, 210, 0.1);
+        }
+
+        th {
+            background: rgba(22, 66, 60, 0.5);
+            color: #C4DAD2;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #D8C4B6;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .delete-btn:hover {
+            background: rgba(216, 196, 182, 0.1);
+            transform: scale(1.1);
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            text-align: center;
+            background: rgba(216, 196, 182, 0.1);
+            border: 1px solid rgba(216, 196, 182, 0.2);
+            color: #C4DAD2;
+        }
+
+        .back-link {
+            display: inline-block;
+            text-decoration: none;
+            color: #D8C4B6;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .back-link:hover {
+            background: rgba(196, 218, 210, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Investment Management</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('create')">Create Investment</button>
+            <button class="tab" onclick="showTab('view')">View Investments</button>
+            <button class="tab" onclick="showTab('delete')">Delete Investment</button>
+        </div>
+
+        <!-- Create Investment Form -->
+        <div id="createTab" class="tab-content active">
+            <form method="POST" action="{{ url_for('saving.create_investment') }}" class="form">
+                <div class="form-group">
+                    <label for="user_id">User ID</label>
+                    <input type="number" id="user_id" name="user_id" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="principal_amount">Principal Amount (Rs)</label>
+                    <input type="number" id="principal_amount" name="principal_amount" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="interest_rate">Annual Interest Rate (%)</label>
+                    <input type="number" id="interest_rate" name="interest_rate" required min="0" max="100" step="0.01">
+                </div>
+                <button type="submit" class="btn">Create Investment</button>
+            </form>
+        </div>
+
+        <!-- View Investments -->
+        <div id="viewTab" class="tab-content">
+            <form method="POST" action="{{ url_for('saving.display_investment') }}" class="form">
+                <div class="form-group">
+                    <label for="view_user_id">User ID</label>
+                    <input type="number" id="view_user_id" name="user_id" required min="1">
+                </div>
+                <button type="submit" class="btn">View Investments</button>
+            </form>
+
+            {% if investments %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Investment ID</th>
+                        <th>Principal Amount (Rs)</th>
+                        <th>Interest Rate (%)</th>
+                        <th>Start Date</th>
+                        <th>Days Invested</th>
+                        <th>Total Interest Earned (Rs)</th>
+                        <th>Current Daily Interest (Rs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for investment in investments %}
+                    <tr>
+                        <td>{{ investment.investment_id }}</td>
+                        <td>{{ "%.2f"|format(investment.principal_amount) }}</td>
+                        <td>{{ "%.2f"|format(investment.interest_rate) }}</td>
+                        <td>{{ investment.start_date }}</td>
+                        <td>{{ investment.days_invested }}</td>
+                        <td>{{ "%.2f"|format(investment.total_interest_earned) }}</td>
+                        <td>{{ "%.2f"|format(investment.current_daily_interest) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <!-- Delete Investment -->
+        <div id="deleteTab" class="tab-content">
+            <form method="POST" action="{{ url_for('saving.delete_investment') }}" class="form">
+                <div class="form-group">
+                    <label for="delete_user_id">User ID</label>
+                    <input type="number" id="delete_user_id" name="user_id" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="investment_id">Investment ID (Optional - leave empty to delete all)</label>
+                    <input type="number" id="investment_id" name="investment_id" min="1">
+                </div>
+                <button type="submit" class="btn">Delete Investment</button>
+            </form>
+        </div>
+
+        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

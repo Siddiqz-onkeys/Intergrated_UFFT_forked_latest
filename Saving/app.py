@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify,Blueprint
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Blueprint
 from decimal import Decimal
+from datetime import date,datetime
 from .savings_goals_manager import SavingsGoalsManager
 
 app = Flask(__name__)
@@ -11,9 +12,10 @@ manager = SavingsGoalsManager()
 
 saving_bp = Blueprint('saving', __name__, template_folder='templates', static_folder='static')
 
+
 @saving_bp.route('/')
 def index():
-    return render_template('index_saving.html')
+    return render_template("saving_index.html")
 @saving_bp.route('/get_family_contributions/<int:user_id>')
 def get_family_contributions(user_id):
     try:
@@ -59,7 +61,6 @@ def get_family_contributions(user_id):
     except Exception as e:
         print(f"Error in get_family_contributions: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
 @saving_bp.route('/create_goal', methods=['GET', 'POST'])
 def create_goal():
     if request.method == 'POST':
@@ -67,28 +68,31 @@ def create_goal():
             user_id = int(request.form['user_id'])
             user_goal = float(request.form['user_goal'])
             deadline = request.form['deadline']
-            
+
             # Check if the user is an admin
             is_admin = manager.is_admin(user_id)
+
+            # Get family goal input safely
             family_goal = request.form.get('family_goal')
-            
-            if family_goal and not is_admin:
-                flash("Only administrators can create family goals.", "error")
-                return redirect(url_for('saving.create_goal'))
-            
-            # Create a family goal if admin
             family_goal = float(family_goal) if family_goal else None
+
+            if family_goal is not None and not is_admin:
+                flash("Only administrators can create family goals.", "error")
+                return render_template('create_goal.html')
+
+            # Create a savings goal
             success = manager.create_savings_goal(user_id, user_goal, deadline, family_goal)
-            
+
             if success:
                 flash("Savings goal created successfully!", "success")
             else:
-                flash("Failed to create savings goal. Saving goal already exits", "error")
+                flash("Failed to create savings goal. Saving goal already exists.", "error")
+
         except ValueError as e:
             flash(f"Invalid input: {str(e)}", "error")
-            
-        return redirect(url_for('saving.create_goal'))
-        
+
+        return render_template('create_goal.html')
+
     return render_template('create_goal.html')
 
 @saving_bp.route('/check_admin/<int:user_id>')
@@ -277,23 +281,75 @@ def delete_goal(goal_type, goal_id):
         flash(f"Failed to delete goal: {str(e)}", "error")
     return redirect(url_for('saving.display_goals'))
 
+# @saving_bp.route('/create_joint_goal', methods=['GET', 'POST'])
+# def create_joint_goal():
+#     if request.method == 'POST':
+#         # Step 1: Fetch Users by Family ID
+#         if 'family_id' in request.form and not 'user_ids' in request.form:
+#             try:
+#                 family_id = int(request.form['family_id'])
+#                 users = manager.get_users_by_family(family_id)
+
+#                 if not users:
+#                     flash("No users found for the given family ID.", "error")
+#                     return render_template('create_joint_goal.html', users=[], family_id=family_id)
+
+#                 return render_template('create_joint_goal.html', users=users, family_id=family_id)
+#             except ValueError:
+#                 flash("Invalid family ID. Please enter a valid number.", "error")
+#                 return render_template('create_joint_goal.html', users=[], family_id=None)
+
+#         # Step 2: Create Joint Goal
+#         elif 'user_ids' in request.form:
+#             try:
+#                 user_ids = request.form.getlist('user_ids')
+#                 joint_goal = float(request.form['joint_goal'])
+#                 deadline = request.form['deadline']
+
+#                 if len(user_ids) < 2:
+#                     flash("At least two users are required to create a joint goal.", "error")
+#                     return redirect(url_for('create_joint_goal'))
+
+#                 user_ids = [int(user_id) for user_id in user_ids]
+#                 success, message = manager.create_joint_goal(user_ids, joint_goal, deadline)
+
+#                 if success:
+#                     flash(message, "success")
+#                 else:
+#                     flash(message, "error")
+#             except ValueError:
+#                 flash("Invalid input. Please check the form fields.", "error")
+#             except Exception as e:
+#                 flash(f"An unexpected error occurred: {str(e)}", "error")
+
+#             return redirect(url_for('create_joint_goal'))
+
+#     # Initial Form
+#     return render_template('create_joint_goal.html', users=[], family_id=None)
 @saving_bp.route('/create_joint_goal', methods=['GET', 'POST'])
 def create_joint_goal():
     if request.method == 'POST':
-        # Step 1: Fetch Users by Family ID
-        if 'family_id' in request.form and not 'user_ids' in request.form:
+        # Step 1: Fetch Users by User ID
+        if 'user_id' in request.form and not 'user_ids' in request.form:
             try:
-                family_id = int(request.form['family_id'])
-                users = manager.get_users_by_family(family_id)
+                user_id = int(request.form['user_id'])
+                family_id = manager.get_family_id(user_id)  # Get family_id from user_id
+
+                if not family_id:
+                    flash("Invalid user ID or user does not belong to any family.", "error")
+                    return render_template('create_joint_goal.html', users=[], user_id=user_id)
+
+                users = manager.get_users_by_family(family_id)  # Fetch users from family_id
 
                 if not users:
-                    flash("No users found for the given family ID.", "error")
-                    return render_template('create_joint_goal.html', users=[], family_id=family_id)
+                    flash("No users found for the given family.", "error")
+                    return render_template('create_joint_goal.html', users=[], user_id=user_id)
 
-                return render_template('create_joint_goal.html', users=users, family_id=family_id)
+                return render_template('create_joint_goal.html', users=users, user_id=user_id)
+
             except ValueError:
-                flash("Invalid family ID. Please enter a valid number.", "error")
-                return render_template('create_joint_goal.html', users=[], family_id=None)
+                flash("Invalid user ID. Please enter a valid number.", "error")
+                return render_template('create_joint_goal.html', users=[], user_id=None)
 
         # Step 2: Create Joint Goal
         elif 'user_ids' in request.form:
@@ -320,8 +376,8 @@ def create_joint_goal():
 
             return redirect(url_for('saving.create_joint_goal'))
 
-    # Initial Form
-    return render_template('create_joint_goal.html', users=[], family_id=None)
+    return render_template('create_joint_goal.html', users=[], user_id=None)
+
 
 
 @saving_bp.route('/get_joint_goals/<int:user_id>')
@@ -503,6 +559,70 @@ def update_goal():
     return render_template('update_goal.html', 
                          pre_fill_user_id=pre_fill_user_id,
                          pre_fill_goal_type=pre_fill_goal_type)
+@saving_bp.route('/investments')
+def investments():
+    return render_template('investments.html')
 
+@saving_bp.route('/create_investment', methods=['POST'])
+def create_investment():
+    if request.method == 'POST':
+        try:
+            user_id = int(request.form['user_id'])
+            principal_amount = float(request.form['principal_amount'])
+            interest_rate = float(request.form['interest_rate'])
+            
+            success, message = manager.create_investment(user_id, principal_amount, interest_rate)
+            flash(message, 'success' if success else 'error')
+            
+        except ValueError as e:
+            flash(f"Invalid input: {str(e)}", 'error')
+        except Exception as e:
+            flash(f"An unexpected error occurred: {str(e)}", 'error')
+            
+    return redirect(url_for('saving.investments'))
+
+@saving_bp.route('/display_investment', methods=['POST'])
+def display_investment():
+    investments = None
+    try:
+        user_id = int(request.form['user_id'])
+        success, result = manager.display_investment(user_id)
+        
+        if success and result:
+            # Process the result to ensure dates are properly formatted
+            investments = []
+            for inv in result:
+                inv_dict = dict(inv)
+                if isinstance(inv_dict['start_date'], (date, datetime)):
+                    inv_dict['start_date'] = inv_dict['start_date'].strftime('%Y-%m-%d')
+                investments.append(inv_dict)
+        else:
+            flash(result if isinstance(result, str) else "No investments found.", 'error')
+            
+    except ValueError as e:
+        flash(f"Invalid input: {str(e)}", 'error')
+    except Exception as e:
+        flash(f"An unexpected error occurred: {str(e)}", 'error')
+    
+    return render_template('investments.html', investments=investments)
+
+@saving_bp.route('/delete_investment', methods=['POST'])
+def delete_investment():
+    try:
+        user_id = int(request.form['user_id'])
+        investment_id = request.form.get('investment_id')
+        
+        if investment_id:
+            investment_id = int(investment_id)
+            
+        success, message = manager.delete_investment(user_id, investment_id)
+        flash(message, 'success' if success else 'error')
+        
+    except ValueError as e:
+        flash(f"Invalid input: {str(e)}", 'error')
+    except Exception as e:
+        flash(f"An unexpected error occurred: {str(e)}", 'error')
+        
+    return redirect(url_for('saving.investments'))
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

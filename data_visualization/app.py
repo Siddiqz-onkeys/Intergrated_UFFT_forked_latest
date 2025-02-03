@@ -37,7 +37,7 @@ def get_db_connection():
 
 @data_visualization_bp.route('/', methods=['GET', 'POST'])
 def index():
-    if 'user_id' not in session:
+    if 'login_name' not in session:
         return redirect(url_for('user_reg.signin'))
     
     u_id = session['user_id']
@@ -51,7 +51,8 @@ def index():
     time_range = ''
     start_date = ''
     end_date = ''
-    family_id = session.get('family_id')  # Retrieve family_id from the session
+    family_id = session['family_id']  # Retrieve family_id from the session
+    print(family_id)
     no_records = False  # Flag for no records
     success_message = False  # Default value for success message flag
 
@@ -240,7 +241,7 @@ def save_report():
         with get_db_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO Reports (user_id, content, generated_at)
+                    INSERT INTO reports (user_id, content, generated_at)
                     VALUES (%s, %s, %s)
                 """, (user_id, report_data, datetime.now()))
                 connection.commit()
@@ -269,7 +270,7 @@ def show_history():
     with get_db_connection() as connection:
         with connection.cursor(dictionary=True) as cursor:
             user_id=session['user_id']
-            cursor.execute(f'SELECT report_id, user_id, content, generated_at FROM Reports where user_id={user_id}')
+            cursor.execute(f'SELECT report_id, user_id, content, generated_at FROM reports where user_id={user_id}')
             reports = cursor.fetchall()
 
     return render_template('history.html', reports=reports,name=name)
