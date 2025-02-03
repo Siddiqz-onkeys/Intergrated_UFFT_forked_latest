@@ -45,9 +45,13 @@
                 <div class="forms">
                     <!-- ####### ADD EXPENSE FORM #######-->
                     <div class="add_expense_form">
-                        <!-- #############  START OF THE FORM ###############-->
-                        <form id="add_expense" method="POST" action="/expense/get_form_data" enctype="multipart/form-data" style="display: none;">                  
-                            <!-- ########## the input for category ##########-->
+                        <!-- #############  START OF THE FORM ###############
+                                         
+                        <form id="add_expense" method="POST" action="{{url_for('expense.get_form_data')}}" enctype="multipart/form-data" style="display: none;">                 
+
+                            
+
+                           <!-- ########## the input for category ##########-->
                             <label for="category"> Category:</label>
                             <select id="category" name="category">
                                 <option value="" disabled selected>Select a Category</option>

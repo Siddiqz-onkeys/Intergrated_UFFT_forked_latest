@@ -319,7 +319,7 @@ def hof():
          fam_name=request.form['fam_name']
          user_name=session.get('user_name')
          hof_code=session.get('hof_code')
-         cur.execute("insert into family (family_id,family_name) values(%s,%s)",(hof_code,fam_name))
+         cur.execute("insert into families (family_id,family_name) values(%s,%s)",(hof_code,fam_name))
          con.commit()
          cur.execute("update users set family_id=%s where user_name=%s",(hof_code,user_name))
          con.commit()
