@@ -12,32 +12,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     </head>
     <body> 
-        
-        <header> <h1 id="header_text"> UNIFIED FAMILY FINANCE TRACKER</h1></header>
-
-        <!-- #### REPLACE THE USER SECTION BELOW THIS CODE WITH THE FOLLOWING CODE 
-            {% if user_role=='hof'%}
-            <form id="user-selection" method="POST" action="{{url_for('expense.index')}}" enctype="multipart/form">
-                <label> User: </label>
-                <select id="user_id" name="user_id">
-                    <option value="" disabled selected> -- Select user --- </option>
-                    {% for user in users %}
-                    <option value={{ user.user_id}}>{{ user.user_name}}</option>
-                    {% endfor %}
-                </select>
-                <button > FETCH ALL </button>
-            </form>
-            <button > My Expenses </button>
-
-            {% endif %}
-        
-        -->
-
         <header>
-            <h1 id="header_text"> TRACK YOUR EXPENSES, {{ curr_user_name }}</h1>
+            <h1 id="header_text"> YOUR EXPENSES,OUR EXPERTISE</h1>
         </header>
         
-        {% if curr_user_role == 'hof' %}
+        {% if user_role == 'hof' %}
         <div class="hof-spl" style="display: flex; justify-content: space-between; gap: 20px; margin:20px">
             <!-- ##### user selection section ###### -->
             <form id="user-selection" method="POST" action="{{ url_for('expense.index') }}" enctype="multipart/form-data">
@@ -53,19 +32,6 @@
             </form>
         </div>
         {% endif %}
-
-        <!-- ##### user selection section ######
-        <form id="user-selection" method="POST" action="{{url_for('expense.index')}}" enctype="multipart/form">
-            <label> User: </label>
-            <select id="user_id" name="user_id">
-                <option value="" disabled selected> -- Select user --- </option>
-                {% for user in users %}
-                <option value={{ user.user_id}}>{{ user.user_name}}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" > FETCH ALL </button>
-        </form> -->
-
 
         <div id="main-container">
             <div class="feature_buttons">
@@ -215,25 +181,10 @@
                                 <label for="filter_catego">Category:</label>
                                 <select id="filter_category" name="filter_category">
                                     <option value="" disabled selected>Select a Category</option>
-                                    <option value="rent">Rent</option>
-                                    <option value="furniture">Furniture</option>
-                                    <option value="maid">Maid</option>
-                                    <option value="appliances">Appliances</option>
-                                    <option value="grociries">Groceries</option>
-                                    <option value="bills">Bills</option>
-                                    <option value="fees">Fees</option>
-                                    <option value="emi">EMI</option>
-                                    <option value="investment">Investments</option>
-                                    <option value="food">Food</option>
-                                    <option value="travel">Travel</option>
-                                    <option value="clothes">Clothes</option>
-                                    <option value="health">Health</option>
-                                    <option value="medical">Medical</option>
-                                    <option value="vehicle_maintenance">Vehicle Maintenance</option>
-                                    <option value="miscellaneous">Miscellaneous</option>
-                                    <option value="others">Others</option>
+                                    {% for item in categories%}
+                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
+                                    {% endfor %} 
                                 </select>
-                                <br><br>
 
                                 <label for="filter_amount_range_min">Amount Range (Min):</label>
                                 <input type="number" id="filter_amount_range_min" name="filter_amount_range_min"
@@ -349,45 +300,11 @@
                             <form id="edit_expense" method="POST" action="" enctype="multipart/form-data" style="display: none;">
                                 <!-- ########## the input for category ##########-->
                                 <label for="category"> Category:</label>
-                                <select id="category" name="category">
+                                <select id="filter_category" name="filter_category">
                                     <option value="" disabled selected>Select a Category</option>
-
-                                    <!-- Housing section-->
-                                    <optgroup label="house hold expenses">
-                                        <option value="rent"> rent </option>
-                                        <option value="furniture"> Furniture </option>
-                                        <option value="maid"> Maid </option>
-                                        <option value="appliances"> Appliances </option>
-                                        <option value="grociries">Grociries</option>
-                                        <option value="bills">Bills</option>
-                                    </optgroup>
-
-                                    <!-- Financial Commitmetns -->
-                                    <optgroup label="Financial Commitments">
-                                        <option value="fees">Fees</option>
-                                        <option value="emi">EMI</option>
-                                        <option value="investment">Investments</option>
-                                    </optgroup>
-
-                                    <!--LifeStyle expenses-->
-                                    <optgroup label="Lifestyle Expenses">
-                                        <option value="Food">Food</option>
-                                        <option value="Travel">Travel</option>
-                                        <option value="Clothes">Clothes</option>
-                                    </optgroup>
-
-                                    <!--Health and Medical-->
-                                    <option value="health">Health</option>
-                                    <option value="Medical">Medical</option>
-
-                                    <!-- Vehicle Maintainance -->
-                                    <option value="vehicle maintainace"> vehicle maintainance</option>
-
-                                    <!--Mischellenous -->
-                                    <option value="miscellaneous">Mischellenous</option>
-
-                                    <!--Others -->
-                                    <option value="others">Others</option>
+                                    {% for item in categories%}
+                                        <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
+                                    {% endfor %} 
                                 </select>
                                 <br><br>
 
@@ -502,7 +419,6 @@
                                     <!-- Trash Icon to directly trigger the deletion -->                            
                                     <i class="fas fa-trash" onclick="delete_expense('{{ expense.expense_id }}')"></i>
                                     {% endif %}
-
                                     </td>
                                 </tr>
                                 

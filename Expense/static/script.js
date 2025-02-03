@@ -11,12 +11,6 @@ window.onload = function() {
 };
 
 
-function fetch_back() {
-  form = document.getElementById("user-selection");
-  form.method = "GET";
-  form.submit();
-}
-
 
 function showEditMenu(expense_id,expense_amount){
     document.getElementById('edit_menu').style.display='block';
@@ -34,7 +28,7 @@ function edit_expense(){
     document.getElementById('edit_expense').style.display="block";
     document.getElementById('add_amount_form').style.display="none";
     const form = document.getElementById('edit_expense');
-    form.action = `/expense/edit_expense/${id}`;
+    form.action = `/edit_expense/${id}`;
     
 }
 
@@ -42,7 +36,7 @@ function add_amount(){
     document.getElementById('add_amount_form').style.display="block";
     document.getElementById('edit_expense').style.display="none";
     const form = document.getElementById('add_amount_form');
-    form.action = `/expense/add_amount/${id}`;
+    form.action = `/add_amount/${id}`;
     
 }
 
@@ -112,34 +106,32 @@ function delete_expense(expense_id) {
 function deletion_f() {
     // Perform the deletion using the stored del_id
     const form =document.getElementById('deleteConfirmationSection')
-    form.action = `/expense/delete_expense/${del_id}`;
+    form.action=`/delete_expense/${del_id}`
     form.submit()
-    
-
     // Close the confirmation form
     close_delete();
 }
 
 function rollbackDeletion() {
-    fetch("/expense/rollback_deletion", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
+    fetch('/rollback_deletion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
     })
-      .then((response) => {
+    .then(response => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+            throw new Error('Network response was not ok');
         }
         return response.json();
-      })
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    })
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 // Function to close the delete confirmation form if the user clicks "Cancel"
@@ -166,7 +158,7 @@ function load_rec_to_exp(rec_id){
 function add_rec_to_exp(){
     const form = document.getElementById('rec_exp_conf');
     if (rec_id_ !== null) {
-        form.action = `/expense/add_rec_to_exp/${rec_id_}`;
+        form.action = `/add_rec_to_exp/${rec_id_}`;
     }
 }
 
