@@ -1,6 +1,7 @@
 import mysql.connector
 from datetime import datetime 
-from flask import Flask,request,render_template,jsonify,redirect,url_for,Blueprint,session
+from flask import Flask,request,render_template,jsonify,redirect,url_for,Blueprint,session,current_app
+from flask_mail import Message
 import os,time
 from werkzeug.utils import secure_filename
 from threading import Timer
@@ -147,6 +148,31 @@ def get_cats():
         return categories
 
 
+##### send user alert mail ###
+def send_user_alert_email(user_email, total_expenses, user_budget):
+    """Send an alert email to the user when budget for user is exceeded."""
+    mail = current_app.extensions['mail']  # Use the current app's mail instance
+    subject = f" Personal Budget Alert: User budget Exceeded"
+    body = f"""
+    Dear User,
+
+    Alert! Your total expenses have exceeded your personal budget.
+    
+    Total Expenses: ₹{total_expenses}
+    Threshold: ₹{user_budget}
+    
+    Please review your spending.
+    
+    Regards,
+    Budget Tracker Team
+    """
+    message = Message(subject=subject, recipients=[user_email], body=body)
+
+    try:
+        mail.send(message)
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 ########### ESTABLISHING A ROUTE FOR THE HTML REQUEST ##########
 @expense_bp.route('/', methods=["GET", "POST"])
@@ -170,6 +196,11 @@ def index():
     #carry the user name
     global curr_user_name
     curr_user_name=session['login_name']
+    
+    ## carry the email of the user
+    global curr_user_email
+    cursor.execute("SELECT email FROM users WHERE user_id=%s",(curr_user,))
+    curr_user_email=cursor.fetchone()[0]
     
     # Fetching users data
     if request.method == "GET":
@@ -309,8 +340,79 @@ def add_expense(category_id, amount, date_in, description="", receipt=""):
     # Execute the query
     cursor.execute(query, tuple(params))
     connect_.commit()
+    
+    # Calculate user's total expenses dynamically
+    cursor.execute('''
+        SELECT SUM(amount) AS total_expenses
+        FROM expenses
+        WHERE user_id = %s
+    ''', (curr_user,))
+    total_expenses = cursor.fetchone()
+    total_expenses = total_expenses[0] if total_expenses else 0
 
- ######### AGE VERIFICATION ############
+    # Fetch user's personal budget
+    cursor.execute('SELECT amount AS user_budget FROM budgets WHERE user_id = %s', (curr_user,))
+    budget_data = cursor.fetchone()
+
+    # Send alert email if expenses exceed budget
+    if budget_data and total_expenses > budget_data[0]:
+        send_user_alert_email(curr_user_email, total_expenses, budget_data[0])
+
+    # Check if total expenses exceed the category threshold
+    cursor.execute('''
+        SELECT 
+            budgets.amount AS budget_amount,
+            budgets.threshold_value,
+            categories.name AS category_name
+        FROM budgets
+        INNER JOIN categories ON budgets.category_id = categories.category_id
+        WHERE budgets.category_id = %s
+    ''', (category_id,))
+    budget = cursor.fetchone()
+
+    cursor.execute('''
+        SELECT SUM(amount) AS category_total_expenses
+        FROM expenses
+        WHERE category_id = %s and user_id=%s
+    ''', (category_id,curr_user,))
+    category_total_expenses = cursor.fetchone()
+    category_total_expenses = category_total_expenses[0] if category_total_expenses else 0
+
+    # Send email if category expenses exceed the threshold
+    if budget and category_total_expenses > budget[1]:
+        send_alert_email(curr_user_email, budget[2], category_total_expenses, budget[1])
+
+
+#### to send mail s regarding the budgets 
+def send_alert_email(user_mail,name, total_expenses, threshold_value):
+        """Send an alert email to the user when budget threshold is exceeded."""
+        mail = current_app.extensions['mail']  # Use the current app's mail instance
+        subject = f"Budget Alert: {name} Expenses Exceeded"
+        body = f"""
+        Dear User,
+
+        Your expenses for the category '{name}' have exceeded the budget threshold.
+        
+        Total Expenses: ₹{total_expenses}
+        Threshold: ₹{threshold_value}
+        
+        Please review your spending.
+        
+        Regards,
+        Budget Tracker Team
+        """
+        message = Message(subject=subject, recipients=[user_mail], body=body)
+
+        try:
+            mail.send(message)
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+        
+
+
+
+######### AGE VERIFICATION ############
 
 
 @expense_bp.route('/verify_major',methods=["GET"])

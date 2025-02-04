@@ -267,7 +267,7 @@
                             <form id="edit_expense" method="POST" action="" enctype="multipart/form-data" style="display: none;">
                                 <!-- ########## the input for category ##########-->
                                 <label for="category"> Category:</label>
-                                <select id="filter_category" name="filter_category">
+                                <select id="category" name="category">
                                     <option value="" disabled selected>Select a Category</option>
                                     {% for item in categories%}
                                         <option value="{{ item.cat_name }}"> {{ item.cat_name}} </option>
