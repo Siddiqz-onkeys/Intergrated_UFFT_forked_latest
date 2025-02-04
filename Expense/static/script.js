@@ -10,6 +10,13 @@ window.onload = function() {
     }
 };
 
+function fetch_back(){
+    form=document.getElementById('user-selection');
+    form.method="GET";
+    form.submit();
+
+}
+
 
 
 function showEditMenu(expense_id,expense_amount){
@@ -28,7 +35,7 @@ function edit_expense(){
     document.getElementById('edit_expense').style.display="block";
     document.getElementById('add_amount_form').style.display="none";
     const form = document.getElementById('edit_expense');
-    form.action = `/edit_expense/${id}`;
+    form.action = `/expense/edit_expense/${id}`;
     
 }
 
@@ -36,7 +43,7 @@ function add_amount(){
     document.getElementById('add_amount_form').style.display="block";
     document.getElementById('edit_expense').style.display="none";
     const form = document.getElementById('add_amount_form');
-    form.action = `/add_amount/${id}`;
+    form.action = `/expense/add_amount/${id}`;
     
 }
 
@@ -106,7 +113,8 @@ function delete_expense(expense_id) {
 function deletion_f() {
     // Perform the deletion using the stored del_id
     const form =document.getElementById('deleteConfirmationSection')
-    form.action=`/delete_expense/${del_id}`
+    form.method="POST"
+    form.action=`/expense/delete_expense/${del_id}`
     form.submit()
     // Close the confirmation form
     close_delete();
@@ -158,7 +166,7 @@ function load_rec_to_exp(rec_id){
 function add_rec_to_exp(){
     const form = document.getElementById('rec_exp_conf');
     if (rec_id_ !== null) {
-        form.action = `/add_rec_to_exp/${rec_id_}`;
+        form.action = `/expense/add_rec_to_exp/${rec_id_}`;
     }
 }
 
