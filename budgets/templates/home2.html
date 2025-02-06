@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Budget Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -134,7 +136,7 @@
         }
 
 
-
+        
 
         a.delete-link {
             color: rgb(200, 220, 200);
@@ -191,6 +193,7 @@
         <div>
             <button class="btn" onclick="toggleOverview('category')">Category Budgets</button>
             <button class="btn" onclick="toggleOverview('user')">User Budgets</button>
+            <a href="{{ url_for('user_reg.welcome') }}" class="btn btn-danger mx-2"> Home</a>
         </div>
 
         <!-- Category Budgets Overview -->
@@ -223,7 +226,7 @@
                                     <a href="#" 
                                     class="delete-link" 
                                     data-url="{{ url_for('budget.delete_budget', id=budget.budget_id, budget_type='category') }}"
-                                    onclick="showDeletePopup(this)">
+                                    onclick="showDeletePopup(this)" style="margin-left: 10px;">
                                      🗑️
                                  </a>
                                  
@@ -285,15 +288,17 @@
         </div>
 
         <div>
-            <a href="{{ url_for('budget.add_category') }}" class="btn">Add Category</a>
-            <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
+            {% if user_role != 'Member' %}
+                <a href="{{ url_for('budget.add_category') }}" class="btn">Add Category</a>
+                <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
+            {% endif %}
             <a href="{{ url_for('budget.expenses') }}" class="btn">Add Expense</a>
             <a href="{{ url_for('budget.report') }}" class="btn">View Reports</a>
             {% if user_role == 'Member' %}
                 <a href="{{ url_for('budget.request_budget') }}" class="btn">Request Budget</a>
             {% endif %}
-            <a href="{{ url_for('user_reg.welcome') }}" class="btn">Back to home</a>
         </div>
+        
     </div>
 
 

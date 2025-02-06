@@ -5,34 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Expense</title>
     <link rel="stylesheet" href="{{ url_for('budget.static', filename='styles.css') }}">
-</head>
-<body>
-    <div class="container">
+    <script>
         
-        <div class="logo">
- 
-            
-        </div>   
+    
+        document.addEventListener("DOMContentLoaded", function() {
+            let form = document.querySelector("#expenseForm");  
+            let amountInput = document.querySelector("#amount");
+            let popup = document.getElementById("budgetPopup");
+            let popupMessage = document.getElementById("popupMessage");
+            let continueBtn = document.getElementById("continueBtn");
+            let cancelBtn = document.getElementById("cancelBtn");
+        
+            // Read values from HTML body data attributes
+            let userBudget = parseFloat(document.body.getAttribute("data-user-budget")) || 0;
+            let totalExpenses = parseFloat(document.body.getAttribute("data-total-expenses")) || 0;
+        
+            console.log("User Budget:", userBudget);  
+            console.log("Total Expenses:", totalExpenses);
+        
+            form.addEventListener("submit", function(event) {
+                let expenseAmount = parseFloat(amountInput.value) || 0;
+                let newTotal = totalExpenses + expenseAmount;
+        
+                console.log("Expense Amount:", expenseAmount);
+                console.log("New Total Expenses:", newTotal);
+        
+                if (newTotal > userBudget) {
+                    event.preventDefault();  // Stop form submission
+                    popupMessage.innerText = "You don't have sufficient budget amount to add this expense.";
+                    popup.style.display = "flex";  // Show popup
+                }
+            });
+        
+            // "Continue" button submits the form
+            continueBtn.addEventListener("click", function() {
+                popup.style.display = "none";
+                form.submit();  // Proceed with form submission
+            });
+        
+            // "Cancel" button hides the popup
+            cancelBtn.addEventListener("click", function(event) {
+                event.preventDefault();  // Prevent form submission
+                popup.style.display = "none";  // Close the popup
+            });
+        });
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                let messages = document.querySelectorAll(".flash-messages .alert");
+                messages.forEach(msg => msg.style.display = "none");
+            }, 4000); // Flash messages disappear after 5 seconds
+        });
+
+        
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let dateInput = document.getElementById("date");
+            let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+            dateInput.setAttribute("max", today); // Set max attribute to today
+        });
+
+    </script>
+    
+    <style>
+        /* Popup styles */
+        .popup {
+            position: absolute;  /* Absolute position inside form */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
+            display: none;  /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .popup-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .popup-content button {
+            margin: 10px;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        #continueBtn {
+            background: green;
+            color: white;
+        }
+        
+        #cancelBtn {
+            background: red;
+            color: white;
+        }
+        
+    </style>
+</head>
+<body data-user-budget="{{ user_budget | default(0) }}" data-total-expenses="{{ total_expenses | default(0) }}">
+    <div class="container">
         <h1>Add Expense</h1>
 
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+        
+     <!-- Flash Messages -->
+     {% with messages = get_flashed_messages(with_categories=true) %}
+     {% if messages %}
+         <div class="flash-messages">
+             {% for category, message in messages %}
+                 <div class="alert {{ category }}">{{ message }}</div>
+             {% endfor %}
+         </div>
+     {% endif %}
+     {% endwith %}
+ 
 
         <!-- Expense Form -->
-        <form method="POST">
-            <div class="form-group">
-                <label for="user_id">User ID</label>
-                <input type="number" name="user_id" id="user_id" placeholder="Enter User ID" required>
-            </div>
-
+        <form method="POST" id="expenseForm" onsubmit="checkBudget(event)">
             <div class="form-group">
                 <label for="category_id">Select Category</label>
                 <select name="category_id" id="category_id" required>
@@ -59,9 +161,21 @@
             </div>
 
             <button type="submit" class="button">Add Expense</button>
+
+
+            <div id="budgetPopup" class="popup">
+                <div class="popup-content">
+                    <p id="popupMessage"></p>
+                    <button id="continueBtn">Continue</button>
+                    <button id="cancelBtn">Cancel</button>
+                </div>
+            </div>
+            
         </form>
 
         <a href="{{ url_for('budget.home') }}" class="go-back-btn">Go Back</a>
     </div>
+
+  
 </body>
 </html>
