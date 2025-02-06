@@ -491,7 +491,17 @@ def rollback_deletion():
             isdeleted=False
             status_undo=True
         ###### ADD { user_role=curr_user_role,user_name=curr_user_name } WHILE INTGRATING 
-        return render_template('index.html',expenses=get_expenses(),user_id=curr_user, users=get_users(), reccur_exps=get_recs(), categories=get_cats(),status_delete=isdeleted ,max_date=current_date,major=verify_major(),status_undo=status_undo)
+        return render_template(
+            'index.html',major=verify_major(),
+            expenses=get_expenses(),
+            user_id=curr_user,
+            users=get_users(),
+            reccur_exps=get_recs(),
+            categories=get_cats(),
+            max_date=current_date,
+            user_role=curr_user_role,
+            user_name=curr_user_name,status_undo=status_undo
+        )
     except Exception as e:
         # Print the stack trace to get more detailed error info
         print("Error during rollback:", e)

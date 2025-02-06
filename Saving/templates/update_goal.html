@@ -214,18 +214,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('saving.update_goal') }}" class="form">
-            <div class="form-group">
-                <label for="user_id">User ID</label>
-                <input type="number" 
-                       id="user_id" 
-                       name="user_id" 
-                       value="{{ pre_fill_user_id }}"
-                       placeholder="Enter your User ID" 
-                       min="1" 
-                       required>
-            </div>
-
+        <form method="POST" action="{{ url_for('update_goal') }}" class="form">
             <div class="form-group">
                 <label for="update_type">Update Type</label>
                 <select id="update_type" 
@@ -275,7 +264,7 @@
             <button type="submit" class="btn">Update Goal</button>
         </form>
 
-        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
@@ -287,27 +276,18 @@
         const updateType = document.getElementById('update_type');
         const jointGoalSelect = document.querySelector('.joint-goal-select');
         const jointIdSelect = document.getElementById('joint_id');
-        const userId = document.getElementById('user_id');
 
         updateType.addEventListener('change', function() {
             if (this.value === 'joint') {
                 jointGoalSelect.classList.add('visible');
-                if (userId.value) {
-                    loadJointGoals(userId.value);
-                }
+                loadJointGoals();
             } else {
                 jointGoalSelect.classList.remove('visible');
             }
         });
 
-        userId.addEventListener('change', function() {
-            if (updateType.value === 'joint' && this.value) {
-                loadJointGoals(this.value);
-            }
-        });
-
-        function loadJointGoals(userId) {
-            fetch(`/get_user_joint_goals/${userId}`)
+        function loadJointGoals() {
+            fetch('/get_user_joint_goals')  // The user ID will be handled by the server using session
                 .then(response => response.json())
                 .then(goals => {
                     jointIdSelect.innerHTML = goals.length 

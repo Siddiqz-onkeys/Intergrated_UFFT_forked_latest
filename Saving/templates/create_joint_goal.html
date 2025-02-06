@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,20 +16,19 @@
             background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
             color: #C4DAD2;
             min-height: 100vh;
-            padding: 2rem;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 2rem;
+            padding: 2rem;
         }
 
-        .create-joint-goal-container {
+        .container {
             background: rgba(196, 218, 210, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 3rem;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(196, 218, 210, 0.2);
             animation: fadeScale 0.8s ease-out;
@@ -44,12 +43,72 @@
             color: #C4DAD2;
         }
 
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            color: #D8C4B6;
+        }
+
+        input, select {
+            background: rgba(196, 218, 210, 0.05);
+            border: 1px solid rgba(196, 218, 210, 0.2);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            color: #C4DAD2;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #C4DAD2;
+            background: rgba(196, 218, 210, 0.1);
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) opacity(0.7);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #16423C;
+        }
+
         .flash-message {
             padding: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border-radius: 10px;
+            font-size: 0.9rem;
             backdrop-filter: blur(5px);
-            text-align: center;
         }
 
         .flash-success {
@@ -64,63 +123,6 @@
             color: #C4DAD2;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            color: #D8C4B6;
-        }
-
-        input[type="number"],
-        input[type="date"] {
-            background: rgba(196, 218, 210, 0.05);
-            border: 1px solid rgba(196, 218, 210, 0.2);
-            border-radius: 10px;
-            padding: 0.8rem 1rem;
-            color: #C4DAD2;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 0.5rem;
-            accent-color: #16423C;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #C4DAD2;
-            background: rgba(196, 218, 210, 0.1);
-        }
-
-        input::placeholder {
-            color: rgba(196, 218, 210, 0.5);
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1) opacity(0.7);
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
         .btn {
             background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
             color: #C4DAD2;
@@ -131,7 +133,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             letter-spacing: 1px;
-            width: 100%;
         }
 
         .btn:hover {
@@ -141,16 +142,16 @@
 
         .back-link {
             display: inline-block;
+            margin-top: 1.5rem;
             text-decoration: none;
             color: #D8C4B6;
             font-size: 0.9rem;
             text-align: center;
             width: 100%;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem;
             border: 1px solid rgba(196, 218, 210, 0.2);
             border-radius: 25px;
             transition: all 0.3s ease;
-            margin-top: 2rem;
         }
 
         .back-link:hover {
@@ -170,12 +171,8 @@
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .create-joint-goal-container {
-                padding: 1.5rem;
+            .container {
+                padding: 2rem;
             }
 
             h1 {
@@ -185,8 +182,8 @@
     </style>
 </head>
 <body>
-    <div class="create-joint-goal-container">
-        <h1>Create a Joint Savings Goal</h1>
+    <div class="container">
+        <h1>Create Joint Savings Goal</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -198,219 +195,44 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="{{ url_for('saving.create_joint_goal') }}">
-            {% if not family_id %}
+        <form method="POST" action="{{ url_for('create_joint_goal') }}" class="form">
+            {% if not users %}
+                <button type="submit" class="btn">Fetch Available Users</button>
+            {% else %}
                 <div class="form-group">
-                    <label for="family_id">Enter Family ID</label>
-                    <input type="number" 
-                           id="family_id" 
-                           name="family_id" 
-                           placeholder="Enter your family ID"
-                           required>
-                </div>
-                <button type="submit" class="btn">Fetch Users</button>
-            {% elif users %}
-                <input type="hidden" name="family_id" value="{{ family_id }}">
-                <div class="form-group">
-                    <label>Select Users</label>
+                    <label>Select Users to Join Goal</label>
                     <div class="checkbox-group">
                         {% for user in users %}
                             <label>
-                                <input type="checkbox" 
-                                       id="user_{{ user.user_id }}" 
-                                       name="user_ids" 
-                                       value="{{ user.user_id }}">
-                                {{ user.name }}
+                                <input type="checkbox" name="user_ids" value="{{ user.user_id }}">
+                                <span>{{ user.name }}</span>
                             </label>
                         {% endfor %}
                     </div>
                 </div>
+                
                 <div class="form-group">
                     <label for="joint_goal">Joint Goal Amount</label>
-                    <input type="number" 
-                           id="joint_goal" 
-                           name="joint_goal" 
-                           step="0.01" 
-                           placeholder="Enter goal amount"
-                           required>
+                    <input type="number" id="joint_goal" name="joint_goal" step="0.01" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="deadline">Deadline</label>
-                    <input type="date" 
-                           id="deadline" 
-                           name="deadline" 
-                           required>
+                    <input type="date" id="deadline" name="deadline" required>
                 </div>
+                
                 <button type="submit" class="btn">Create Joint Goal</button>
             {% endif %}
         </form>
         
-        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
         // Set minimum date as today
+        const deadlineInput = document.getElementById('deadline');
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('deadline').min = today;
+        deadlineInput.setAttribute('min', today);
     </script>
 </body>
-</html> -->
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Joint Goal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
-            color: #C4DAD2;
-            min-height: 100vh;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .create-joint-goal-container {
-            background: rgba(196, 218, 210, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 600px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(196, 218, 210, 0.2);
-            animation: fadeScale 0.8s ease-out;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #C4DAD2;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            width: 100%;
-        }
-
-        label {
-            color: #D8C4B6;
-        }
-
-        input[type="number"],
-        input[type="date"] {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: 10px;
-            border: 1px solid rgba(196, 218, 210, 0.2);
-            background: rgba(196, 218, 210, 0.05);
-            color: #C4DAD2;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 1rem;
-            border-radius: 25px;
-            background: linear-gradient(135deg, #16423C 0%, #1a4e47 100%);
-            color: #C4DAD2;
-            cursor: pointer;
-            text-align: center;
-            margin: 0 0.5rem;
-        }
-
-        .btn:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            /* Ensures vertical arrangement */
-            gap: 0.5rem;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="create-joint-goal-container">
-        <h1>Create a Joint Savings Goal</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="flash-message flash-{{ category }}">
-            {{ message | safe }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="{{ url_for('saving.create_joint_goal') }}">
-            {% if not user_id %}
-            <div class="form-group">
-                <label for="user_id">Enter User ID</label>
-                <input type="number" id="user_id" name="user_id" required>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn">Fetch Users</button>
-                <a href="{{ url_for('saving.index') }}" class="btn">Back to Home</a>
-            </div>
-            {% elif users %}
-            <input type="hidden" name="user_id" value="{{ user_id }}">
-            <div class="form-group">
-                <label>Select Users</label>
-                <!-- <div class="checkbox-group">
-                        {% for user in users %}
-                            <label>
-                                <input type="checkbox" name="user_ids" value="{{ user.user_id }}"> {{ user.name }}
-                            </label>
-                        {% endfor %}
-                    </div> -->
-                <div class="checkbox-group">
-                    {% for user in users %}
-                    <label style="display: block;"> <!-- Ensure block-level display -->
-                        <input type="checkbox" name="user_ids" value="{{ user.user_id }}">
-                        {{ user.name }}
-                    </label>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="joint_goal">Joint Goal Amount</label>
-                <input type="number" id="joint_goal" name="joint_goal" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="deadline">Deadline</label>
-                <input type="date" id="deadline" name="deadline" required>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn">Create Joint Goal</button>
-                <a href="{{ url_for('saving.index') }}" class="btn">Back to Home</a>
-            </div>
-            {% endif %}
-        </form>
-    </div>
-</body>
-
 </html>

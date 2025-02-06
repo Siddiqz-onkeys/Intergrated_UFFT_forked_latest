@@ -1,30 +1,43 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Blueprint
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session,Blueprint
 from decimal import Decimal
-from datetime import date,datetime
-from .savings_goals_manager import SavingsGoalsManager
+from datetime import date, datetime
+from Saving.savings_goals_manager import SavingsGoalsManager
+from db_connection import create_session
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for flash messages
-
+saving_bp = Blueprint('savings', __name__, template_folder='templates', static_folder='static')
 # Initialize the SavingsGoalsManager
 manager = SavingsGoalsManager()
 
-
-saving_bp = Blueprint('saving', __name__, template_folder='templates', static_folder='static')
-
+# @saving_bp.route('/login', methods=['POST'])
+# def login():
+#     login_name = request.form['login_name']
+#     create_session(session, manager.cursor, login_name)
+#     return redirect(url_for('index'))
 
 @saving_bp.route('/')
 def index():
-    return render_template("saving_index.html")
-@saving_bp.route('/get_family_contributions/<int:user_id>')
-def get_family_contributions(user_id):
-    try:
-        # Get family ID for the user
-        family_id = manager.get_family_id(user_id)
-        if not family_id:
-            return jsonify({'error': 'User not found'}), 404
+    # if 'user_id' not in session:
+    #     return redirect(url_for('index'))
+    return render_template('index_saving.html')
 
-        # Get all contributions for this family
+# @saving_bp.route('/logout')
+# def logout():
+#     session.clear()
+#     flash("Logged out successfully.", "success")
+#     return redirect(url_for('login_page'))
+@saving_bp.route('/get_family_contributions')
+def get_family_contributions():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in first'}), 401
+
+    try:
+        user_id = session['user_id']
+        family_id = session.get('family_id')
+        if not family_id:
+            return jsonify({'error': 'User family not found'}), 404
+
         query = """
         SELECT s.user_id, s.familygoal_contributed_amount as contribution, 
                s.family_goal, s.family_target_amount, u.name
@@ -38,12 +51,10 @@ def get_family_contributions(user_id):
         if not results:
             return jsonify({'error': 'No family goal found'}), 404
 
-        # Get the current family goal and target amount
         family_goal = float(results[0]['family_goal']) if results[0]['family_goal'] else 0
         family_target = float(results[0]['family_target_amount']) if results[0]['family_target_amount'] else 0
         total_contributed = sum(float(result['contribution']) for result in results)
 
-        # Prepare response data
         response_data = {
             'users': [{
                 'user_id': result['user_id'],
@@ -52,7 +63,7 @@ def get_family_contributions(user_id):
             } for result in results],
             'family_goal': family_goal,
             'total_contributed': total_contributed,
-            'remaining': family_target,  # Use the actual target amount from database
+            'remaining': family_target,
             'progress': 0 if family_goal == 0 else ((family_goal - family_target) / family_goal * 100)
         }
 
@@ -61,18 +72,21 @@ def get_family_contributions(user_id):
     except Exception as e:
         print(f"Error in get_family_contributions: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
 @saving_bp.route('/create_goal', methods=['GET', 'POST'])
 def create_goal():
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         try:
-            user_id = int(request.form['user_id'])
+            user_id = session['user_id']
             user_goal = float(request.form['user_goal'])
             deadline = request.form['deadline']
+            is_admin = manager.is_admin()
 
-            # Check if the user is an admin
-            is_admin = manager.is_admin(user_id)
-
-            # Get family goal input safely
             family_goal = request.form.get('family_goal')
             family_goal = float(family_goal) if family_goal else None
 
@@ -80,8 +94,7 @@ def create_goal():
                 flash("Only administrators can create family goals.", "error")
                 return render_template('create_goal.html')
 
-            # Create a savings goal
-            success = manager.create_savings_goal(user_id, user_goal, deadline, family_goal)
+            success = manager.create_savings_goal( user_goal, deadline, family_goal)
 
             if success:
                 flash("Savings goal created successfully!", "success")
@@ -95,21 +108,24 @@ def create_goal():
 
     return render_template('create_goal.html')
 
-@saving_bp.route('/check_admin/<int:user_id>')
-def check_admin(user_id):
-    is_admin = manager.is_admin(user_id)
-    return jsonify({'isAdmin': is_admin})
 
 @saving_bp.route('/contribute', methods=['GET', 'POST'])
 def contribute():
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         try:
-            user_id = int(request.form['user_id'])
+            user_id = session['user_id']
             contribution_type = request.form['contribution_type']
             amount = float(request.form['amount'])
 
             if contribution_type == 'joint':
-                joint_id = int(request.form['joint_id'])
+                joint_id = session.get('joint_id')
+                if not joint_id:
+                    return "ERROR: Joint ID not found in session."
+
                 
                 # Get current joint goal status
                 query = """
@@ -169,8 +185,16 @@ def contribute():
 
     return render_template('contribute.html')
 
-@saving_bp.route('/display_goals', methods=['GET', 'POST'])
+
+@saving_bp.route('/display_goals')
 def display_goals():
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for('index'))
+    
+    # user_id = session['user_id']
+    # goals = manager.get_user_goals(user_id)
+    # return render_template('display_goals.html', goals=goals)
     user_id = None
     goals = []
     family_goals = []
@@ -180,7 +204,8 @@ def display_goals():
 
     if request.method == 'POST':
         form_submitted = True
-        user_id = int(request.form.get('user_id'))
+        user_id = session.get('user_id') 
+
         selected_goal_type = request.form.get('goal_type')
         try:
             if selected_goal_type == "user_goal":
@@ -240,6 +265,7 @@ def display_goals():
                            selected_goal_type=selected_goal_type,
                            user_id=user_id)
 
+
 @saving_bp.route('/delete_goal/<goal_type>/<int:goal_id>', methods=['POST'])
 def delete_goal(goal_type, goal_id):
     r=0
@@ -254,11 +280,11 @@ def delete_goal(goal_type, goal_id):
             # Validate user_id
             if not user_id:
                 flash("User ID is required for joint goals.", "error")
-                return redirect(url_for('saving.display_goals'))
+                return redirect(url_for('display_goals'))
 
             if not user_id.isdigit():
                 flash(f"Invalid user ID: {user_id}. Must be a numeric value.", "error")
-                return redirect(url_for('saving.display_goals'))
+                return redirect(url_for('display_goals'))
             query="SELECT COUNT(%s) FROM joint_goal_participants WHERE joint_id=%s"
             manager.cursor.execute(query,(goal_id,goal_id,))
             cou=manager.cursor.fetchone()
@@ -279,60 +305,18 @@ def delete_goal(goal_type, goal_id):
 
     except Exception as e:
         flash(f"Failed to delete goal: {str(e)}", "error")
-    return redirect(url_for('saving.display_goals'))
+    return redirect(url_for('display_goals'))
 
-# @saving_bp.route('/create_joint_goal', methods=['GET', 'POST'])
-# def create_joint_goal():
-#     if request.method == 'POST':
-#         # Step 1: Fetch Users by Family ID
-#         if 'family_id' in request.form and not 'user_ids' in request.form:
-#             try:
-#                 family_id = int(request.form['family_id'])
-#                 users = manager.get_users_by_family(family_id)
-
-#                 if not users:
-#                     flash("No users found for the given family ID.", "error")
-#                     return render_template('create_joint_goal.html', users=[], family_id=family_id)
-
-#                 return render_template('create_joint_goal.html', users=users, family_id=family_id)
-#             except ValueError:
-#                 flash("Invalid family ID. Please enter a valid number.", "error")
-#                 return render_template('create_joint_goal.html', users=[], family_id=None)
-
-#         # Step 2: Create Joint Goal
-#         elif 'user_ids' in request.form:
-#             try:
-#                 user_ids = request.form.getlist('user_ids')
-#                 joint_goal = float(request.form['joint_goal'])
-#                 deadline = request.form['deadline']
-
-#                 if len(user_ids) < 2:
-#                     flash("At least two users are required to create a joint goal.", "error")
-#                     return redirect(url_for('create_joint_goal'))
-
-#                 user_ids = [int(user_id) for user_id in user_ids]
-#                 success, message = manager.create_joint_goal(user_ids, joint_goal, deadline)
-
-#                 if success:
-#                     flash(message, "success")
-#                 else:
-#                     flash(message, "error")
-#             except ValueError:
-#                 flash("Invalid input. Please check the form fields.", "error")
-#             except Exception as e:
-#                 flash(f"An unexpected error occurred: {str(e)}", "error")
-
-#             return redirect(url_for('create_joint_goal'))
-
-#     # Initial Form
-#     return render_template('create_joint_goal.html', users=[], family_id=None)
 @saving_bp.route('/create_joint_goal', methods=['GET', 'POST'])
 def create_joint_goal():
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for('index'))
     if request.method == 'POST':
         # Step 1: Fetch Users by User ID
         if 'user_id' in request.form and not 'user_ids' in request.form:
             try:
-                user_id = int(request.form['user_id'])
+                user_id = session['user_id']
                 family_id = manager.get_family_id(user_id)  # Get family_id from user_id
 
                 if not family_id:
@@ -360,7 +344,7 @@ def create_joint_goal():
 
                 if len(user_ids) < 2:
                     flash("At least two users are required to create a joint goal.", "error")
-                    return redirect(url_for('saving.create_joint_goal'))
+                    return redirect(url_for('create_joint_goal'))
 
                 user_ids = [int(user_id) for user_id in user_ids]
                 success, message = manager.create_joint_goal(user_ids, joint_goal, deadline)
@@ -374,16 +358,17 @@ def create_joint_goal():
             except Exception as e:
                 flash(f"An unexpected error occurred: {str(e)}", "error")
 
-            return redirect(url_for('saving.create_joint_goal'))
+            return redirect(url_for('create_joint_goal'))
 
     return render_template('create_joint_goal.html', users=[], user_id=None)
 
+@saving_bp.route('/get_joint_goals')
+def get_joint_goals():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in first'}), 401
 
-
-@saving_bp.route('/get_joint_goals/<int:user_id>')
-def get_joint_goals(user_id):
-    """Get all joint goals for a user"""
     try:
+        user_id = session['user_id']
         query = """
         SELECT 
             jg.joint_id,
@@ -411,7 +396,10 @@ def get_joint_goals(user_id):
 
 @saving_bp.route('/get_user_joint_goals/<int:user_id>')
 def get_user_joint_goals(user_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in first'}), 401
     try:
+        user_id = session['user_id']
         query = """
         SELECT 
             jg.joint_id,
@@ -433,10 +421,12 @@ def get_user_joint_goals(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @saving_bp.route('/get_joint_contributions/<int:joint_id>')
 def get_joint_contributions(joint_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in first'}), 401
     try:
+        user_id = session['user_id']
         query = """
         SELECT 
             jg.joint_goal_amount,
@@ -475,7 +465,7 @@ def get_joint_contributions(joint_id):
     except Exception as e:
         print(f"Error fetching joint contributions: {str(e)}")
         return jsonify({'error': str(e)}), 500
-    
+
 @saving_bp.route('/delete_joint_goal_action/<int:joint_id>', methods=['POST'])
 def delete_joint_goal_action(joint_id):
     """
@@ -498,17 +488,18 @@ def delete_joint_goal_action(joint_id):
     except Exception as e:
         flash(f"Error deleting joint goal: {str(e)}", "error")
 
-    return redirect(url_for('saving.display_goals'))
-
+    return redirect(url_for('display_goals'))
 
 @saving_bp.route('/update_goal', methods=['GET', 'POST'])
 def update_goal():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please log in first'}), 401
     pre_fill_user_id = request.args.get('user_id', '')
     pre_fill_goal_type = request.args.get('goal_type', 'user')
 
     if request.method == 'POST':
         try:
-            user_id = int(request.form['user_id'])
+            user_id = session['user_id']
             update_type = request.form['update_type']
             new_goal = float(request.form['new_goal'])
             deadline = request.form['deadline']
@@ -516,17 +507,17 @@ def update_goal():
 
             if confirmation != 'yes':
                 flash('Update cancelled by user.', 'error')
-                return redirect(url_for('saving.update_goal'))
+                return redirect(url_for('update_goal'))
 
             if update_type == 'joint':
-                joint_id = int(request.form['joint_id'])
+                joint_id = session['joint_id']
                 
                 # Verify user participation
                 query = "SELECT 1 FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
                 manager.cursor.execute(query, (joint_id, user_id))
                 if not manager.cursor.fetchone():
                     flash('You are not a participant in this joint goal.', 'error')
-                    return redirect(url_for('saving.update_goal'))
+                    return redirect(url_for('update_goal'))
 
                 # Update joint goal
                 update_query = """
@@ -545,7 +536,7 @@ def update_goal():
             else:  # family
                 if not manager.is_admin(user_id):
                     flash('Only administrators can update family goals.', 'error')
-                    return redirect(url_for('saving.update_goal'))
+                    return redirect(url_for('update_goal'))
                 success, message = manager.new_update_family_goal(user_id, new_goal, deadline)
                 flash(message, 'success' if success else 'error')
 
@@ -554,7 +545,7 @@ def update_goal():
         except Exception as e:
             flash(f'Error updating goal: {str(e)}', 'error')
 
-        return redirect(url_for('saving.update_goal'))
+        return redirect(url_for('update_goal'))
 
     return render_template('update_goal.html', 
                          pre_fill_user_id=pre_fill_user_id,
@@ -567,7 +558,7 @@ def investments():
 def create_investment():
     if request.method == 'POST':
         try:
-            user_id = int(request.form['user_id'])
+            user_id = session['user_id']
             principal_amount = float(request.form['principal_amount'])
             interest_rate = float(request.form['interest_rate'])
             
@@ -579,13 +570,12 @@ def create_investment():
         except Exception as e:
             flash(f"An unexpected error occurred: {str(e)}", 'error')
             
-    return redirect(url_for('saving.investments'))
-
+    return redirect(url_for('investments'))
 @saving_bp.route('/display_investment', methods=['POST'])
 def display_investment():
     investments = None
     try:
-        user_id = int(request.form['user_id'])
+        user_id =session['user_id']
         success, result = manager.display_investment(user_id)
         
         if success and result:
@@ -595,7 +585,7 @@ def display_investment():
                 inv_dict = dict(inv)
                 if isinstance(inv_dict['start_date'], (date, datetime)):
                     inv_dict['start_date'] = inv_dict['start_date'].strftime('%Y-%m-%d')
-                investments.append(inv_dict)
+                investments.saving_bpend(inv_dict)
         else:
             flash(result if isinstance(result, str) else "No investments found.", 'error')
             
@@ -609,7 +599,7 @@ def display_investment():
 @saving_bp.route('/delete_investment', methods=['POST'])
 def delete_investment():
     try:
-        user_id = int(request.form['user_id'])
+        user_id = session['user_id']
         investment_id = request.form.get('investment_id')
         
         if investment_id:
@@ -623,6 +613,6 @@ def delete_investment():
     except Exception as e:
         flash(f"An unexpected error occurred: {str(e)}", 'error')
         
-    return redirect(url_for('saving.investments'))
+    return redirect(url_for('investments'))
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    saving_bp.run(debug=True, port=5001)

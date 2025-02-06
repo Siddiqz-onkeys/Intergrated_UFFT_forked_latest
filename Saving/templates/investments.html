@@ -252,11 +252,7 @@
 
         <!-- Create Investment Form -->
         <div id="createTab" class="tab-content active">
-            <form method="POST" action="{{ url_for('saving.create_investment') }}" class="form">
-                <div class="form-group">
-                    <label for="user_id">User ID</label>
-                    <input type="number" id="user_id" name="user_id" required min="1">
-                </div>
+            <form method="POST" action="{{ url_for('create_investment') }}" class="form">
                 <div class="form-group">
                     <label for="principal_amount">Principal Amount (Rs)</label>
                     <input type="number" id="principal_amount" name="principal_amount" required min="0" step="0.01">
@@ -271,11 +267,7 @@
 
         <!-- View Investments -->
         <div id="viewTab" class="tab-content">
-            <form method="POST" action="{{ url_for('saving.display_investment') }}" class="form">
-                <div class="form-group">
-                    <label for="view_user_id">User ID</label>
-                    <input type="number" id="view_user_id" name="user_id" required min="1">
-                </div>
+            <form method="POST" action="{{ url_for('display_investment') }}" class="form">
                 <button type="submit" class="btn">View Investments</button>
             </form>
 
@@ -311,11 +303,7 @@
 
         <!-- Delete Investment -->
         <div id="deleteTab" class="tab-content">
-            <form method="POST" action="{{ url_for('saving.delete_investment') }}" class="form">
-                <div class="form-group">
-                    <label for="delete_user_id">User ID</label>
-                    <input type="number" id="delete_user_id" name="user_id" required min="1">
-                </div>
+            <form method="POST" action="{{ url_for('delete_investment') }}" class="form">
                 <div class="form-group">
                     <label for="investment_id">Investment ID (Optional - leave empty to delete all)</label>
                     <input type="number" id="investment_id" name="investment_id" min="1">
@@ -324,7 +312,7 @@
             </form>
         </div>
 
-        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>

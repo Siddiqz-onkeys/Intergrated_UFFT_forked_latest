@@ -260,10 +260,6 @@
 
         <form method="POST" class="form">
             <div class="form-group">
-                <label for="user_id">Enter User ID</label>
-                <input type="number" id="user_id" name="user_id" value="{{ user_id }}" min="1" required>
-            </div>
-            <div class="form-group">
                 <label for="goal_type">Select Goal Type</label>
                 <select id="goal_type" name="goal_type" required>
                     <option value="user_goal" {% if selected_goal_type == 'user_goal' %}selected{% endif %}>User Goal</option>
@@ -294,7 +290,7 @@
                     <td>{{ goal.user_target_amount }}</td>
                     <td>{{ goal.deadline }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='user', goal_id=goal.user_id) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('delete_goal', goal_type='user', goal_id=goal.user_id) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
@@ -322,7 +318,7 @@
                     <td>{{ goal.family_target_amount }}</td>
                     <td>{{ goal.deadline }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
@@ -373,7 +369,7 @@
             <button onclick="hideModal()" class="btn">Cancel</button>
         </div>
 
-        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('savings.index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
