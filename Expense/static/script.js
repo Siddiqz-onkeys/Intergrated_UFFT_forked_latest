@@ -17,6 +17,53 @@ function fetch_back(){
 
 }
 
+function open_add_expense(){
+    curr_state_add = document.getElementById('recc_exps').style.display
+    if (curr_state_add=='block'){
+        curr_state_add='none';
+    }else{
+        curr_state_add='block';
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+    }
+}
+
+function open_overview(){
+    curr_state_overview = document.getElementById('recc_exps').style.display
+    if (curr_state_overview=='block'){
+        curr_state_overview='none';
+    }else{
+        curr_state_overview='block';
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+    }
+}
+
+function open_filters(){
+    curr_state_filters = document.getElementById('recc_exps').style.display
+    if (curr_state_filters=='block'){
+        curr_state_filters='none';
+    }else{
+        curr_state_filters='block';
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+    }
+}
+
+function show_rec_tab(){
+    curr_state_recs = document.getElementById('recc_exps').style.display
+    if (curr_state_recs=='block'){
+        curr_state_recs='none';
+    }else{
+        curr_state_recs='block';
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+        document.getElementById().style.display="none";
+    }
+    }
 
 function showEditMenu(expense_id,expense_amount){
     document.getElementById('edit_menu').style.display='block';
@@ -147,14 +194,7 @@ function close_delete() {
     document.getElementById("deleteConfirmationSection").style.display = "none";
 }
 
-function show_rec_tab(){
-    curr_state = document.getElementById('recc_exps').style.display
-    if (curr_state=='block'){
-        document.getElementById('recc_exps').style.display='none';
-    }else{
-        document.getElementById('recc_exps').style.display='block';
-    }
-    }
+
 
 let rec_id_ = null;
 
