@@ -18,7 +18,6 @@ function fetch_back(){
 }
 
 
-
 function showEditMenu(expense_id,expense_amount){
     document.getElementById('edit_menu').style.display='block';
 
@@ -101,6 +100,7 @@ function sortTable(columnIndex, header) {
         }
     });
 }
+
 let del_id = null; // Variable to store the expense ID to be deleted
 
 // Function to show the delete confirmation form
@@ -233,4 +233,3 @@ function updateArrowStates(index, totalCards) {
 document.addEventListener('DOMContentLoaded', () => {
     showCard(currentCardIndex);
 });
-

@@ -214,7 +214,7 @@ def index():
             categories=get_cats(),
             max_date=current_date,
             user_role=curr_user_role,
-            user_name=curr_user_name
+            user_name=curr_user_name,family_fetch=False
         )
     
     else:
@@ -256,7 +256,8 @@ def index():
             categories=get_cats(),
             max_date=current_date,
             user_role=curr_user_role,
-            user_name=curr_user_name
+            user_name=curr_user_name,
+            family_fetch=True
         )
 
 ########## SAVING THE UPLOADED FILES IN A FOLDER ############
@@ -410,11 +411,7 @@ def send_alert_email(user_mail,name, total_expenses, threshold_value):
             print(f"Error sending email: {e}")
         
 
-
-
 ######### AGE VERIFICATION ############
-
-
 @expense_bp.route('/verify_major',methods=["GET"])
 def verify_major():
     cursor.execute("SELECT dob FROM users WHERE user_id=%s",(curr_user,))
@@ -464,49 +461,44 @@ def delete_expense(expense_id):
 @expense_bp.route('/rollback_deletion', methods=["POST"])
 def rollback_deletion():
     status_undo=False
-    try:
-        if deleted_expense:
-            # Log the deleted expense to verify
-            print(f"Restoring deleted expense: {deleted_expense}")
-            
-            # Ensure the column names match the ones in your database schema
-            # Insert the deleted expense back into the database
-            cursor.execute(
-                """
-                INSERT INTO expenses (expense_id, user_id, category_id, date, amount, family_id, description, receipt)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    deleted_expense[0],  # expense_id (index 0)
-                    deleted_expense[1],  # user_id (index 1)
-                    deleted_expense[2],  # category_id (index 2)
-                    deleted_expense[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(deleted_expense[3], datetime) else None,  # date (index 3)
-                    deleted_expense[4],  # amount (index 4)
-                    deleted_expense[5],  # family_id (index 5)
-                    deleted_expense[6],  # description (index 6)
-                    deleted_expense[7]   # receipt (index 7)
-                )
+    if deleted_expense:
+        # Log the deleted expense to verify
+        print(f"Restoring deleted expense: {deleted_expense}")
+        
+        # Ensure the column names match the ones in your database schema
+        # Insert the deleted expense back into the database
+        cursor.execute(
+            """
+            INSERT INTO expenses (expense_id, user_id, category_id, date, amount, family_id, description, receipt)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                deleted_expense[0],  # expense_id (index 0)
+                deleted_expense[1],  # user_id (index 1)
+                deleted_expense[2],  # category_id (index 2)
+                deleted_expense[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(deleted_expense[3], datetime) else None,  # date (index 3)
+                deleted_expense[4],  # amount (index 4)
+                deleted_expense[5],  # family_id (index 5)
+                deleted_expense[6],  # description (index 6)
+                deleted_expense[7]   # receipt (index 7)
             )
-            connect_.commit()
-            isdeleted=False
-            status_undo=True
-        ###### ADD { user_role=curr_user_role,user_name=curr_user_name } WHILE INTGRATING 
-        return render_template(
-            'index.html',major=verify_major(),
-            expenses=get_expenses(),
-            user_id=curr_user,
-            users=get_users(),
-            reccur_exps=get_recs(),
-            categories=get_cats(),
-            max_date=current_date,
-            user_role=curr_user_role,
-            user_name=curr_user_name,status_undo=status_undo
         )
-    except Exception as e:
-        # Print the stack trace to get more detailed error info
-        print("Error during rollback:", e)
-        traceback.print_exc()
-        return jsonify({"rolled_back": False, "error": str(e)}), 500
+        connect_.commit()
+        isdeleted=False
+        status_undo=True
+    ###### ADD { user_role=curr_user_role,user_name=curr_user_name } WHILE INTGRATING 
+    return render_template(
+        'index.html',major=verify_major(),
+        expenses=get_expenses(),
+        user_id=curr_user,
+        users=get_users(),
+        reccur_exps=get_recs(),
+        categories=get_cats(),
+        max_date=current_date,
+        user_role=curr_user_role,
+        user_name=curr_user_name,status_undo=status_undo
+    )
+
 
 
 
