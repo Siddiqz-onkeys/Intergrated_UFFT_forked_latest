@@ -18,52 +18,58 @@ function fetch_back(){
 }
 
 function open_add_expense(){
-    curr_state_add = document.getElementById('recc_exps').style.display
-    if (curr_state_add=='block'){
-        curr_state_add='none';
-    }else{
-        curr_state_add='block';
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
+    let elem = document.getElementById('add_expense');
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        // Hide other sections (replace 'other_id' with actual element IDs)
+        document.getElementById('recc_exps').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
     }
 }
 
 function open_overview(){
-    curr_state_overview = document.getElementById('recc_exps').style.display
-    if (curr_state_overview=='block'){
-        curr_state_overview='none';
-    }else{
-        curr_state_overview='block';
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
+    let elem = document.getElementById('interval-selection'); // Make sure this ID exists
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('recc_exps').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
     }
 }
 
 function open_filters(){
-    curr_state_filters = document.getElementById('recc_exps').style.display
-    if (curr_state_filters=='block'){
-        curr_state_filters='none';
-    }else{
-        curr_state_filters='block';
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
+    let elem = document.getElementById('sorting_filtering'); // Make sure this ID exists
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('recc_exps').style.display = "none";
     }
 }
 
 function show_rec_tab(){
-    curr_state_recs = document.getElementById('recc_exps').style.display
-    if (curr_state_recs=='block'){
-        curr_state_recs='none';
-    }else{
-        curr_state_recs='block';
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
-        document.getElementById().style.display="none";
+    let elem = document.getElementById('recc_exps');
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
     }
-    }
+}
+
 
 function showEditMenu(expense_id,expense_amount){
     document.getElementById('edit_menu').style.display='block';

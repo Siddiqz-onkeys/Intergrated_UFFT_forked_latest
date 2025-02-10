@@ -103,18 +103,18 @@ def get_expenses():
 
 ######### Get users #######
 def get_users():
-    cursor.execute("SELECT user_id,user_name FROM users WHERE family_id=%s",(curr_family_id,))
-    users_list=cursor.fetchall()
-    
-    users=[
+    cursor.execute("SELECT user_id, user_name FROM users WHERE family_id = %s", (curr_family_id,))
+    users_list = cursor.fetchall()
+
+    users = [
         {
             'user_id': user[0],
-            'user_name':user[1],
-            
-            
-        } for user in users_list
+            'user_name': user[1],
+        } for user in users_list if user[0] != curr_user  # Exclude current user
     ]
+    
     return users
+
 
 ########### get recurring expenses #######
 def get_recs():

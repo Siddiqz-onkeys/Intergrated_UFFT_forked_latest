@@ -42,9 +42,9 @@
 
             <div class="buttons-section">
                 <div class="feature_buttons">
-                    <button onclick=" document.getElementById('add_expense').style.display='block'"> Add Expense</button>
-                    <button onclick=" document.getElementById('interval-selection').style.display='block'"> Overview </button>
-                    <button onclick=" document.getElementById('sorting_filtering').style.display='block'"> Filters </button>
+                    <button onclick="open_add_expense()"> Add Expense</button>
+                    <button onclick="open_overview()"> Overview </button>
+                    <button onclick="open_filters ()"> Filters </button>
                     <button onclick="show_rec_tab()"> Reccuring expenses </button>
                     <a href="{{ url_for('user_reg.welcome') }}" class="btn btn-danger mx-2"> Home</a>
                 </div>            
