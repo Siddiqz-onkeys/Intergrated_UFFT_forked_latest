@@ -392,11 +392,10 @@ class SavingsGoalsManager:
         except Error as e:
             print(f"Error displaying joint goals: {str(e)}")
     
-    def delete_user_goal(self, user_id):
+    def delete_user_goal(self, user_id, goal_id):
         try:
-            # query = "DELETE FROM savings_goals WHERE user_id = %s"
-            query="UPDATE savings_goals SET user_goal=%s, user_target_amount=%s, usergoal_contributed_amount=%s WHERE user_id=%s"
-            cursor.execute(query, (None,None,None,user_id,))
+            query = "DELETE FROM savings_goals WHERE user_id = %s AND goal_id = %s"
+            cursor.execute(query, (user_id, goal_id))
             connection.commit()
             return True
         except Exception as e:

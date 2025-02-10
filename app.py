@@ -3,7 +3,7 @@ from Expense.app import expense_bp
 from user_reg.main import user_reg_bp
 from Saving.app import saving_bp
 from data_visualization.app import data_visualization_bp
-from budgets.app import budget_bp 
+from budgets.app import budget_bp
 from flask_mail import Mail
 
 

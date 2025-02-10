@@ -258,7 +258,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" class="form">
+        <form method="POST" class="form" action="/saving/display_goals">
             <div class="form-group">
                 <label for="goal_type">Select Goal Type</label>
                 <select id="goal_type" name="goal_type" required>
@@ -275,7 +275,7 @@
             <caption>User Goals</caption>
             <thead>
                 <tr>
-                    <th>User ID</th>
+                
                     <th>User Goal (Rs)</th>
                     <th>Remaining (Rs)</th>
                     <th>Deadline</th>
@@ -285,12 +285,12 @@
             <tbody>
                 {% for goal in goals %}
                 <tr>
-                    <td>{{ goal.user_id }}</td>
-                    <td>{{ goal.user_goal }}</td>
-                    <td>{{ goal.user_target_amount }}</td>
-                    <td>{{ goal.deadline }}</td>
+                    
+                    <td>{{ goal[0] }}</td>
+                    <td>{{ goal[1] }}</td>
+                    <td>{{ goal[2] }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('delete_goal', goal_type='user', goal_id=goal.user_id) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('savings.delete_goal', goal_type='user', goal_id=goal[3]) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
@@ -318,7 +318,7 @@
                     <td>{{ goal.family_target_amount }}</td>
                     <td>{{ goal.deadline }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('savings.delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
