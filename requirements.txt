@@ -6,4 +6,4 @@ apscheduler
 pandas
 reportlab
 gunicorn==20.1.0
-
+XlsxWriter

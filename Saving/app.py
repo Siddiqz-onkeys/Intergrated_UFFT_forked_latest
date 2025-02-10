@@ -111,12 +111,15 @@ def create_goal():
 
 @saving_bp.route('/contribute', methods=['GET', 'POST'])
 def contribute():
+   
     if 'user_id' not in session:
+               
         flash("Please log in first.", "error")
         return redirect(url_for('index'))
 
-    if request.method == 'POST':
+    if request.method =="POST":
         try:
+            
             user_id = session['user_id']
             contribution_type = request.form['contribution_type']
             amount = float(request.form['amount'])
@@ -175,10 +178,12 @@ def contribute():
 
             else:
                 # Handle existing user/family contribution logic
-                success, message = manager.contribute_to_goal(user_id, contribution_type, amount)
+                success= manager.contribute_to_goal(contribution_type, amount)
                 if success:
-                    return f"SUCCESS:{message}"
-                return f"ERROR:{message}"
+                    messages='Contibution Successfull'
+                    return f"SUCCESS:{messages}"
+                messages='Contribution unsuccessfull'
+                return f"ERROR:{messages}"
 
         except ValueError as e:
             return f"ERROR:Invalid input: {str(e)}"

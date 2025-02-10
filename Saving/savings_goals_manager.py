@@ -89,13 +89,13 @@ class SavingsGoalsManager:
             """
             
             cursor.execute(update_query, (new_family_goal, new_family_goal, family_id))
-            self.connection.commit()
+            connection.commit()
             print(f"Family goal set to Rs {new_family_goal} for all family members.")
             return True
 
         except Error as e:
             print(f"Error updating family goal: {e}")
-            self.connection.rollback()
+            connection.rollback()
             return False
 
     def update_savings_goal(self, new_goal, deadline):
@@ -128,12 +128,12 @@ class SavingsGoalsManager:
                 user_id, 
                 family_id
             ))
-            self.connection.commit()
+            connection.commit()
             return True
 
         except (Error, ValueError) as e:
             print(f"Error updating savings goal: {e}")
-            self.connection.rollback()
+            connection.rollback()
             return False
 
     def new_update_goal(self, new_user_goal, deadline):
@@ -165,11 +165,11 @@ class SavingsGoalsManager:
                 user_id, 
                 family_id
             ))
-            self.connection.commit()
+            connection.commit()
             return True, f"User goal updated to Rs {new_user_goal} successfully!"
 
         except (Error, ValueError) as e:
-            self.connection.rollback()
+            connection.rollback()
             return False, f"Error updating savings goal: {e}"
 
 
@@ -197,11 +197,11 @@ class SavingsGoalsManager:
                 deadline,
                 family_id
             ))
-            self.connection.commit()
+            connection.commit()
             return True, f"Family goal updated to Rs {new_family_goal} successfully!"
 
         except (Error, ValueError) as e:
-            self.connection.rollback()
+            connection.rollback()
             return False, f"Error updating family goal: {e}"
 
     def create_savings_goal(self, user_goal, deadline, family_goal=None):
@@ -253,17 +253,17 @@ class SavingsGoalsManager:
                 """
                 cursor.execute(insert_participant_query, (joint_id, user_id))
             
-            self.connection.commit()
+            connection.commit()
             return True
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             return False
 
 
     def contribute_to_goal(self, contribution_type, amount):
         try:
             user_id = self.get_user_id()
-            family_id = self.get_family_id(user_id)
+            family_id = self.get_family_id()
             amount = Decimal(amount)
 
             if contribution_type == 'user':
@@ -281,10 +281,10 @@ class SavingsGoalsManager:
                 """
                 cursor.execute(query, (amount, family_id))
 
-            self.connection.commit()
+            connection.commit()
             return True
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             return False
 
 
@@ -302,10 +302,10 @@ class SavingsGoalsManager:
             update_participant_query = "UPDATE joint_goal_participants SET contributed_amount = contributed_amount + %s WHERE joint_id = %s AND user_id = %s"
             cursor.execute(update_participant_query, (amount, joint_id, user_id))
             
-            self.connection.commit()
+            connection.commit()
             return True
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             return False
         
     def display_savings_goal(self):
@@ -397,10 +397,10 @@ class SavingsGoalsManager:
             # query = "DELETE FROM savings_goals WHERE user_id = %s"
             query="UPDATE savings_goals SET user_goal=%s, user_target_amount=%s, usergoal_contributed_amount=%s WHERE user_id=%s"
             cursor.execute(query, (None,None,None,user_id,))
-            self.connection.commit()
+            connection.commit()
             return True
         except Exception as e:
-            self.connection.rollback()
+            connection.rollback()
             raise Exception(f"Error deleting user goal: {e}")
 
     def delete_family_goal(self, family_id):
@@ -411,9 +411,9 @@ class SavingsGoalsManager:
             # query = "DELETE FROM savings_goals WHERE family_id = %s"
             query="UPDATE savings_goals SET family_goal=%s, family_target_amount=%s, familygoal_contributed_amount=%s WHERE family_id=%s"
             cursor.execute(query, (None,None,None,family_id,))
-            self.connection.commit()
+            connection.commit()
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             raise Exception(f"Error deleting family goal: {e}")
 
     def delete_joint_goal(self, joint_id, user_id, leave_contributions):
@@ -450,9 +450,9 @@ class SavingsGoalsManager:
                 cursor.execute("DELETE FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
                 cursor.execute("DELETE FROM joint_goals WHERE joint_id = %s", (joint_id,))
 
-            self.connection.commit()
+            connection.commit()
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             raise Exception(f"Error managing joint goal deletion: {e}")
 
 
@@ -553,10 +553,10 @@ class SavingsGoalsManager:
             start_date = datetime.now().date()
             query = "INSERT INTO fixed_investment (user_id, principal_amount, interest_rate, start_date) VALUES (%s, %s, %s, %s)"
             cursor.execute(query, (user_id, principal_amount, interest_rate, start_date))
-            self.connection.commit()
+            connection.commit()
             return True
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             return False
 
     def display_investment(self):
@@ -650,11 +650,11 @@ class SavingsGoalsManager:
             if cursor.rowcount == 0:
                 return False, "No investments found to delete"
                 
-            self.connection.commit()
+            connection.commit()
             return True, "Investment(s) deleted successfully"
             
         except Error as e:
-            self.connection.rollback()
+            connection.rollback()
             return False, f"Error deleting investment: {str(e)}"
 
 def main():
