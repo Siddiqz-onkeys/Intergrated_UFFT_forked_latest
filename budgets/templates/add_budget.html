@@ -16,6 +16,16 @@
         <header>
             <h1>Add Budget</h1>
         </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+        
         <form method="POST">
             <div class="form-group">
                 <label for="budget_type">Budget Type:</label>
@@ -88,6 +98,15 @@
                 document.getElementById('user_section').style.display = 'block';
             }
         });
+
+
+        setTimeout(function() {
+            var flashMessages = document.getElementById('flash-messages');
+            if (flashMessages) {
+                flashMessages.style.display = 'none';
+            }
+        }, 4000);
+    
     </script>
 </body>
 </html>

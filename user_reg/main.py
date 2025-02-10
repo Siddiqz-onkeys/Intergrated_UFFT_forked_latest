@@ -29,7 +29,7 @@ def is_username_taken(username):
     return count > 0
 
 def is_famname_taken(familyname):
-    query = "SELECT COUNT(*) FROM family WHERE family_name = %s"
+    query = "SELECT COUNT(*) FROM families WHERE family_name = %s"
     cur.execute(query, (familyname,))
     count = cur.fetchone()[0]
     return count > 0
@@ -41,8 +41,6 @@ def check_account(login_name,login_pass):
         cur.execute("select password from users where user_name = %s", (login_name,))
         row=cur.fetchone()
         if row==(login_pass,):
-            cur.execute("select role from users where user_name=%s",(login_name,))
-            role=cur.fetchone()[0]
             return True,"Successfull login"
         else:
             return False,"Invalid password"
@@ -53,6 +51,8 @@ def ret_role(login_name):
     cur.execute("select role from users where user_name=%s",(login_name,))
     role=cur.fetchone()[0]
     return role
+
+
 
 def is_valid_password(password):
     special_characters = "!@#$%^&*(),.?\":{}|<>"
@@ -89,6 +89,8 @@ def validate_phone_number(phone_no):
     elif str(phone_no)[0] not in "6789":
         return "Phone number should start with 6, 7, 8, or 9."
     return None
+
+
 
 
 def validate_email(email):
@@ -157,6 +159,14 @@ def member_code(mem_code):
     else:
         return False,'Family code not found. Please try again'
 
+def check_forgot_details(user):
+     cur.execute("select user_name from users where user_name = %s",(user,))
+     row=cur.fetchone()
+     if row==None:
+         return False,"Username doesn't exist"
+     else:
+         return True,'Success'
+
 
 @user_reg_bp.route("/")
 def index():
@@ -211,10 +221,8 @@ def signin():
          login_name = request.form['login_name']
          login_pass = request.form['login_pass']
          val, mess =check_account(login_name,login_pass)
-         # make a session 
-         if val:
-            create_session(session, cur, login_name)
-         
+         #Create a session 
+         create_session(session,cur,login_name)
          if not val:
             return render_template('signin.html', error=f"{mess}")
          else:
@@ -231,12 +239,15 @@ def get_mail():
     else:
         pass_email=request.form['email_otp']
         pass_user=request.form['user']
-
-        pass_otp=reset_pass(pass_email)
-        session['pass_otp']=pass_otp
-        session['pass_email']=pass_email
-        session['pass_user']=pass_user
-    return redirect(url_for('user_reg.forgot_password'))
+        val,message=check_forgot_details(pass_user)
+        if not val:
+            return render_template('email.html',error=f"{message}")
+        else:
+            pass_otp=reset_pass(pass_email)
+            session['pass_otp']=pass_otp
+            session['pass_email']=pass_email
+            session['pass_user']=pass_user
+        return redirect(url_for('user_reg.forgot_password'))
 
 @user_reg_bp.route('/forgot_password',methods=['GET','POST'])
 def forgot_password():
@@ -261,10 +272,16 @@ def reset():
     else:
         new_pass=request.form['new_pass']
         new_user=session.get('pass_user')
+        is_valid, message = is_valid_password(new_pass)
+        if not is_valid:
+            return render_template('reset.html', error=f"{message}")
+         
         cur.execute("UPDATE users SET password = %s WHERE user_name = %s", 
                         (new_pass, new_user))
         con.commit()
     return redirect(url_for('user_reg.signin'))
+
+
 
 
 @user_reg_bp.route("/otp",methods=['GET','POST'])
@@ -279,6 +296,8 @@ def otp():
             return redirect(url_for('user_reg.role'))
         else:
             return render_template('otp.html',error="Incorrect OTP")
+
+
 
 
 @user_reg_bp.route("/role",methods=['GET','POST'])
@@ -307,6 +326,7 @@ def role():
             return redirect(url_for('user_reg.member'))
         else:
             return redirect(url_for('user_reg.signin'))
+
 
 
 @user_reg_bp.route("/hof",methods=['GET','POST'])
@@ -341,6 +361,8 @@ def member():
     return redirect(url_for('user_reg.signin'))
 
 
+
+
 @user_reg_bp.route("/del_acc",methods=['GET','POST'])
 def del_acc():
     if request.method=='GET':
@@ -349,27 +371,30 @@ def del_acc():
         del_user=request.form['del_user']
         del_pass=request.form['del_pass']
         session['user']=del_user
-        cur.execute("select role from users where user_name=%s",(del_user,))
+        val, mess =check_account(del_user,del_pass)
+        if not val:
+            return render_template('delAcc.html', error=f"{mess}")
+        else:
+            cur.execute("select role from users where user_name=%s",(del_user,))
+            row=cur.fetchone()
+            if row==('HOF',) or row==('hof',):
+                cur.execute("select family_id from users where user_name=%s",(del_user,))
+                fam_row=cur.fetchone()
+                session['family_id'] = fam_row[0]
+                return redirect(url_for('user_reg.options'))
+            elif row==('Member',) or row==('None',) :
+                cur.execute("delete from users where user_name=%s", (del_user,))
+                con.commit()
+                return redirect(url_for('user_reg.index'))
         
-        row=cur.fetchone()
 
-        if row==('HOF',) or row==('hof',):
-            cur.execute("select family_id from users where user_name=%s",(del_user,))
-            fam_row=cur.fetchone()
-            session['family_id'] = fam_row[0]
-            return redirect(url_for('user_reg.options'))
-        elif row==('Member',) or row==('None',) :
-            cur.execute("delete from users where user_name=%s", (del_user,))
-            con.commit()
-            return redirect(url_for('user_reg.index'))
-        
-
+    
 @user_reg_bp.route("/options",methods=['GET','POST'])
 def options():
     if request.method=='GET':
         return render_template("options.html")
     else:
-        opt=request.form['1']
+        opt=request.form['option']
         if opt=='assign_hof':
             return redirect(url_for('user_reg.new_hof'))
         elif opt=='full' :
@@ -392,6 +417,9 @@ def options():
 
             return redirect(url_for('user_reg.welcome'))
 
+        
+    
+
 @user_reg_bp.route("/new_hof",methods=['GET','POST'])
 def new_hof():
     if request.method=='GET':
@@ -410,11 +438,15 @@ def new_hof():
         return redirect(url_for('user_reg.index'))
     
 
+
+       
+
+
 @user_reg_bp.route("/welcome")
 def welcome():
     role=session.get('role').lower()
+    family_id=session.get('family_id')
     login_name=session.get('login_name')
-    family_id=session['family_id']
     return render_template('welcome.html',role=role,login_name=login_name,family_id=family_id)
 
 @user_reg_bp.route('/MyAccount')
@@ -429,5 +461,7 @@ def logout():
     session.clear()
     return redirect(url_for('user_reg.index'))
     
+
+
 if __name__ == '__main__':
     app.run(debug=True,port=8000)

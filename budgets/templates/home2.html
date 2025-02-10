@@ -134,7 +134,7 @@
         }
 
 
-
+        
 
         a.delete-link {
             color: rgb(200, 220, 200);
@@ -223,7 +223,7 @@
                                     <a href="#" 
                                     class="delete-link" 
                                     data-url="{{ url_for('budget.delete_budget', id=budget.budget_id, budget_type='category') }}"
-                                    onclick="showDeletePopup(this)">
+                                    onclick="showDeletePopup(this)" style="margin-left: 10px;">
                                      🗑️
                                  </a>
                                  
@@ -285,15 +285,18 @@
         </div>
 
         <div>
-            <a href="{{ url_for('budget.add_category') }}" class="btn">Add Category</a>
-            <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
+            {% if user_role != 'Member' %}
+                <a href="{{ url_for('budget.add_category') }}" class="btn">Add Category</a>
+                <a href="{{ url_for('budget.add_budget') }}" class="btn">Add Budget</a>
+            {% endif %}
             <a href="{{ url_for('budget.expenses') }}" class="btn">Add Expense</a>
             <a href="{{ url_for('budget.report') }}" class="btn">View Reports</a>
             {% if user_role == 'Member' %}
                 <a href="{{ url_for('budget.request_budget') }}" class="btn">Request Budget</a>
             {% endif %}
-            <a href="{{ url_for('user_reg.welcome') }}" class="btn">Back to home</a>
+            <a href="{{ url_for('user_reg.welcome') }}" class="btn">Back to Home</a>
         </div>
+        
     </div>
 
 

@@ -9,13 +9,13 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: 100vh;
+            
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             color: white;
             background-color: #fff8e7; 
-            overflow: hidden;
+           
         }
 
         body::before {
@@ -94,6 +94,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            margin-top: 100px;
         }
 
         .logo {
@@ -184,12 +185,98 @@ h3{
     font-size: 20px;
     margin-top: 3rem;
 }
+
+
+@media only screen and (max-width: 480px) {
+
+    body {
+            font-family: Arial, sans-serif;
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            background-color: #fff8e7; 
+           
+        }
+
+    
+    body::before {
+            content: "";
+            position: absolute;
+            top: -90px;
+            left: -200px;
+            width: 350px;
+            height: 350px;
+            background: rgba(196, 218, 210, 0.8); 
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            width: 270px;
+            height: 270px;
+            right: -70px;
+            bottom:-350px;
+            background: rgba(196, 218, 210, 0.8); 
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+.welcome-msg {
+    font-size: 20px;
+   
+   
+}
+
+.header-buttons {
+    font-size: 9px;
+   
+    gap: 1rem;
+   
+    display: flex;
+}
+
+.account-btn,.logout-btn{
+    width: 100px;
+    text-align: center;
+}
+
+.feature-box {
+    padding: 1.5rem;
+    height: 130px;
+    width: 160px;
+}
+
+.summary-btn {
+    font-size: 18px;
+   
+}
+.features-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+.logo{
+    font-size: 34px;
+    text-align: center;
+
+   
+}
+.main-content{
+    margin-top: 2.5rem;
+}
+}
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="welcome-msg">Welcome, {{ login_name }}!</div> <!-- Changed to Dark Green -->
+        <div class="welcome-msg">Welcome, {{ login_name }}!</div>
         <div class="header-buttons">
             <form action="{{ url_for('user_reg.MyAccount') }}">
                 <input type="submit" value="My Account" class="account-btn">
@@ -237,13 +324,12 @@ h3{
     </div>
 </div>
 
-    {% if role == 'hof' %}
-    <form action="{{ url_for('data_visualization.fetch_family_summary') }}" method="GET">
+{% if role == 'hof' %}
+    <form action="{{ url_for('data_visualization.fetch_family_summary')}}"  method="GET">
         <input type="hidden" name="family_id" value="{{ family_id }}">
-        <input class="summary-btn" type="submit" value="View summary of members">
-    </form>
+        <input type="submit" value="Summary of members" class="summary-btn">
+    </form> 
     {% endif %}
-
 
 </body>
 </html>
