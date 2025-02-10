@@ -1,9 +1,7 @@
-Flask==2.3.2
-Flask-Mail==0.9.1
+Flask
+Flask-Mail
 mysql-connector-python
-transformers
-apscheduler
+APScheduler
 pandas
 reportlab
-gunicorn==20.1.0
-
+XlsxWriter
