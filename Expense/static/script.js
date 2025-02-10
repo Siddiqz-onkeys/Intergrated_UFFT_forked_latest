@@ -34,7 +34,7 @@ function open_add_expense(){
 function open_overview(){
     let elem = document.getElementById('interval-selection'); // Make sure this ID exists
     if (elem.style.display == 'block'){
-        elem.style.display = 'none';
+        elem.style.display = 'none'
     } else {
         elem.style.display = 'block';
 
