@@ -1,10 +1,11 @@
-# Intergrated_UFFT
-Version 1.2
+<h1>Integrated codes</h1>
 
-To use all the mentioned libraries and functionalities in your Python script, you need to install the required packages and ensure their versions are compatible with your application. corresponding commands to install them :
-
-### Install All Packages at Once
-To install all the external libraries at once, you can use the following `pip` command:
-```bash
-pip install Flask Flask-Mail mysql-connector-python APScheduler pandas reportlab XlsxWriter
-```
+<h3>Currently has integration of modules :</h3>
+<ul>
+<li>User acct mgmt</li>
+<li>Saving</li>
+<li>Expenses</li>
+<li>Data vis.</li>
+<li>Budget</li>
+</ul>
+"# Project_UFFT_2.0" 
