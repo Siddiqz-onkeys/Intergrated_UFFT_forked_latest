@@ -292,6 +292,15 @@ h3{
         <div class="logo" style="color:#16423C">FAMORA</div>
         <div class="features-container">
 
+            <div class="feature-box">
+                <a href="{{ url_for('budget.home') }}">
+                    <div class="img-container">
+                        <img src="static/budget-calculator.png">
+                    </div>
+                    <h3>Budget</h3>
+                </a>
+            </div>
+
     <div class="feature-box">
         <a href="{{ url_for('expense.index') }}"><div class="img-container">
             <img src="static/expense.png">
@@ -315,13 +324,6 @@ h3{
        </a>
     </div>
    
-    <div class="feature-box">
-        <a href="{{ url_for('budget.home') }}"><div class="img-container">
-            <img src="static/budget-calculator.png">
-        </div>
-        <h3>Budget</h3>
-       </a>
-    </div>
 </div>
 
 {% if role == 'hof' %}

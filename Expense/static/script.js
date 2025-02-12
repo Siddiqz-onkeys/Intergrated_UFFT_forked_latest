@@ -17,6 +17,58 @@ function fetch_back(){
 
 }
 
+function open_add_expense(){
+    let elem = document.getElementById('add_expense');
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        // Hide other sections (replace 'other_id' with actual element IDs)
+        document.getElementById('recc_exps').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
+    }
+}
+
+function open_overview(){
+    let elem = document.getElementById('interval-selection'); // Make sure this ID exists
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none'
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('recc_exps').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
+    }
+}
+
+function open_filters(){
+    let elem = document.getElementById('sorting_filtering'); // Make sure this ID exists
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('recc_exps').style.display = "none";
+    }
+}
+
+function show_rec_tab(){
+    let elem = document.getElementById('recc_exps');
+    if (elem.style.display == 'block'){
+        elem.style.display = 'none';
+    } else {
+        elem.style.display = 'block';
+
+        document.getElementById('add_expense').style.display = "none";
+        document.getElementById('interval-selection').style.display = "none";
+        document.getElementById('sorting_filtering').style.display = "none";
+    }
+}
 
 
 function showEditMenu(expense_id,expense_amount){
@@ -101,6 +153,7 @@ function sortTable(columnIndex, header) {
         }
     });
 }
+
 let del_id = null; // Variable to store the expense ID to be deleted
 
 // Function to show the delete confirmation form
@@ -147,14 +200,7 @@ function close_delete() {
     document.getElementById("deleteConfirmationSection").style.display = "none";
 }
 
-function show_rec_tab(){
-    curr_state = document.getElementById('recc_exps').style.display
-    if (curr_state=='block'){
-        document.getElementById('recc_exps').style.display='none';
-    }else{
-        document.getElementById('recc_exps').style.display='block';
-    }
-    }
+
 
 let rec_id_ = null;
 
@@ -233,4 +279,3 @@ function updateArrowStates(index, totalCards) {
 document.addEventListener('DOMContentLoaded', () => {
     showCard(currentCardIndex);
 });
-

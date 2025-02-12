@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Make Contribution</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
@@ -80,7 +81,8 @@
             color: #D8C4B6;
         }
 
-        input, select {
+        input,
+        select {
             background: rgba(196, 218, 210, 0.05);
             border: 1px solid rgba(196, 218, 210, 0.2);
             border-radius: 10px;
@@ -90,7 +92,8 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #C4DAD2;
             background: rgba(196, 218, 210, 0.1);
@@ -175,6 +178,7 @@
                 opacity: 0;
                 transform: scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -186,7 +190,8 @@
                 padding: 1rem;
             }
 
-            .container, .chart-container {
+            .container,
+            .chart-container {
                 padding: 1.5rem;
             }
 
@@ -200,23 +205,20 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Make Contribution</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">
-                    {{ message | safe }}
-                </div>
-            {% endfor %}
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            {{ message | safe }}
+        </div>
+        {% endfor %}
         {% endif %}
         {% endwith %}
         <form id="contributionForm" method="POST" class="form">
-            <div class="form-group">
-                <label for="user_id">User ID</label>
-                <input type="number" id="user_id" name="user_id" min="1" required placeholder="Enter your User ID">
-            </div>
             <div class="form-group">
                 <label for="contribution_type">Contribution Type</label>
                 <select id="contribution_type" name="contribution_type" required>
@@ -231,7 +233,8 @@
             </div>
             <div class="form-group">
                 <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" min="0" step="0.01" required placeholder="Enter contribution amount">
+                <input type="number" id="amount" name="amount" min="0" step="0.01" required
+                    placeholder="Enter contribution amount">
                 <div class="info-text">Note: Amount should be a positive number.</div>
             </div>
             <button type="submit" class="btn">Make Contribution</button>
@@ -242,32 +245,31 @@
     <div class="chart-container" id="chartContainer">
         <canvas id="contributionChart"></canvas>
         <div class="contribution-stats" id="contributionStats"></div>
-    
     </div>
 
     <script>
         let currentChart = null;
 
-        async function checkJointGoals(userId) {
+        async function checkJointGoals() {
             try {
-                const response = await fetch(`/get_joint_goals/${userId}`);
+                const response = await fetch('/saving/get_joint_goals');
                 const data = await response.json();
-                
+
                 const jointGoalSelect = document.getElementById('jointGoalSelect');
                 const jointIdSelect = document.getElementById('joint_id');
                 const contributionType = document.getElementById('contribution_type');
-                
+
                 // Clear existing options
                 jointIdSelect.innerHTML = '';
-                
+
                 if (data.goals && data.goals.length > 0) {
                     // Add joint goal option if user has joint goals
                     if (!Array.from(contributionType.options).some(option => option.value === 'joint')) {
                         const jointOption = new Option('Joint Goal', 'joint');
                         contributionType.add(jointOption);
                     }
-                    
-                        data.goals.forEach(goal => {
+
+                    data.goals.forEach(goal => {
                         const option = new Option(
                             `Goal: Rs ${goal.joint_goal_amount} (Remaining: Rs ${goal.joint_target_amount})`,
                             goal.joint_id
@@ -290,11 +292,11 @@
         async function updateChart(type, id) {
             const container = document.getElementById('chartContainer');
             const stats = document.getElementById('contributionStats');
-            
+
             try {
                 let endpoint;
                 if (type === 'family') {
-                    endpoint = `/saving/get_family_contributions/${id}`;
+                    endpoint = '/saving/get_family_contributions';
                 } else if (type === 'joint') {
                     endpoint = `/saving/get_joint_contributions/${id}`;
                 } else {
@@ -311,7 +313,7 @@
 
                 container.style.display = 'block';
                 const ctx = document.getElementById('contributionChart').getContext('2d');
-                
+
                 let chartData;
                 if (type === 'family') {
                     chartData = {
@@ -366,25 +368,20 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('contributionForm');
             const contributionType = document.getElementById('contribution_type');
-            const userId = document.getElementById('user_id');
             const jointGoalSelect = document.getElementById('jointGoalSelect');
 
-            userId.addEventListener('change', function() {
-                checkJointGoals(this.value);
-                if (contributionType.value === 'family') {
-                    updateChart('family', this.value);
-                }
-            });
+            // Check for joint goals when page loads
+            checkJointGoals();
 
-            contributionType.addEventListener('change', function() {
+            contributionType.addEventListener('change', function () {
                 const showJointSelect = this.value === 'joint';
                 jointGoalSelect.style.display = showJointSelect ? 'block' : 'none';
-                
-                if (this.value === 'family' && userId.value) {
-                    updateChart('family', userId.value);
+
+                if (this.value === 'family') {
+                    updateChart('family');
                 } else if (this.value === 'joint' && document.getElementById('joint_id').value) {
                     updateChart('joint', document.getElementById('joint_id').value);
                 } else {
@@ -392,47 +389,45 @@
                 }
             });
 
-            document.getElementById('joint_id').addEventListener('change', function() {
+            document.getElementById('joint_id').addEventListener('change', function () {
                 if (contributionType.value === 'joint') {
                     updateChart('joint', this.value);
                 }
             });
 
-            form.addEventListener('submit', async function(e) {
+            form.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
+
                 const formData = new FormData(this);
                 try {
                     const response = await fetch('/saving/contribute', {
                         method: 'POST',
                         body: formData
                     });
-                    
+
                     const result = await response.text();
                     const [status, ...messageParts] = result.split(':');
                     const message = messageParts.join(':');
 
                     const flashMessage = document.createElement('div');
                     flashMessage.className = 'flash-message';
-                    
+
                     if (status === 'SUCCESS') {
-                        flashMessage.style.backgroundColor = 'lightgreen';
-                        flashMessage.style.color = '#155724';
+                        flashMessage.classList.add('flash-success');
                         flashMessage.textContent = message;
-                        
+
                         // Update chart if needed
                         const type = formData.get('contribution_type');
                         if (type === 'family') {
-                            updateChart('family', formData.get('user_id'));
+                            updateChart('family');
                         } else if (type === 'joint') {
                             updateChart('joint', formData.get('joint_id'));
                         }
                     } else {
-                        flashMessage.style.backgroundColor = '#F8D7DA';
-                        flashMessage.style.color = '#721C24';
+                        flashMessage.classList.add('flash-error');
                         flashMessage.textContent = message;
                     }
-                    
+
                     form.insertBefore(flashMessage, form.firstChild);
                 } catch (error) {
                     console.error('Error:', error);
@@ -441,5 +436,5 @@
         });
     </script>
 </body>
+
 </html>
-   
