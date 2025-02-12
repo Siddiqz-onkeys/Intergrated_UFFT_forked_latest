@@ -5,19 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
     <link rel="stylesheet" href="/user_reg/static/first.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        #togglePassword {
+    position: absolute;
+    right: 28px; 
+    top: 49%;
+    transform: translateY(-100%);
+    cursor: pointer;
+  }
+  .error{
+    color: #960019;
+  font-size: 18px;
+  }
+
+  .pass-input{
+    position: relative;
+  }
+
+ 
+ 
+    </style>
 </head>
 <body>
     <div class="container">
-    <h1>Set new password</h1>
+    <h1 style="font-size: 32px;">Set new password</h1>
     {% if error %}
-    <p style="color: brown;">{{error}}</p>
+    <p class="error">{{error}}</p><br><br>
     {% endif %}
-    <form action="{{ url_for('user_reg.reset') }}" method="POST">
-        <input type="text" name="new_pass" placeholder="Enter new password">  <br><br><br><br><br>
+    <form action="{{ url_for('user_reg.reset') }}" method="POST" id="passwordForm">
 
+        <div class="pass-input">
+
+            <input type="password" placeholder="   Enter New Password" name="new_pass" required="required" id="password">
+            <span id="togglePassword"><i class="far fa-eye-slash"></i></span><br><br>
+        </div>
+            <div id="requirements">
+                <p id="length"> <i class="fa-solid fa-xmark"></i>  Atleast 8 characters long</p>
+                <p id="uppercase"> <i class="fa-solid fa-xmark"></i>  Atleast one uppercase letter</p>
+                <p id="lowercase"> <i class="fa-solid fa-xmark"></i>  Atleast one lowercase letter</p>
+                <p id="number"> <i class="fa-solid fa-xmark"></i>  Atleast one digit</p>
+                <p id="special"> <i class="fa-solid fa-xmark"></i>  Atleast one special character</p>
+    
+            </div>
         <div class="sl">
             <input type="submit" class="google-btn" value="Continue">
         </div>
     </form></div>
+
+    <script src="/user_reg/static/pass.js"></script>
 </body>
 </html>

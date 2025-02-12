@@ -214,7 +214,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('update_goal') }}" class="form">
+        <form method="POST" action="{{ url_for('saving.update_goal') }}" class="form">
             <div class="form-group">
                 <label for="update_type">Update Type</label>
                 <select id="update_type" 
@@ -264,7 +264,7 @@
             <button type="submit" class="btn">Update Goal</button>
         </form>
 
-        <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
@@ -287,7 +287,7 @@
         });
 
         function loadJointGoals() {
-            fetch('/get_user_joint_goals')  // The user ID will be handled by the server using session
+            fetch('/saving/get_user_joint_goals')  
                 .then(response => response.json())
                 .then(goals => {
                     jointIdSelect.innerHTML = goals.length 

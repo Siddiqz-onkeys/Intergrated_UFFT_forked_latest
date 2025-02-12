@@ -6,14 +6,27 @@ from mysql.connector import Error
 import datetime
 from decimal import Decimal
 from db_connection import get_connection
-connection=get_connection()
-#cursor=connection.cursor()
-cursor = connection.cursor(buffered=True)
+import uuid  # Import UUID for generating unique IDs
+
+
 class SavingsGoalsManager:
-    
+    def __init__(self):
+        try:
+            # Establish database connection
+            # self.connection = mysql.connector.connect(
+            #     host='localhost',
+            #     database='projectufft',
+            #     user='root',
+            #     password='BabuRex@143',
+            #     use_pure=True  # This helps with Decimal handling
+            # )
+            self.connection = get_connection()
+            self.cursor = self.connection.cursor(dictionary=True)
+        except Error as e:
+            print(f"Error connecting to MySQL Platform: {e}")
+            raise
     def get_user_id(self):
         """Retrieve the user ID from the session."""
-        global user_id
         user_id = session.get('user_id')
         if not user_id:
             raise ValueError("User is not logged in.")
@@ -30,27 +43,27 @@ class SavingsGoalsManager:
         Validate if user exists and get user details
         """
         try:
-            query = "SELECT * FROM Users WHERE user_id = %s"
-            cursor.execute(query, (user_id,))
-            user = cursor.fetchone()
+            query = "SELECT * FROM users WHERE user_id = %s"
+            self.cursor.execute(query, (user_id,))
+            user = self.cursor.fetchone()
             return user
         except Error as e:
             print(f"Database error during user validation: {e}")
             return None
 
     def is_admin(self):
-        user_id = self.get_user_id()
+        user_id = session['user_id']
         query = "SELECT role FROM users WHERE user_id = %s"
-        cursor.execute(query, (user_id,))
-        user = cursor.fetchone()
-        return user and user[0].lower() == 'hof'
+        self.cursor.execute(query, (user_id,))
+        user = self.cursor.fetchone()
+        return user and user['role'].lower() == 'hof'
 
     def get_family_id(self):
         user_id = self.get_user_id()
         query = "SELECT family_id FROM users WHERE user_id = %s"
-        cursor.execute(query, (user_id,))
-        user = cursor.fetchone()
-        return user[0] if user else None
+        self.cursor.execute(query, (user_id,))
+        user = self.cursor.fetchone()
+        return user['family_id'] if user else None
         
     def get_joint_id(self, user_id_1):
         """
@@ -58,8 +71,8 @@ class SavingsGoalsManager:
         """
         try:
             query = "SELECT joint_id FROM joint_goals WHERE user_id_1= %s"
-            cursor.execute(query, (user_id_1,))
-            joint = cursor.fetchone()
+            self.cursor.execute(query, (user_id_1,))
+            joint = self.cursor.fetchone()
             return joint['joint_id'] if joint else None
         except Error as e:
             print(f"Database error getting family ID: {e}")
@@ -88,14 +101,14 @@ class SavingsGoalsManager:
             WHERE family_id = %s
             """
             
-            cursor.execute(update_query, (new_family_goal, new_family_goal, family_id))
-            connection.commit()
+            self.cursor.execute(update_query, (new_family_goal, new_family_goal, family_id))
+            self.connection.commit()
             print(f"Family goal set to Rs {new_family_goal} for all family members.")
             return True
 
         except Error as e:
             print(f"Error updating family goal: {e}")
-            connection.rollback()
+            self.connection.rollback()
             return False
 
     def update_savings_goal(self, new_goal, deadline):
@@ -108,8 +121,8 @@ class SavingsGoalsManager:
                 return False
 
             query = "SELECT * FROM savings_goals WHERE user_id = %s AND family_id = %s"
-            cursor.execute(query, (user_id, family_id))
-            existing_goal = cursor.fetchone()
+            self.cursor.execute(query, (user_id, family_id))
+            existing_goal = self.cursor.fetchone()
 
             if not existing_goal:
                 return False
@@ -121,32 +134,32 @@ class SavingsGoalsManager:
                 deadline = %s
             WHERE user_id = %s AND family_id = %s
             """
-            cursor.execute(update_query, (
+            self.cursor.execute(update_query, (
                 Decimal(str(new_goal)), 
                 Decimal(str(new_goal)), 
                 deadline,
                 user_id, 
                 family_id
             ))
-            connection.commit()
+            self.connection.commit()
             return True
 
         except (Error, ValueError) as e:
             print(f"Error updating savings goal: {e}")
-            connection.rollback()
+            self.connection.rollback()
             return False
 
     def new_update_goal(self, new_user_goal, deadline):
         try:
-            user_id = self.get_user_id()
-            family_id = self.get_family_id(user_id)
+            user_id=session['user_id']
+            family_id=session['family_id']
 
             if not family_id:
                 return False, "Could not find family for this user."
 
             query = "SELECT * FROM savings_goals WHERE user_id = %s AND family_id = %s"
-            cursor.execute(query, (user_id, family_id))
-            existing_goal = cursor.fetchone()
+            self.cursor.execute(query, (user_id, family_id))
+            existing_goal = self.cursor.fetchone()
 
             if not existing_goal:
                 return False, "No existing savings goal found for this user."
@@ -158,26 +171,26 @@ class SavingsGoalsManager:
                 deadline = %s
             WHERE user_id = %s AND family_id = %s
             """
-            cursor.execute(update_query, (
+            self.cursor.execute(update_query, (
                 Decimal(str(new_user_goal)), 
                 Decimal(str(new_user_goal)), 
                 deadline,
                 user_id, 
                 family_id
             ))
-            connection.commit()
+            self.connection.commit()
             return True, f"User goal updated to Rs {new_user_goal} successfully!"
 
         except (Error, ValueError) as e:
-            connection.rollback()
+            self.connection.rollback()
             return False, f"Error updating savings goal: {e}"
 
 
     def new_update_family_goal(self, new_family_goal, deadline):
         try:
-            user_id = self.get_user_id()
-            family_id = self.get_family_id(user_id)
-
+            user_id=session['user_id']
+            family_id=session['family_id']
+            
             if not family_id:
                 return False, "Could not find family for this user."
 
@@ -191,34 +204,113 @@ class SavingsGoalsManager:
                 deadline = %s
             WHERE family_id = %s
             """
-            cursor.execute(update_query, (
+            self.cursor.execute(update_query, (
                 Decimal(str(new_family_goal)),
                 Decimal(str(new_family_goal)),
                 deadline,
                 family_id
             ))
-            connection.commit()
+            self.connection.commit()
             return True, f"Family goal updated to Rs {new_family_goal} successfully!"
 
         except (Error, ValueError) as e:
-            connection.rollback()
+            self.connection.rollback()
             return False, f"Error updating family goal: {e}"
 
     def create_savings_goal(self, user_goal, deadline, family_goal=None):
-            user_id = self.get_user_id()
-            family_id = self.get_family_id()
-
-            if not family_id:
+        """
+        Create a new savings goal for a user
+        """
+        try:
+            user_id = session.get('user_id')
+            if not user_id:
+                print("User not logged in!")
                 return False
 
+            # Validate user
+            user = self.validate_user(user_id)
+            if not user:
+                print("Invalid User ID")
+                return False
+
+            if user_goal <= 0:
+                print("Saving goal cannot be zero or negative!")
+                return False
+
+            # Get family ID
+            family_id = user['family_id']
+
+        # Convert to Decimal safely
+            try:
+                user_goal = Decimal(str(user_goal))
+                if family_goal is not None:
+                    family_goal = Decimal(str(family_goal))
+            except ValueError:
+                print("Invalid goal value!")
+                return False
+
+            # Only admin can set a new family goal
             if family_goal is not None and not self.is_admin():
+                print("Only admin can create family goals")
                 return False
 
-            query = "INSERT INTO savings_goals (family_id, user_id, user_goal, user_target_amount, deadline) VALUES (%s, %s, %s, %s, %s)"
-            values = (family_id, user_id, Decimal(user_goal), Decimal(user_goal), deadline)
-            cursor.execute(query, values)
-            connection.commit()
+            # Check if a goal already exists for this user
+            query = "SELECT * FROM savings_goals WHERE user_id = %s AND family_id = %s"
+            self.cursor.execute(query, (user_id, family_id))
+            existing_goal = self.cursor.fetchone()
+
+            if existing_goal:
+                print("A savings goal for this user already exists.")
+                return False
+
+            # Check for existing family goal
+            query = "SELECT family_goal, family_target_amount FROM savings_goals WHERE family_id = %s AND family_goal IS NOT NULL LIMIT 1"
+            self.cursor.execute(query, (family_id,))
+            existing_family_goal = self.cursor.fetchone()
+
+            # Determine which family goal to use
+            final_family_goal = None
+            final_family_target = None
+
+            if self.is_admin() and family_goal is not None:
+                final_family_goal = family_goal
+                final_family_target = family_goal
+            elif existing_family_goal:
+                final_family_goal = existing_family_goal['family_goal']
+                final_family_target = existing_family_goal['family_target_amount']
+
+        # Insert new savings goal
+            if final_family_goal is not None:
+                query = """
+                INSERT INTO savings_goals 
+                (family_id, user_id, user_goal, family_goal, 
+                user_target_amount, family_target_amount, usergoal_contributed_amount, familygoal_contributed_amount, deadline) 
+                VALUES (%s, %s, %s, %s, %s, %s, 0, 0, %s)
+                """
+                values = (family_id, user_id, user_goal, final_family_goal, user_goal, final_family_target, deadline)
+
+                # If admin is setting a new family goal, update it for all existing members
+                if self.is_admin() and family_goal is not None:
+                    self.update_family_goal_for_family(family_id, family_goal)
+            else:
+                # No family goal exists
+                query = """
+                INSERT INTO savings_goals 
+                (family_id, user_id, user_goal, 
+                user_target_amount, usergoal_contributed_amount, familygoal_contributed_amount, deadline) 
+                VALUES (%s, %s, %s, %s, 0, 0, %s)
+                """
+                values = (family_id, user_id, user_goal, user_goal, deadline)
+
+            self.cursor.execute(query, values)
+            self.connection.commit()
+            print("Savings goal created successfully!")
             return True
+
+        except Error as e:
+            print(f"Error creating savings goal: {e}")
+            self.connection.rollback()
+            return False
         
 
     
@@ -227,65 +319,154 @@ class SavingsGoalsManager:
         Fetch all users belonging to a specific family.
         """
         try:
-            query = "SELECT user_id, name FROM Users WHERE family_id = %s"
-            cursor.execute(query, (family_id,))
-            return cursor.fetchall()
+            query = "SELECT user_id, name FROM users WHERE family_id = %s"
+            self.cursor.execute(query, (family_id,))
+            return self.cursor.fetchall()
         except Error as e:
             print(f"Database error fetching users by family ID: {e}")
             return []
 
+
     def create_joint_goal(self, user_ids, joint_goal_amount, deadline):
+        """
+        Create a joint savings goal for multiple users using UUID for unique joint_id.
+        """
         try:
-            family_id = self.get_family_id()
-            joint_goal_amount = Decimal(joint_goal_amount)
+            if len(user_ids) < 2:
+                return False, "At least two users are required for a joint goal."
 
+            # Validate users and ensure they belong to the same family
+            family_id = None
+            for user_id in user_ids:
+                user = self.validate_user(user_id)
+                if not user:
+                    return False, f"Invalid User ID: {user_id}"
+                if family_id is None:
+                    family_id = user['family_id']
+                elif family_id != user['family_id']:
+                    return False, "All users must belong to the same family."
+
+            # Validate goal amount
+            joint_goal_amount = Decimal(str(joint_goal_amount))
+            if joint_goal_amount <= 0:
+                return False, "Joint goal amount must be greater than zero."
+
+            # 🔹 Generate a unique `joint_id` using UUID
+            joint_id = int(uuid.uuid4().int % 1_000_000)  # Convert UUID to an integer within a valid range
+
+            # Insert the joint goal
             insert_joint_goal_query = """
-            INSERT INTO joint_goals (joint_goal_amount, joint_target_amount, deadline) 
-            VALUES (%s, %s, %s)
+            INSERT INTO joint_goals (joint_id, joint_goal_amount, joint_target_amount, deadline, created_at) 
+            VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_joint_goal_query, (joint_goal_amount, joint_goal_amount, deadline))
-            joint_id = cursor.lastrowid
+            self.cursor.execute(insert_joint_goal_query, (
+            joint_id,
+            joint_goal_amount,
+            joint_goal_amount,  # Target amount is the same as goal amount initially
+            deadline,
+            datetime.datetime.now(),  # Set current timestamp
+            ))
 
+        # Add participants
             for user_id in user_ids:
                 insert_participant_query = """
                 INSERT INTO joint_goal_participants (joint_id, user_id, contributed_amount)
                 VALUES (%s, %s, 0)
                 """
-                cursor.execute(insert_participant_query, (joint_id, user_id))
-            
-            connection.commit()
-            return True
-        except Error as e:
-            connection.rollback()
-            return False
+                self.cursor.execute(insert_participant_query, (joint_id, user_id))
 
+            self.connection.commit()
+            return True, f"Joint goal of Rs {joint_goal_amount} created successfully for {len(user_ids)} users!"
+    
+        except Error as e:
+            self.connection.rollback()
+            return False, f"Error creating joint goal: {str(e)}"
 
     def contribute_to_goal(self, contribution_type, amount):
+        """
+        Contribute to either user or family goal with detailed error handling.
+        """
         try:
-            user_id = self.get_user_id()
-            family_id = self.get_family_id()
-            amount = Decimal(amount)
+            # Get family ID for the user
+            user_id=session['user_id']
+            family_id=session['family_id']
+            
+            if not family_id:
+                return False, "Could not find family for this user."
 
+            # Convert the contribution amount to Decimal to ensure precision
+            amount = Decimal(str(amount))
+            if amount <= 0:
+                return False, "Contribution amount must be greater than zero."
+
+            # Fetch current savings goal for the user
+            
+            # Handle user contribution
             if contribution_type == 'user':
-                query = """
-                UPDATE savings_goals SET user_target_amount = user_target_amount - %s,
-                    usergoal_contributed_amount = usergoal_contributed_amount + %s
+                query = "SELECT * FROM savings_goals WHERE user_id = %s"
+                self.cursor.execute(query, (user_id,))
+                goal = self.cursor.fetchone()
+
+                if not goal:
+                    return False, "No User goal found for this user"
+
+                new_user_target = goal['user_target_amount'] - amount
+                if new_user_target < 0:
+                    remaining = goal['user_target_amount']
+                    return False, f"Contribution exceeds remaining target! Maximum allowed contribution is Rs{remaining}"
+
+                # Update the user's savings goal
+                update_query = """
+                UPDATE savings_goals 
+                SET user_target_amount = %s, 
+                    usergoal_contributed_amount = usergoal_contributed_amount + %s 
                 WHERE family_id = %s AND user_id = %s
                 """
-                cursor.execute(query, (amount, amount, family_id, user_id))
+                self.cursor.execute(update_query, (new_user_target, amount, family_id, user_id))
 
+            # Handle family contribution
             elif contribution_type == 'family':
-                query = """
-                UPDATE savings_goals SET family_target_amount = family_target_amount - %s
+                query = "SELECT * FROM savings_goals WHERE family_id = %s LIMIT 1"
+                self.cursor.execute(query, (family_id,))
+                goal = self.cursor.fetchone()
+                
+                if not goal:
+                    return False, "No savings goal found for this user in the family."
+
+                if goal['family_target_amount'] is None:
+                    return False, "A family goal has not yet been created by your admin!"
+                
+                new_family_target = goal['family_target_amount'] - amount
+                if new_family_target < 0:
+                    remaining = goal['family_target_amount']
+                    return False, f"Contribution exceeds family target! Maximum allowed contribution is Rs{remaining}"
+
+                # Update the family target for all users in the same family
+                update_query_family_target = """
+                UPDATE savings_goals 
+                SET family_target_amount = %s
                 WHERE family_id = %s
                 """
-                cursor.execute(query, (amount, family_id))
+                self.cursor.execute(update_query_family_target, (new_family_target, family_id))
 
-            connection.commit()
-            return True
-        except Error as e:
-            connection.rollback()
-            return False
+                # Update the contributing user's current amount towards the family goal
+                update_query_user_contribution = """
+                UPDATE savings_goals 
+                SET familygoal_contributed_amount = familygoal_contributed_amount + %s
+                WHERE family_id = %s AND user_id = %s
+                """
+                self.cursor.execute(update_query_user_contribution, (amount, family_id, user_id))
+
+            else:
+                return False, "Invalid contribution type. Choose 'user' or 'family'."
+
+            # Commit the transaction to save changes
+            self.connection.commit()
+            return True, "Contribution successful!"
+
+        except (Error, ValueError) as e:
+            self.connection.rollback()
+            return False, f"Error processing contribution: {str(e)}"
 
 
     def contribute_to_joint_goal(self, amount):
@@ -297,15 +478,15 @@ class SavingsGoalsManager:
 
             amount = Decimal(amount)
             update_query = "UPDATE joint_goals SET joint_target_amount = joint_target_amount - %s WHERE joint_id = %s"
-            cursor.execute(update_query, (amount, joint_id))
+            self.cursor.execute(update_query, (amount, joint_id))
             
             update_participant_query = "UPDATE joint_goal_participants SET contributed_amount = contributed_amount + %s WHERE joint_id = %s AND user_id = %s"
-            cursor.execute(update_participant_query, (amount, joint_id, user_id))
+            self.cursor.execute(update_participant_query, (amount, joint_id, user_id))
             
-            connection.commit()
+            self.connection.commit()
             return True
         except Error as e:
-            connection.rollback()
+            self.connection.rollback()
             return False
         
     def display_savings_goal(self):
@@ -323,8 +504,8 @@ class SavingsGoalsManager:
 
             # Fetch all goals for the family
             query = "SELECT * FROM savings_goals WHERE family_id = %s"
-            cursor.execute(query, (family_id,))
-            goals = cursor.fetchall()
+            self.cursor.execute(query, (family_id,))
+            goals = self.cursor.fetchall()
 
             if goals:
                 print("\n--- Family Savings Goals ---")
@@ -367,8 +548,8 @@ class SavingsGoalsManager:
             WHERE jgp.user_id = %s
             GROUP BY jg.joint_id, jgp.contributed_amount
             """
-            cursor.execute(query, (user_id,))
-            goals = cursor.fetchall()
+            self.cursor.execute(query, (user_id,))
+            goals = self.cursor.fetchall()
 
             if not goals:
                 print("No joint goals found for this user.")
@@ -392,27 +573,29 @@ class SavingsGoalsManager:
         except Error as e:
             print(f"Error displaying joint goals: {str(e)}")
     
-    def delete_user_goal(self, user_id, goal_id):
+    def delete_user_goal(self, user_id):
         try:
-            query = "DELETE FROM savings_goals WHERE user_id = %s AND goal_id = %s"
-            cursor.execute(query, (user_id, goal_id))
-            connection.commit()
+            # query = "DELETE FROM savings_goals WHERE user_id = %s"
+            query="UPDATE savings_goals SET user_goal=0, user_target_amount=0, usergoal_contributed_amount=0 WHERE user_id=%s"
+            self.cursor.execute(query, (user_id,))
+            self.connection.commit()
             return True
         except Exception as e:
-            connection.rollback()
+            self.connection.rollback()
             raise Exception(f"Error deleting user goal: {e}")
 
-    def delete_family_goal(self, family_id):
+    def delete_family_goal(self):
         """
         Delete all savings goals for a family.
         """
         try:
+            family_id=session['family_id']
             # query = "DELETE FROM savings_goals WHERE family_id = %s"
             query="UPDATE savings_goals SET family_goal=%s, family_target_amount=%s, familygoal_contributed_amount=%s WHERE family_id=%s"
-            cursor.execute(query, (None,None,None,family_id,))
-            connection.commit()
+            self.cursor.execute(query, (None,None,None,family_id,))
+            self.connection.commit()
         except Error as e:
-            connection.rollback()
+            self.connection.rollback()
             raise Exception(f"Error deleting family goal: {e}")
 
     def delete_joint_goal(self, joint_id, user_id, leave_contributions):
@@ -427,7 +610,7 @@ class SavingsGoalsManager:
             if leave_contributions == 1:
                 # Remove the user from the joint goal but keep contributions
                 delete_query = "DELETE FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
-                cursor.execute(delete_query, (joint_id, user_id))
+                self.cursor.execute(delete_query, (joint_id, user_id))
             else:
                 # Refund contributions and remove the user
                 refund_query = """
@@ -438,20 +621,20 @@ class SavingsGoalsManager:
                         WHERE joint_id = %s AND user_id = %s)
                     WHERE joint_id = %s
                 """
-                cursor.execute(refund_query, (joint_id, user_id, joint_id))
+                self.cursor.execute(refund_query, (joint_id, user_id, joint_id))
                 delete_query = "DELETE FROM joint_goal_participants WHERE joint_id = %s AND user_id = %s"
-                cursor.execute(delete_query, (joint_id, user_id))
+                self.cursor.execute(delete_query, (joint_id, user_id))
 
             # If no participants remain, delete the joint goal
-            cursor.execute("SELECT COUNT(*) AS count FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
-            result = cursor.fetchone()
+            self.cursor.execute("SELECT COUNT(*) AS count FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
+            result = self.cursor.fetchone()
             if result and result['count']<2:
-                cursor.execute("DELETE FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
-                cursor.execute("DELETE FROM joint_goals WHERE joint_id = %s", (joint_id,))
+                self.cursor.execute("DELETE FROM joint_goal_participants WHERE joint_id = %s", (joint_id,))
+                self.cursor.execute("DELETE FROM joint_goals WHERE joint_id = %s", (joint_id,))
 
-            connection.commit()
+            self.connection.commit()
         except Error as e:
-            connection.rollback()
+            self.connection.rollback()
             raise Exception(f"Error managing joint goal deletion: {e}")
 
 
@@ -469,8 +652,8 @@ class SavingsGoalsManager:
 
         # Check if the user's individual target is 0
         query = "SELECT user_id FROM savings_goals WHERE user_target_amount = 0"
-        cursor.execute(query)
-        res = cursor.fetchall()
+        self.cursor.execute(query)
+        res = self.cursor.fetchall()
 
         for i in res:
             if i['user_id'] == user_id:
@@ -488,8 +671,8 @@ class SavingsGoalsManager:
 
         # Check if the family's target is 0
         query1 = "SELECT family_id FROM savings_goals WHERE family_target_amount = 0"
-        cursor.execute(query1)
-        res1 = cursor.fetchall()
+        self.cursor.execute(query1)
+        res1 = self.cursor.fetchall()
         for i in res1:
             if i['family_id'] == family_id:
                 print("You have completed your family saving goal!")
@@ -511,13 +694,13 @@ class SavingsGoalsManager:
     def is_goal_zero(self, user_id, contribution_type):
         try:
             if contribution_type == "user":
-                cursor.execute("SELECT user_goal FROM savings_goals WHERE user_id = %s", (user_id,))
+                self.cursor.execute("SELECT user_goal FROM savings_goals WHERE user_id = %s", (user_id,))
             elif contribution_type == "family":
-                cursor.execute("SELECT family_goal FROM savings_goals WHERE family_id = (SELECT family_id FROM users WHERE user_id = %s)", (user_id,))
+                self.cursor.execute("SELECT family_goal FROM savings_goals WHERE family_id = (SELECT family_id FROM users WHERE user_id = %s)", (user_id,))
             else:
                 return True
 
-            result = cursor.fetchone()
+            result = self.cursor.fetchone()
             return result and result[0] == 0
         except Exception as e:
             print(f"Error checking goal: {e}")
@@ -530,8 +713,8 @@ class SavingsGoalsManager:
             FROM savings_goals 
             WHERE user_id = %s
             """
-            cursor.execute(query, (user_id,))
-            result = cursor.fetchone()
+            self.cursor.execute(query, (user_id,))
+            result = self.cursor.fetchone()
             if result:
                 return {
                     'total_goal': result['user_goal'],
@@ -544,19 +727,24 @@ class SavingsGoalsManager:
         except Error as e:
             print(f"Error getting user goal info: {e}")
             return None
+    
     def create_investment(self, principal_amount, interest_rate):
         try:
-            user_id = self.get_user_id()
+            user_id = session['user_id']
             principal_amount = Decimal(principal_amount)
             interest_rate = Decimal(interest_rate)
-            start_date = datetime.now().date()
+            start_date = datetime.datetime.now().date()
+        
             query = "INSERT INTO fixed_investment (user_id, principal_amount, interest_rate, start_date) VALUES (%s, %s, %s, %s)"
-            cursor.execute(query, (user_id, principal_amount, interest_rate, start_date))
-            connection.commit()
-            return True
+            self.cursor.execute(query, (user_id, principal_amount, interest_rate, start_date))
+            self.connection.commit()
+            return True, "Investment successfully created."
         except Error as e:
-            connection.rollback()
-            return False
+            self.connection.rollback()
+            return False, f"Database error: {str(e)}"
+        except Exception as e:
+            return False, f"Unexpected error: {str(e)}"
+
 
     def display_investment(self):
         
@@ -570,6 +758,7 @@ class SavingsGoalsManager:
             tuple: (success_bool, data_dict or error_message)
         """
         try:
+            user_id=session['user_id']
             # Validate user
             if not self.validate_user(user_id):
                 return False, "Invalid user ID"
@@ -580,8 +769,8 @@ class SavingsGoalsManager:
             FROM fixed_investment
             WHERE user_id = %s
             """
-            cursor.execute(query, (user_id,))
-            investments = cursor.fetchall()
+            self.cursor.execute(query, (user_id,))
+            investments = self.cursor.fetchall()
             
             if not investments:
                 return False, "No investments found for this user"
@@ -640,103 +829,22 @@ class SavingsGoalsManager:
                 DELETE FROM fixed_investment 
                 WHERE user_id = %s AND investment_id = %s
                 """
-                cursor.execute(query, (user_id, investment_id))
+                self.cursor.execute(query, (user_id, investment_id))
             else:
                 # Delete all investments for user
                 query = "DELETE FROM fixed_investment WHERE user_id = %s"
-                cursor.execute(query, (user_id,))
+                self.cursor.execute(query, (user_id,))
                 
-            if cursor.rowcount == 0:
+            if self.cursor.rowcount == 0:
                 return False, "No investments found to delete"
                 
-            connection.commit()
+            self.connection.commit()
             return True, "Investment(s) deleted successfully"
             
         except Error as e:
-            connection.rollback()
+            self.connection.rollback()
             return False, f"Error deleting investment: {str(e)}"
 
-def main():
-    manager = SavingsGoalsManager()
-    while True:
-        print("\n--- Unified Family Finance Tracker ---")
-        print("1. Create User Savings Goal")
-        print("2. Create Joint Savings Goal")
-        print("3. Contribute to Savings Goal")
-        print("4. Contribute to Joint Goal")
-        print("5. Display Family Savings Goals")
-        print("6. Display Joint Goals")
-        print("7. Update Savings Goal")
-        print("8. Exit")
-
-        choice = input("Enter your choice (1-8): ")
-
-        try:
-            if choice == '1':
-                user_id = int(input("Enter User ID: "))
-                if manager.is_admin(user_id):
-                    user_goal = float(input("Enter User Goal Amount: "))
-                    family_goal = float(input("Enter Family Goal Amount (optional, press enter to skip): ") or 0)
-                    deadline = input("Enter Deadline (YYYY-MM-DD): ")
-                    family_goal = family_goal if family_goal > 0 else None
-                    manager.create_savings_goal(user_id, user_goal, deadline, family_goal)
-                else:
-                    user_goal = float(input("Enter User Goal Amount: "))
-                    deadline = input("Enter Deadline (YYYY-MM-DD): ")
-                    manager.create_savings_goal(user_id, user_goal, deadline)
-
-            elif choice == '2':
-                user_ids = []
-                print("Enter User IDs (press Enter when done)")
-                while True:
-                    user_id = input("Enter User ID (or press Enter to finish adding users): ")
-                    if not user_id:
-                        break
-                    user_ids.append(int(user_id))
-                
-                if len(user_ids) < 2:
-                    print("At least two users are required for a joint goal.")
-                    continue
-                
-                joint_goal = float(input("Enter Joint Goal Amount: "))
-                deadline = input("Enter Deadline (YYYY-MM-DD): ")
-                success, message = manager.create_joint_goal(user_ids, joint_goal, deadline)
-                print(message)
-
-            elif choice == '3':
-                user_id = int(input("Enter User ID: "))
-                contribution_type = input("Contribute to 'user' or 'family' goal: ").lower()
-                amount = float(input("Enter contribution amount: "))
-                success, message = manager.contribute_to_goal(user_id, contribution_type, amount)
-                print(message)
-                manager.track(user_id)
-
-            elif choice == '4':
-                user_id = int(input("Enter User ID: "))
-                amount = float(input("Enter contribution amount: "))
-                success, message = manager.contribute_to_joint_goal(user_id, amount)
-                print(message)
-
-            elif choice == '5':
-                manager.display_savings_goal()
-
-            elif choice == '6':
-                user_id = int(input("Enter User ID: "))
-                manager.display_joint_goals(user_id)
-
-            elif choice == '7':
-                user_id = int(input("Enter User ID: "))
-                manager.update_savings_goal(user_id)
-
-            elif choice == '8':
-                print("Exiting the application.")
-                break
-
-            else:
-                print("Invalid choice. Please try again.")
-
-        except ValueError as e:
-            print(f"Invalid input: {str(e)}")
 
 if __name__ == "__main__":
     main()

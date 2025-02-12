@@ -258,7 +258,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" class="form" action="/saving/display_goals">
+        <form method="POST" class="form">
             <div class="form-group">
                 <label for="goal_type">Select Goal Type</label>
                 <select id="goal_type" name="goal_type" required>
@@ -275,7 +275,7 @@
             <caption>User Goals</caption>
             <thead>
                 <tr>
-                
+                    <th>User ID</th>
                     <th>User Goal (Rs)</th>
                     <th>Remaining (Rs)</th>
                     <th>Deadline</th>
@@ -285,12 +285,12 @@
             <tbody>
                 {% for goal in goals %}
                 <tr>
-                    
-                    <td>{{ goal[0] }}</td>
-                    <td>{{ goal[1] }}</td>
-                    <td>{{ goal[2] }}</td>
+                    <td>{{ goal.user_id }}</td>
+                    <td>{{ goal.user_goal }}</td>
+                    <td>{{ goal.user_target_amount }}</td>
+                    <td>{{ goal.deadline }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('savings.delete_goal', goal_type='user', goal_id=goal[3]) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='user', goal_id=goal.user_id) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
@@ -308,7 +308,9 @@
                     <th>Family Goal (Rs)</th>
                     <th>Remaining (Rs)</th>
                     <th>Deadline</th>
+                    {% if role=='hof'%}
                     <th>Action</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -317,11 +319,14 @@
                     <td>{{ goal.family_goal }}</td>
                     <td>{{ goal.family_target_amount }}</td>
                     <td>{{ goal.deadline }}</td>
+                        {% if role=='hof'%}
                     <td>
-                        <form method="POST" action="{{ url_for('savings.delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
+
+                        <form method="POST" action="{{ url_for('saving.delete_goal', goal_type='family', goal_id=user_id) }}" style="display:inline;">
                             <button type="submit" class="delete-btn">🗑️</button>
                         </form>
                     </td>
+                    {%endif%}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -369,13 +374,13 @@
             <button onclick="hideModal()" class="btn">Cancel</button>
         </div>
 
-        <a href="{{ url_for('savings.index') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
         function showModal(jointId, userId) {
             document.getElementById('modalUserId').value = userId;
-            document.getElementById('deleteForm').action = `/delete_joint_goal_action/${jointId}`;
+            document.getElementById('deleteForm').action = `/saving/delete_joint_goal_action/${jointId}`;
             document.getElementById('deleteModal').style.display = 'block';
         }
         

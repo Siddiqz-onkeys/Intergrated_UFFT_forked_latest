@@ -8,13 +8,14 @@
 </head>
 <body>
     <div class="container">
-    <h1>You are a member ! <br> Please enter the code shared by HOF<br>and join the family !</h1>
+    <h1>You are a member !</h1>
+    <p style="color: #16423C; font-weight: 550;font-size: 25px;">Please enter the code shared by HOF<br>and join the family !</p><br>
     {% if error %}
     <p style="color: brown;">{{error}}</p>
     {% endif %}
     <br><br>
     <form action="{{ url_for('user_reg.member') }}" method="POST">
-        <input type="text" name="code" placeholder="Enter Code">  <br><br><br><br><br>
+        <input type="text" name="code" placeholder="Enter Code">  <br><br><br>
 
  
         <div class="sl">

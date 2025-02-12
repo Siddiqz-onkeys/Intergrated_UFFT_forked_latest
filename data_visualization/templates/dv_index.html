@@ -9,16 +9,47 @@
         <link rel="stylesheet" href="{{ url_for('data_visualization.static', filename='styles.css') }}"> 
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script src="static/js/Expanse.js"></script>
+        <style>
+body {
+    background-color: #fdf8ef; /* Set this to match your page's background */
+    font-family: Arial, sans-serif;
+}
+
+.btn-custom-outline {
+    background-color: #2a7e69; /* Default background */
+    border: 2px solid #1d3c34; /* Border color */
+    color: #1d3c34; /* Text color */
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+.btn{
+    background-color:#1d3c34; 
+    color:#fdf8ef;
+}
+.btn-custom-outline:hover {
+    background-color: transparent; /* Transparent background on hover */
+    color: #000; /* Change text color to black */
+    border: 2px solid #000; /* Change border to black */
+}
+
+/* No changes needed for the "Log Out" button as it's already solid red */
+        </style>
     </head>
     <body>
-        <div class="container py-4">
-            
-            <h1 class="text-center">Expense Report</h1>
-            <!-- Top Navigation -->
-            <div class="d-flex justify-content-end align-items-end mb-4">
-                <a href="{{ url_for('user_reg.welcome') }}" class="btn btn-danger mx-2">Back to Home</a>
-                <a href="{{ url_for('data_visualization.show_history') }}" class="btn btn-success">Show History</a>
+    <div class="container py-4">
+        <div class="d-flex align-items-center justify-content-between mb-5" style="margin-left:25%;">
+            <div class="text-center flex-grow-1">
+                <h1>EXPENSE REPORT</h1>
             </div>
+            <div style="margin-left: 10%;">
+                <a href="{{ url_for('user_reg.welcome') }}" class="btn btn-outline-secondary mx-2">Back to Home</a>
+                <a href="{{ url_for('data_visualization.show_history') }}" class="btn btn-outline-secondary mx-2">Show History</a>
+            </div>
+        </div>
+
+
+
             
             <!-- Hidden Family ID -->
             <form method="POST"  action="{{ url_for('data_visualization.index') }}"  class="row g-3 align-items-center justify-content-center">

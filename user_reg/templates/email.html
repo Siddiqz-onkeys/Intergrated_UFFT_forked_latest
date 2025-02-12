@@ -3,14 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>forgot pass</title>
+    <title>Forgot Password</title>
     <link rel="stylesheet" href="/user_reg/static/first.css">
+    <style>
+        .error{
+    color: #960019;
+  font-size: 18px;
+  margin-bottom: 8px;
+  }
+
+  .mess{
+    font-size: 26px;
+    text-align:center;
+    font-weight: 550;
+    padding-bottom:26px;
+    letter-spacing: 0.5;
+    color:#16423C;
+  }
+  
+    </style>
 </head>
 <body>
     <div class="container">
-    <h1>Please enter your username and mail id <br>to recieve otp to reset password</h1>
+    <p class="mess">Please enter your username and email<br>to receive otp to reset password</p>
     {% if error %}
-    <p style="color: brown;">{{error}}</p>
+    <p class="error">{{error}}</p>
     {% endif %}
     <form action="{{ url_for('user_reg.get_mail') }}" method="POST">
         <input type="text" name="user" placeholder="Enter username">  <br><br>

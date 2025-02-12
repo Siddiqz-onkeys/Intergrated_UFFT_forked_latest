@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hof code</title>
+    <title>HOF code</title>
     <link rel="stylesheet" href="/user_reg/static/first.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>You are a HOF ! <br> Here is a code to share with your family members <br> They can enter this code when
-            they signup and join the family !</h1>
-        <h1>{{ message }}</h1>
+        <h1 style="font-size: 32px;">You are a HOF !</h1>
+        <p style="color: #16423C; font-weight: 550;font-size: 25px;">Here is a code to share with your family members <br> They can enter this code when
+            they signup and join the family !</p><br>
+        <h3 style="color: #16423C;font-weight: 550;text-align: center;font-size: 24px;text-decoration: underline;">{{ message }}</h3><br>
         <form action="{{ url_for('user_reg.hof') }}" method="POST">
             <input type="text" placeholder="Enter a Family Name" required name="fam_name">
 

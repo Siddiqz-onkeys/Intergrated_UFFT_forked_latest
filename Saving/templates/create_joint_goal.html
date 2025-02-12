@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,7 +62,8 @@
             color: #D8C4B6;
         }
 
-        input, select {
+        input,
+        select {
             background: rgba(196, 218, 210, 0.05);
             border: 1px solid rgba(196, 218, 210, 0.2);
             border-radius: 10px;
@@ -71,7 +73,8 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #C4DAD2;
             background: rgba(196, 218, 210, 0.1);
@@ -164,6 +167,7 @@
                 opacity: 0;
                 transform: scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -181,51 +185,53 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Create Joint Savings Goal</h1>
-        
+
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message flash-{{ category }}">
-                        {{ message | safe }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            {{ message | safe }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
-        
-        <form method="POST" action="{{ url_for('create_joint_goal') }}" class="form">
+
+        <form method="POST" action="{{ url_for('saving.create_joint_goal') }}" class="form">
             {% if not users %}
-                <button type="submit" class="btn">Fetch Available Users</button>
+            <input type="number" id="user_id" name="user_id" value="{{UID}}" hidden>
+            <button type="submit" class="btn">Fetch Available Users</button>
             {% else %}
-                <div class="form-group">
-                    <label>Select Users to Join Goal</label>
-                    <div class="checkbox-group">
-                        {% for user in users %}
-                            <label>
-                                <input type="checkbox" name="user_ids" value="{{ user.user_id }}">
-                                <span>{{ user.name }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
+            <div class="form-group">
+                <label>Select Users to Join Goal</label>
+                <div class="checkbox-group">
+                    {% for user in users %}
+                    <label>
+                        <input type="checkbox" name="user_ids" value="{{ user.user_id }}">
+                        <span>{{ user.name }}</span>
+                    </label>
+                    {% endfor %}
                 </div>
-                
-                <div class="form-group">
-                    <label for="joint_goal">Joint Goal Amount</label>
-                    <input type="number" id="joint_goal" name="joint_goal" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="deadline">Deadline</label>
-                    <input type="date" id="deadline" name="deadline" required>
-                </div>
-                
-                <button type="submit" class="btn">Create Joint Goal</button>
+            </div>
+
+            <div class="form-group">
+                <label for="joint_goal">Joint Goal Amount</label>
+                <input type="number" id="joint_goal" name="joint_goal" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="deadline">Deadline</label>
+                <input type="date" id="deadline" name="deadline" required>
+            </div>
+
+            <button type="submit" class="btn">Create Joint Goal</button>
             {% endif %}
         </form>
-        
-        <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
+
+        <a href="{{ url_for('saving.index') }}" class="back-link">Back to Home</a>
     </div>
 
     <script>
@@ -235,4 +241,5 @@
         deadlineInput.setAttribute('min', today);
     </script>
 </body>
+
 </html>

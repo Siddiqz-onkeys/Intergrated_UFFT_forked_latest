@@ -30,7 +30,7 @@ body{
 
 h1{
     text-align:center;
-    font-size: 39px;
+    font-size: 33px;
     font-weight: 600;
     padding-bottom:26px;
     letter-spacing: 0.5;
@@ -39,7 +39,7 @@ h1{
 
 ul{
     text-align:center;
-    font-size: 25px;
+    font-size: 21px;
     font-weight: 600;
     padding-bottom:26px;
     letter-spacing: 0.5;
@@ -48,8 +48,8 @@ ul{
 }
 li{
     text-align:center;
-    font-size: 25px;
-    font-weight: 600;
+    font-size: 21px;
+    font-weight: 540;
     padding-bottom:16px;
     letter-spacing: 0.5;
     color:#16423C;
@@ -98,9 +98,17 @@ input:focus{
     border-color: #16423C;
 }
 
+select:focus{
+    border-color: #16423C;
+}
+
+.options{
+    font-size: 22px;
+}
+
 input::placeholder{
     color:#D8C4B6;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 p {
@@ -174,5 +182,14 @@ input[type="date"] {
     text-align: left; 
     color:#C4DAD2;
 }
+
+.mess{
+    font-size: 26px;
+    text-align:center;
+    font-weight: 550;
+    padding-bottom:26px;
+    letter-spacing: 0.5;
+    color:#16423C;
+  }
 
 

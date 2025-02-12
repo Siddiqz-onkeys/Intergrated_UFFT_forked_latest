@@ -1,0 +1,16 @@
+# Python bytecode files
+__pycache__/
+
+# Virtual environment
+venv/
+
+# Build artifacts
+dist/
+
+# Local configuration
+.venv
+
+# IDE-specific files
+.vscode/
+
+venv/

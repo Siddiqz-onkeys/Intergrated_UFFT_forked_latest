@@ -748,6 +748,7 @@ def approve_reject(user_id, action):
     user_name = user['user_name']
 
     if action == 'accept':
+        requested_amount = float(requested_amount)
         # Update the user's budget
         cursor.execute('''
             UPDATE budgets
