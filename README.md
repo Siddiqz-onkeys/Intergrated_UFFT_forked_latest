@@ -16,10 +16,10 @@ The Unified Family Finance Tracker (UFFT) is a comprehensive web-based applicati
 - Visualization: Matplotlib, Plotly
 - Authentication: Flask-Login
 
-##📈 Usage
-•	Register: Create an account for each family member.
-•	Login: Access your personalized dashboard.
-•	Add Expenses: Navigate to the Expenses module to log daily expenditures.
-•	Monitor Savings: Use the Savings module to set and track savings goals.
-•	Set Budgets: Define monthly budgets in the Budgeting module.
-•	View Reports: Access the Data Visualization module for graphical insight.
+## 📈 Usage
+-	Register: Create an account for each family member.
+- Login: Access your personalized dashboard.
+-	Add Expenses: Navigate to the Expenses module to log daily expenditures.
+-	Monitor Savings: Use the Savings module to set and track savings goals.
+-	Set Budgets: Define monthly budgets in the Budgeting module.
+- View Reports: Access the Data Visualization module for graphical insight.
